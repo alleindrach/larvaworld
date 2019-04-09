@@ -60,10 +60,4 @@ export default function userReducer(state = initState, action) {
       return state;
   }
 }
-export 
-const userPersistConfig = {
-  key: 'user',
-  storage: AsyncStorage,
-  version: 1,
-  blacklist: ['isLogin']
-}
+

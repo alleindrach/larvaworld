@@ -8,7 +8,7 @@ import rootReducer from '../reducer/index'
 
 //redux state 版本迁移
 const migrations = {
-    1: (state) => {
+    1.1: (state) => {
       return {
         ...state,
         //other modify state
@@ -16,15 +16,16 @@ const migrations = {
     },
   }
   
-const config = {
-    key: 'LarvaWorld',
+const persistConfig = {
+    key: 'root',
     storage: AsyncStorage,
-    version: 1,
-    whitelist: ['user'],
+    version: 1.4,
+    // whitelist: ['user'],
+    blacklist: ['user'],
     migrate: createMigrate(migrations, {debug: false}),
 }
   
-const reducer = persistReducer(config, rootReducer)
+const reducer = persistReducer(persistConfig, rootReducer)
   
 const middlewares = [thunk]
   

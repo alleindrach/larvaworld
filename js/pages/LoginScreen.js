@@ -27,17 +27,18 @@ export  class LoginScreen extends BaseScreen {
   }
   
   componentDidMount(){
-      if(this.props.isLogin)
+      if(this.props.user.isLogin)
       {
         const {goBack, state} = this.props.navigation;
         const {params} = state;
         params && params.callback && params.callback();
-        goBack();
+        // goBack();
       }
   }
 
 
   check = () => {
+    const {goBack, state} = this.props.navigation;
     if (StringUtils.isStringEmpty(this.state.username)) {
       Toast.show({text:'请输入用户名',buttonText:'OK',duration:3000});
     } else if (StringUtils.isStringEmpty(this.state.password)) {
@@ -48,7 +49,7 @@ export  class LoginScreen extends BaseScreen {
       Toast.show({text:'请输入验证码',buttonText:'OK',duration:3000});
     }
     else {
-      this.props.doLogin(this.state.username, this.state.password,this.state.captcha)
+      this.props.doLogin(this.state.username, this.state.password,this.state.captcha,goBack)
     }
   };
 
@@ -67,6 +68,7 @@ export  class LoginScreen extends BaseScreen {
 
   renderPage() {
     const {user} = this.props
+    
     return (
       <View style={styles.container}>
       <Image style={styles.logo} source={require('../assets/logo.png')}/>
@@ -105,7 +107,7 @@ export  class LoginScreen extends BaseScreen {
           </TouchableOpacity>      
       </View>
       <View style={styles.errorInfo}>
-        {this.state.error ? <Text style={styles.errorText}>{user.error}</Text> : null}
+        {(user.error )? <Text style={styles.errorText}>{user.error}</Text> : null}
       </View>
       <TouchableOpacity type="primary" style={styles.loginButton} disabled={user.isLoading} onPress={this.check}>
         {user.isLoading ? <ActivityIndicator color="#fff"/> : null}
@@ -129,8 +131,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    doLogin: (username, password,captcha) => {
-      dispatch(UserAction.doLogin(username, password,captcha))
+    doLogin: (username, password,captcha,goBack) => {
+      dispatch(UserAction.doLogin(username, password,captcha,goBack))
     },
     refreshCaptcha:(seed) =>{
       dispatch(UserAction.refreshCaptcha(seed))

@@ -6,7 +6,7 @@ import * as types from "./ActionType"
 // import config from '../../config/Config'
 
 
-export function doLogin(username, password,captcha) {
+export function doLogin(username, password,captcha,goBack) {
   return function (dispatch) {
     dispatch({
       type: types.USER_LOGIN_DOING,
@@ -30,13 +30,14 @@ export function doLogin(username, password,captcha) {
         if(data.state==1){
           dispatch({
                         type: types.USER_LOGIN_SUCCESS,
-                        user: data.result
+                        user: {username:data.data}
           })
+          goBack();//转向登录前的页面
         }else
         {
           dispatch({
                         type: types.USER_LOGIN_FAIL,
-                        error: data.msg
+                        error: data.message
           })
         }
     })
@@ -50,9 +51,11 @@ export function doLogin(username, password,captcha) {
 }
 
 export function logout() {
-  return {
-    type: types.USER_LOGOUT
-  }
+  return function (dispatch) {
+    dispatch({
+      type: types.USER_LOGOUT
+    })
+  };
 }
 export function refreshCaptcha(seed){
   return {
