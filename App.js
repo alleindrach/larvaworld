@@ -6,7 +6,7 @@ import {AppContainer} from "./js/router/index"
 import { Root } from "native-base";
 import {StompEventTypes, withStomp} from 'react-stompjs'
 
-
+import * as Action from './js/redux/action/index'
 class App extends Component {
   constructor(props) {
     super(props)
@@ -43,56 +43,36 @@ class App extends Component {
 
       
     })
-    store.subscribe(()=>{
-      if(store.getState().user.isLogin&& store.getState().user.isLogin!=this.state.isLogin)
-      {
-        console.log("store state changed!",store.getState());
 
-
-        this.props.stompContext.addStompEventListener(
-          StompEventTypes.Connect,
-          () => {
-            console.log('connected!');
-            this.setState({status: 'Connected'})
-            this.state.stompclient.subscribe('/user/topic/message',(msg=>{
-              
-              // const msgs = this.state.messages;
-              // // msgs.push({id:this.counter,title:msg.body}); 
-              // this.setState({messages:msgs.concat({key:msg.headers['message-id'],title:msg.body})})
-              //  console.log(msg);
-            }).bind(this))
-          }
-      )
-      this.props.stompContext.addStompEventListener(
-          StompEventTypes.Disconnect,
-          () => {
-            console.log('Disconnected!');
-            this.setState({status: 'Disconnected'})
-          }
-      )
-      this.props.stompContext.addStompEventListener(
-          StompEventTypes.WebSocketClose,
-          () => {
-            console.log('Disconnected!');
-            this.setState({status: 'Disconnected (not graceful)'})
-          }
-      )
-      this.state.stompclient=this.props.stompContext.newStompClient(
-          'http://127.0.0.1:8762/websocket')  // it's '/' most likely
-
+    store.dispatch(Action.MessageAction.initContext(
+      this.props.stompContext,
+      (msg)=>{
+        store.dispatch(Action.MessageAction.messageReceived(msg));
       }
-      this.setState({isLogin:store.getState().user.isLogin});
-    })
-  }
+    ));
 
-  // _fetchMsg = () => {
-  //   const {store} = this.state
-  //   const {user, app} = store.getState()
-  //   if (user.isLogin && app.networkAvailable) {
-  //     store.dispatch(MessageAction.fetchMsg())
-  //   }
-  //   setTimeout(this._fetchMsg, 1000 * 60)
-  // }
+    this.props.stompContext.addStompEventListener(
+      StompEventTypes.Connect,
+      () => {
+        console.log('connected!');
+        store.dispatch(Action.MessageAction.conected());
+      }
+    )
+    this.props.stompContext.addStompEventListener(
+        StompEventTypes.Disconnect,
+        () => {
+          console.log('Disconnected!');
+          store.dispatch(Action.MessageAction.disconnected);
+        }
+    )
+    this.props.stompContext.addStompEventListener(
+        StompEventTypes.WebSocketClose,
+        () => {
+          console.log('Disconnected!');
+          store.dispatch(Action.MessageAction.disconnected);
+        }
+    )
+  }
 
   render() {
     if (this.state.isLoading) {

@@ -6,56 +6,35 @@ import * as types from "./ActionType"
 // import config from '../../config/Config'
 
 
-export function doLogin(username, password,captcha,goBack) {
-  return function (dispatch) {
-    dispatch({
+export function doLogin(username, password,captcha,goBack,stompContext) {
+  return {
       type: types.USER_LOGIN_DOING,
       username,
-      password
-    })
-    fetch('http://127.0.0.1:8762/user/login',{
-      credentials: 'include',
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'X-Requested-With':"XMLHttpRequest"
-      },
-      body: 'username='+username+'&password='+password+'&captcha='+ captcha
-    })
-    .then((response) => {
-        return response.json();
-    })
-    .then((data) => {
-        if(data.state==1){
-          dispatch({
-                        type: types.USER_LOGIN_SUCCESS,
-                        user: {username:data.data}
-          })
-          goBack();//转向登录前的页面
-        }else
-        {
-          dispatch({
-                        type: types.USER_LOGIN_FAIL,
-                        error: data.message
-          })
-        }
-    })
-    .catch((error) => {
-      dispatch({
-                  type: types.USER_LOGIN_FAIL,
-                  error: '网络请求失败，请检查网络连接'
-      })
-    });
-  }
+      password,
+      captcha,
+      goBack,
+      stompContext
+    }
+}
+export function loginSuccess(username,goBack) {
+  return {
+      type: types.USER_LOGIN_SUCCESS,
+      username,
+      goBack
+    }
+}
+export function loginFail(error) {
+  return {
+      type: types.USER_LOGIN_FAIL,
+      error
+    }
 }
 
+
 export function logout() {
-  return function (dispatch) {
-    dispatch({
+  return {
       type: types.USER_LOGOUT
-    })
-  };
+    }
 }
 export function refreshCaptcha(seed){
   return {

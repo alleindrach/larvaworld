@@ -22,6 +22,8 @@ export default function userReducer(state = initState, action) {
         ...state,
         username: action.username,
         password: action.password,
+        captcha:action.captcha,
+        goBack:action.goBack,
         isLoading: true,
         isLogin: false,
         error: '',

@@ -131,8 +131,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    doLogin: (username, password,captcha,goBack) => {
-      dispatch(UserAction.doLogin(username, password,captcha,goBack))
+    doLogin: (username, password,captcha,goBack,stompContext) => {
+      dispatch(UserAction.doLogin(username, password,captcha,goBack,stompContext))
     },
     refreshCaptcha:(seed) =>{
       dispatch(UserAction.refreshCaptcha(seed))
