@@ -50,9 +50,7 @@ export default class BaseScreen extends Component {
 
   renderNavigationTitle() {
    return (
-    <Body>
-        <Title>{this.props.title}</Title>
-    </Body>
+        this.props.title
    ) 
   }
 
@@ -74,7 +72,7 @@ export default class BaseScreen extends Component {
       <View style={styles.navContainer}>
         <Header style={[styles.navBar, {backgroundColor: this.props.navColor}]}>
             <Left>{this.renderNavigationLeftView()}</Left>
-            <Body>{this.renderNavigationTitle()}</Body>
+            <Body><Title style={{fontSize:em(50)}}>{this.renderNavigationTitle()}</Title></Body>
             <Right>{this.renderNavigationRightView()}</Right>
         </Header>
         <Image style={[styles.navImage, {tintColor: this.props.navColor}]} source={require('../assets/top.png')}/>

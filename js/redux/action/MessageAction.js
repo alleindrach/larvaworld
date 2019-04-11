@@ -1,6 +1,3 @@
-/**
- * Created by jialing on 2017/10/24.
- */
 
 import * as types from "./ActionType"
 // import config from '../../config/Config'

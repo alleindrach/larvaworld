@@ -1,6 +1,7 @@
 import { take, call, select ,put } from 'redux-saga/effects';
 import * as Actions from '../redux/action/index';
-const publicAPI = (baseURL: string = 'http://127.0.0.1:8762') => {
+import config from '../config/Config';
+const publicAPI = (baseURL: string =config.api.base)  => {
     const baseOptions={credentials: 'include',
     method: 'POST',
     headers: {
@@ -9,7 +10,7 @@ const publicAPI = (baseURL: string = 'http://127.0.0.1:8762') => {
         'X-Requested-With':"XMLHttpRequest"
     }}
     const login=(username,password,captcha)=>
-        fetch(baseURL+'/user/login',{
+        fetch(baseURL+'user/login',{
             ...baseOptions,
             body: 'username='+username+'&password='+password+'&captcha='+ captcha
         })
@@ -19,7 +20,7 @@ const publicAPI = (baseURL: string = 'http://127.0.0.1:8762') => {
     
     
     function * connect(stompContext:any){
-        stompClient=stompContext.newStompClient(baseURL+'/websocket')  
+        stompClient=stompContext.newStompClient(baseURL+'websocket')  
         yield put(Actions.MessageAction.doConect(stompClient));
     }
     

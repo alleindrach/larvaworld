@@ -24,6 +24,14 @@ export  class HomeScreen extends BaseScreen {
           title="Go to Login"
           onPress={() => this.props.navigation.navigate('Login')}
         />
+        <Button
+          title="Go to QRCode"
+          onPress={() => this.props.navigation.navigate('QRCode')}
+        />
+        <Button
+          title="Go to MakeFriend"
+          onPress={() => this.props.navigation.navigate('MakeFriend',{"friend":{"name":"lily"}})}
+        />
       </View>
     );
   }

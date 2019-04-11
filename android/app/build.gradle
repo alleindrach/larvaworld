@@ -138,6 +138,8 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-image-picker')
+    implementation project(':react-native-image-crop-picker')
     implementation project(':react-native-smart-barcode')
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-gesture-handler')

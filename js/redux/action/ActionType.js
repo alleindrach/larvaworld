@@ -20,6 +20,7 @@ export const STOMP_MSG_SENDDING='stomp/msg/sendding'
 export const STOMP_MSG_SEND_SUCCESS='stomp/msg/send/success'
 export const STOMP_MSG_SEND_FAIL='stomp/msg/send/fail'
 
+
 export const MESSAGE_UPDATE = 'message/update'
 export const MESSAGE_CHAT_LIST_FETCH_DOING = 'message/chatList/fetching'
 export const MESSAGE_CHAT_LIST_FETCH_SUCCESS = 'message/chatList/fetchSuccess'

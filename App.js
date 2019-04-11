@@ -62,14 +62,14 @@ class App extends Component {
         StompEventTypes.Disconnect,
         () => {
           console.log('Disconnected!');
-          store.dispatch(Action.MessageAction.disconnected);
+          store.dispatch(Action.MessageAction.disconnected());
         }
     )
     this.props.stompContext.addStompEventListener(
         StompEventTypes.WebSocketClose,
         () => {
           console.log('Disconnected!');
-          store.dispatch(Action.MessageAction.disconnected);
+          store.dispatch(Action.MessageAction.disconnected());
         }
     )
   }

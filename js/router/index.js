@@ -3,6 +3,9 @@ import HomeScreen from "../pages/HomeScreen";
 import LoginScreen from "../pages/LoginScreen";
 import RegisterScreen from "../pages/RegisterScreen";
 import ForgetPasswordScreen from '../pages/ForgetPasswordScreen';
+import QrCodeScreen from "../pages/QrCodeScreen";
+import MakeFriendScreen from '../pages/MakeFriendScreen';
+
 const AppNavigator = createStackNavigator({
   
   Home: {
@@ -16,6 +19,13 @@ const AppNavigator = createStackNavigator({
   },
   ForgetPassword: {
     screen: ForgetPasswordScreen
+  },
+  QRCode:{
+    screen:QrCodeScreen
+  },
+  
+  MakeFriend:{
+    screen:MakeFriendScreen
   },
   // AppDrawerNavigator: {
   //   screen: ActivityDrawer,

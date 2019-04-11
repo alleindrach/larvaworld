@@ -9,6 +9,7 @@ import BaseScreen from './BaseScreen';
 import * as UserAction from '../redux/action/UserAction';
 import CustomView from '../component/CustomView';
 import StringUtils from '../common/StringUtils';
+import config from '../config/Config';
 export  class LoginScreen extends BaseScreen {
 
   static navigationOptions = {
@@ -103,7 +104,7 @@ export  class LoginScreen extends BaseScreen {
               value={this.state.captcha}/>
           </View>
           <TouchableOpacity style={styles.captchaButton} onPress={this.refreshCaptcha.bind(this)}>
-              <Image source={{uri:'http://127.0.0.1:8762/common/captcha.jpg?v='+user.captchaSeed}} style={{flex:1,width:50,height:50 }}></Image>
+              <Image source={{uri:config.api.base+config.api.captcha+'?v='+user.captchaSeed}} style={{flex:1,width:50,height:50 }}></Image>
           </TouchableOpacity>      
       </View>
       <View style={styles.errorInfo}>
