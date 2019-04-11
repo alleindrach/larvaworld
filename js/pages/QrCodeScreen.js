@@ -51,7 +51,7 @@ class QrCodeScreen extends BaseScreen {
       </View>
     )
   }
-
+// {"type":"makefriend","friend":{"name":"lily"}}
   _onQrCodeRead = (e) => {
     this._stopScan();
     if (e.nativeEvent.data.code) {
