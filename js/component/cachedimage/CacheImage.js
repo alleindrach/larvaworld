@@ -6,16 +6,13 @@ import ReactNative from 'react-native';
 import * as ImageCacheProvider from './ImageCacheProvider'
 import * as Progress from 'react-native-progress';
 import config from '../../config/Config';
-import {isLocalFile, isOSSFile} from '../../utils/Qiniu';
-
+import PropTypes from 'prop-types';
 const flattenStyle = ReactNative.StyleSheet.flatten;
 const {
   Image,
   NetInfo,
   Platform
 } = ReactNative;
-
-
 const {
   StyleSheet
 } = ReactNative;
@@ -44,17 +41,17 @@ const CACHED_IMAGE_REF = 'cachedImage';
 
 export default class CachedImage extends React.Component {
   static propTypes = {
-    renderImage: React.PropTypes.func.isRequired,
-    showIndicator: React.PropTypes.bool,
-    activityIndicatorProps: React.PropTypes.object.isRequired,
-    useQueryParamsInCacheKey: React.PropTypes.oneOfType([
-      React.PropTypes.bool,
-      React.PropTypes.array
+    renderImage: PropTypes.func.isRequired,
+    showIndicator: PropTypes.bool,
+    activityIndicatorProps: PropTypes.object.isRequired,
+    useQueryParamsInCacheKey: PropTypes.oneOfType([
+      PropTypes.bool,
+      PropTypes.array
     ]).isRequired,
-    resolveHeaders: React.PropTypes.func,
+    resolveHeaders: PropTypes.func,
     defaultSource: Image.propTypes.source,
     errorSource: Image.propTypes.source,
-    showOriginal: React.PropTypes.bool,
+    showOriginal: PropTypes.bool,
   }
 
   static defaultProps = {

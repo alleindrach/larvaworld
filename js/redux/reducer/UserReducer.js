@@ -48,10 +48,10 @@ export default function userReducer(state = initState, action) {
         ...initState,
         username: state.username
       }
-    case types.USER_UPDATE_INFO:
+    case types.USER_HOME_PAGE_UPDATE:
       return {
         ...state,
-        ...action.user
+        ...action.userinfo
       }
     case types.USER_LOGIN_CAPTCHA_REFRESH:
       return {

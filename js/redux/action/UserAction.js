@@ -42,3 +42,16 @@ export function refreshCaptcha(seed){
     seed:seed
   }
 }
+
+
+export function fetchHomePageInfo() {
+  return {
+    type: types.USER_HOME_PAGE_FETCH
+  }
+}
+export function updateHomePageInfo(userinfo){
+  return {
+    type: types.USER_HOME_PAGE_UPDATE,
+    userinfo
+  }
+}

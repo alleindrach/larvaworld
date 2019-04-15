@@ -7,11 +7,14 @@
     "test": "jest"
   },
   "dependencies": {
+    "crypto-js": "^3.1.9-1",
+    "events": "^3.0.0",
     "fbjs": "^1.0.0",
     "native-base": "^2.12.1",
     "query-string": "^6.4.2",
     "react": "16.8.3",
     "react-native": "0.59.3",
+    "react-native-device-info": "^1.4.3",
     "react-native-gesture-handler": "^1.1.0",
     "react-native-image-crop-picker": "^0.23.1",
     "react-native-image-picker": "^0.28.1",

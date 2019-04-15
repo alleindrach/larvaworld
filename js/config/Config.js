@@ -39,7 +39,7 @@ export default config = {
       homepage: 'user/homepage',
       userInfo: 'user/userInfo',
       kidInfo: 'user/kidInfo',
-      verifyCode: 'user/verifyCode',
+      verifyCode: 'common/mobile/captcha',
       modifyUserInfo: 'user/modifyUserInfo',
       modifyKidInfo: 'user/modifyKidInfo',
       modifyAvatar: 'user/modifyAvatar',

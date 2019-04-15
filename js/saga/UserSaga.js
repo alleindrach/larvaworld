@@ -57,3 +57,38 @@ export function  watchUserLoginSuccess() {
         worker
     };
 }
+
+export function  watchHomepageUpdate() {
+
+    function * worker() {
+
+        const state = yield select();
+        if (state.user.isLogin) {
+            try{
+                response =yield call(Api().fetchHomepageInfo) ;
+                if(response.state==1){
+                    yield put(UserActions(response.data,state.user.goBack))
+                }
+                else
+                {
+                    yield put(UserActions.logout())
+                }
+            }catch(error)
+            {
+                yield put(UserActions.loginFail('网络请求失败，请检查网络连接'));
+            }
+        }
+      }
+    
+    function * watcher() {
+        while (true) {
+            yield take(Types.USER_HOME_PAGE_FETCH);
+            yield call(worker);
+        }
+    }
+    
+    return {
+        watcher,
+        worker
+    };
+}

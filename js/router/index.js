@@ -1,5 +1,6 @@
 import { createStackNavigator, createAppContainer } from "react-navigation";
 import HomeScreen from "../pages/HomeScreen";
+import IndexScreen from '../pages/index'
 import LoginScreen from "../pages/LoginScreen";
 import RegisterScreen from "../pages/RegisterScreen";
 import ForgetPasswordScreen from '../pages/ForgetPasswordScreen';
@@ -8,6 +9,9 @@ import MakeFriendScreen from '../pages/MakeFriendScreen';
 
 const AppNavigator = createStackNavigator({
   
+  Index: {
+    screen: IndexScreen
+  },
   Home: {
     screen: HomeScreen
   },
@@ -23,7 +27,7 @@ const AppNavigator = createStackNavigator({
   QRCode:{
     screen:QrCodeScreen
   },
-  
+
   MakeFriend:{
     screen:MakeFriendScreen
   },
@@ -40,7 +44,7 @@ const AppNavigator = createStackNavigator({
 
 },
 {
-  initialRouteName: 'Home',
+  initialRouteName: 'Index',
   /* The header config from HomeScreen is now here */
   initialRouteParams: {},
   mode: 'card',

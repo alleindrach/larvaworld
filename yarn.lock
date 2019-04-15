@@ -1845,6 +1845,11 @@ cross-spawn@^6.0.0:
     shebang-command "^1.2.0"
     which "^1.2.9"
 
+crypto-js@^3.1.9-1:
+  version "3.1.9-1"
+  resolved "http://registry.npm.taobao.org/crypto-js/download/crypto-js-3.1.9-1.tgz#fda19e761fc077e01ffbfdc6e9fdfc59e8806cd8"
+  integrity sha1-/aGedh/Ad+Af+/3G6f38WeiAbNg=
+
 cssom@0.3.x, "cssom@>= 0.3.2 < 0.4.0":
   version "0.3.6"
   resolved "http://registry.npm.taobao.org/cssom/download/cssom-0.3.6.tgz#f85206cee04efa841f3c5982a74ba96ab20d65ad"
@@ -2136,6 +2141,11 @@ eventemitter3@^3.0.0, eventemitter3@^3.1.0:
   version "3.1.0"
   resolved "http://registry.npm.taobao.org/eventemitter3/download/eventemitter3-3.1.0.tgz#090b4d6cdbd645ed10bf750d4b5407942d7ba163"
   integrity sha1-CQtNbNvWRe0Qv3UNS1QHlC17oWM=
+
+events@^3.0.0:
+  version "3.0.0"
+  resolved "http://registry.npm.taobao.org/events/download/events-3.0.0.tgz#9a0a0dfaf62893d92b875b8f2698ca4114973e88"
+  integrity sha1-mgoN+vYok9krh1uPJpjKQRSXPog=
 
 eventsource@^1.0.7:
   version "1.0.7"
@@ -5208,6 +5218,11 @@ react-lifecycles-compat@^3.0.4:
     prop-types "^15.5.10"
     react-timer-mixin "^0.13.2"
     rebound "^0.0.13"
+
+react-native-device-info@^1.4.3:
+  version "1.4.3"
+  resolved "http://registry.npm.taobao.org/react-native-device-info/download/react-native-device-info-1.4.3.tgz#dd08fbc37cc97065072045716b1ad3758424358d"
+  integrity sha1-3Qj7w3zJcGUHIEVxaxrTdYQkNY0=
 
 react-native-drawer@2.5.1:
   version "2.5.1"

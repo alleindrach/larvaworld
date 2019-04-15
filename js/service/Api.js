@@ -1,31 +1,130 @@
-import { take, call, select ,put } from 'redux-saga/effects';
+import { take, call, select, put } from 'redux-saga/effects';
 import * as Actions from '../redux/action/index';
+import _ from 'lodash';
 import config from '../config/Config';
-const publicAPI = (baseURL: string =config.api.base)  => {
-    const baseOptions={credentials: 'include',
-    method: 'POST',
-    headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'X-Requested-With':"XMLHttpRequest"
-    }}
-    const login=(username,password,captcha)=>
-        fetch(baseURL+'user/login',{
+import StringUtils from '../utils/StringUtils'
+const publicAPI = (baseURL: string = config.api.base) => {
+
+    const baseOptions = {
+        credentials: 'include',
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': "XMLHttpRequest"
+        }
+    }
+    const post = (path, data, headers) =>
+        fetch(baseURL + path, {
             ...baseOptions,
-            body: 'username='+username+'&password='+password+'&captcha='+ captcha
-        })
-        .then((response) => {
+            headers: {
+                ...baseOptions.headers,
+                ...headers
+            },
+            body: StringUtils.param(data)
+        }).then((response) => {
             return response.json();
         });
-    
-    
-    function * connect(stompContext:any){
-        stompClient=stompContext.newStompClient(baseURL+'websocket')  
+    const put = (path, data, headers) =>
+        fetch(baseURL + path, {
+            ...baseOptions,
+            method:'PUT',
+            headers: {
+                ...baseOptions.headers,
+                ...headers
+            },
+            body: StringUtils.param(data)
+        }).then((response) => {
+            return response.json();
+        });
+    const del = (path, data, headers) =>
+        fetch(baseURL + path, {
+            ...baseOptions,
+            method:'DELETE',
+            headers: {
+                ...baseOptions.headers,
+                ...headers
+            },
+            body: StringUtils.param(data)
+        }).then((response) => {
+            return response.json();
+        });
+    const get = (path, data, headers) =>
+        fetch(baseURL + path+"?"+StringUtils.param(data), {
+            ...baseOptions,
+            method:'GET',
+            headers: {
+                ...baseOptions.headers,
+                ...headers
+            }
+        }).then((response) => {
+            return response.json();
+        });        
+    const login = (username, password, captcha) =>
+        fetch(baseURL + 'user/login', {
+            ...baseOptions,
+            body: 'username=' + username + '&password=' + password + '&captcha=' + captcha
+        })
+            .then((response) => {
+                return response.json();
+            });
+
+
+    function* connect(stompContext: any) {
+        stompClient = stompContext.newStompClient(baseURL + 'websocket')
         yield put(Actions.MessageAction.doConect(stompClient));
     }
-    
-    return {
-        login,connect
+    const register = (username, password, captcha, mobile) =>
+        fetch(baseURL + config.api.register, {
+            ...baseOptions,
+            body: 'username=' + username + '&password=' + password + '&mobileCaptcha=' + captcha + '&mobile=' + mobile
+        })
+            .then((response) => {
+                return response.json();
+            });
+
+    const mobileCaptcha = (captcha, mobile) =>
+        fetch(baseURL + config.api.mobileCaptcha, {
+            ...baseOptions,
+            body: '&captcha=' + captcha + '&mobile=' + mobile
+        })
+            .then((response) => {
+                return response.json();
+            });
+
+    function* connect(stompContext: any) {
+        stompClient = stompContext.newStompClient(baseURL + 'websocket')
+        yield put(Actions.MessageAction.doConect(stompClient));
     }
+    const checkVersion = () =>
+        fetch(baseURL + config.api.getVersion, {
+            ...baseOptions,
+        })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                if (data.state === 1) {
+                    return {
+                        hasNewVersion: DeviceInfo.getBuildNumber() < data.data.version,
+                        url: data.data.url
+                    }
+                }
+                else
+                    throw new Error(data.message)
+            })
+    const fetchHomepageInfo = () =>
+        fetch(baseURL + config.api.homepage, {
+            ...baseOptions,
+        })
+            .then(response => {
+                return response.json();
+            })
+
+
+    return {
+        post,get,put,del, login, register, mobileCaptcha, connect, checkVersion, fetchHomepageInfo
+    }
+
 }
 export default publicAPI;
