@@ -23,7 +23,7 @@ import * as AppUtils from '../utils/AppUtils'
 import {connect} from 'react-redux'
 import {UserAction} from '../redux/action'
 
-class MyProfile extends BaseScreen {
+class MyProfileScreen extends BaseScreen {
   static navigationOptions = {
     header: null
   };
@@ -210,7 +210,7 @@ const mapDispatchToProps = (dispatch) => {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(MyProfile)
+export default connect(mapStateToProps, mapDispatchToProps)(MyProfileScreen)
 
 const styles = StyleSheet.create({
   container: {

@@ -72,7 +72,7 @@ export default class BaseScreen extends Component {
       <View style={styles.navContainer}>
         <Header style={[styles.navBar, {backgroundColor: this.props.navColor}]}>
             <Left>{this.renderNavigationLeftView()}</Left>
-            <Body><Title style={{fontSize:em(50)}}>{this.renderNavigationTitle()}</Title></Body>
+            <Body><Title style={{fontSize:em(40)}}>{this.renderNavigationTitle()}</Title></Body>
             <Right>{this.renderNavigationRightView()}</Right>
         </Header>
         <Image style={[styles.navImage, {tintColor: this.props.navColor}]} source={require('../assets/top.png')}/>

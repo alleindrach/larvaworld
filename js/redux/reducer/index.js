@@ -2,6 +2,7 @@ import {combineReducers} from 'redux'
 import  UserReducer from './UserReducer'
 import AppReducer from './AppReducer'
 import MessageReducer from './MessageReducer'
+import  EventReducer from './EventReducer'
 import {persistStore, persistReducer, createMigrate} from 'redux-persist'
 import {AsyncStorage} from 'react-native'
 import hardSet from 'redux-persist/lib/stateReconciler/hardSet'
@@ -19,10 +20,18 @@ const messagePersistConfig = {
   whitelist:[],// ['isConnecting','isConnected','error','stompClient','stompContext','msgReceiver'],
   // stateReconciler:hardSet
 }
+const eventPersistConfig = {
+  key: 'event',
+  storage: AsyncStorage,
+  version: 1.0,
+  whitelist:[],// ['isConnecting','isConnected','error','stompClient','stompContext','msgReceiver'],
+  // stateReconciler:hardSet
+}
 const RootReducer = combineReducers({
   app: AppReducer,
   user: persistReducer(userPersistConfig, UserReducer),
-  message: persistReducer(messagePersistConfig, MessageReducer)
+  message: persistReducer(messagePersistConfig, MessageReducer),
+  event:persistReducer(eventPersistConfig, EventReducer),
 });
 
 export default RootReducer

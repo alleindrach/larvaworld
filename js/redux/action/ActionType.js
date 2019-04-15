@@ -45,6 +45,7 @@ export const EVENT_LIST_FETCH_FAIL = 'event/fetchFail'
 export const EVENT_LIST_DELETE_ROW = 'event/deleteRow'
 export const EVENT_LIST_SWITCH_INDEX = 'event/switchIndex'
 export const EVENT_LIST_PRAISE_EVENT = 'event/praise'
+export const EVENT_LIST_PRAISE_EVENT_DONE = 'event/praise/done'
 export const EVENT_LIST_PRAISE_WORK = 'event/work/praise'
 
 //my activity

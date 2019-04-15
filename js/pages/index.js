@@ -36,6 +36,10 @@ export  class IndexScreen extends BaseScreen {
           title="Go to MakeFriend"
           onPress={() => this.props.navigation.navigate('MakeFriend',{"friend":{"name":"lily"}})}
         />
+        <Button
+          title="Go to home"
+          onPress={() => this.props.navigation.navigate('HomeIndex')}
+        />
       </View>
     );
   }
