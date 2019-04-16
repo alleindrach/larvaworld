@@ -5308,10 +5308,8 @@ react-native-safe-area-view@^0.13.0:
   resolved "http://registry.npm.taobao.org/react-native-screens/download/react-native-screens-1.0.0-alpha.22.tgz#7a120377b52aa9bbb94d0b8541a014026be9289b"
   integrity sha1-ehIDd7Uqqbu5TQuFQaAUAmvpKJs=
 
-react-native-smart-barcode@^1.0.6:
+"react-native-smart-barcode@file:./node_modules_private/react-native-smart-barcode":
   version "1.0.6"
-  resolved "http://registry.npm.taobao.org/react-native-smart-barcode/download/react-native-smart-barcode-1.0.6.tgz#7411586c687ed25b6adf456f949b39699c63db5e"
-  integrity sha1-dBFYbGh+0ltq30VvlJs5aZxj214=
 
 react-native-snap-carousel@^3.7.5:
   version "3.7.5"
@@ -5320,6 +5318,11 @@ react-native-snap-carousel@^3.7.5:
   dependencies:
     prop-types "^15.6.1"
     react-addons-shallow-compare "15.6.2"
+
+react-native-sound@^0.10.12:
+  version "0.10.12"
+  resolved "http://registry.npm.taobao.org/react-native-sound/download/react-native-sound-0.10.12.tgz#f912d6f9d6e9e2b42b391e0226787628d940f01a"
+  integrity sha1-+RLW+dbp4rQrOR4CJnh2KNlA8Bo=
 
 react-native-tab-view@^1.0.0, react-native-tab-view@^1.2.0:
   version "1.3.4"

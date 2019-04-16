@@ -8,7 +8,7 @@ import {
   Image
 } from 'react-native'
 import PropTypes from 'prop-types';
-import ImageCarousel from '../component/ImageCarousel'
+import SceneCarousel from './SceneCarousel'
 // import AudioPlayer from '../components/AudioPlayer'
 import {Overlay} from 'teaset'
 import {showDialog} from '../component/Dialog'
@@ -18,17 +18,16 @@ import {connect} from "react-redux";
 class MediaBox extends Component {
   static propTypes = {
     style: ViewPropTypes.style,
-    images: PropTypes.arrayOf(PropTypes.string),
-    audio: PropTypes.string,
+    scenes: PropTypes.array,
   };
 
   constructor(props) {
     super(props);
   }
 
-  _renderImage = () => {
-    return this.props.images && this.props.images.length ?
-      <ImageCarousel style={{marginTop: em(44)}} showPreview={true} images={this.props.images}/> : null
+  _renderScene = () => {
+    return this.props.scenes && this.props.scenes.length ?
+      <SceneCarousel style={{marginTop: em(44)}} showPreview={true} scenes={this.props.scenes}/> : null
   }
 
 //   _renderAudio = () => {
@@ -60,8 +59,7 @@ class MediaBox extends Component {
   render() {
     return (
       <View style={[styles.container, this.props.style]}>
-        {this._renderImage()}
-        // {this._renderAudio()}
+        {this._renderScene()}
       </View>
     )
   }

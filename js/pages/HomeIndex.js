@@ -17,6 +17,16 @@ import Icon from 'react-native-vector-icons/Ionicons'
 
 
 class HomeIndex extends BaseScreen {
+  static navigationOptions = {
+    header: null
+  };
+
+  static defaultProps = {
+    navColor: Colors.navColor,
+    title: '主页',
+    showBackButton: false,
+  };
+
   renderNavigationLeftView() {
     const {navigate} = this.props.navigation;
     const {isLogin} = this.props.user;
@@ -62,16 +72,20 @@ class HomeIndex extends BaseScreen {
   rowData = ()=>{
     return {
       content:{
-        images: [
-            {
-               url:'https://www.xinrong.com/webapp2.0/webapp3.0/images/banner/22.jpg'
-            },
-            {
-              url:'https://www.xinrong.com/webapp2.0/webapp3.0/images/banner/23.jpg'
-            },
-            {
-              url:'https://www.xinrong.com/webapp2.0/webapp3.0/images/banner/04.jpg'
-            }
+        scenes: [
+          {
+            img:'https://www.xinrong.com/webapp2.0/webapp3.0/images/banner/22.jpg',
+            snd:require('../assets/sound/test.mp3')
+          }
+          ,
+          {
+            img:'https://www.xinrong.com/webapp2.0/webapp3.0/images/banner/23.jpg',
+            snd:require('../assets/sound/test.mp3')
+          },
+          {
+            img:'https://www.xinrong.com/webapp2.0/webapp3.0/images/banner/4.jpg',
+            snd:require('../assets/sound/test.mp3')
+          }            
         ]
       }
     }

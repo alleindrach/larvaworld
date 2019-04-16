@@ -13,7 +13,6 @@ import {
 
 import Colors from '../common/Colors'
 import MediaBox from '../component/MediaBox'
-import Avatar from '../component/Avatar'
 import {Menu} from 'teaset'
 import ActionSheet from 'teaset/components/ActionSheet/ActionSheet'
 import config from '../config/Config'
@@ -66,14 +65,33 @@ export default class Work extends Component {
       });
     });
   };
-
+// data:
+  // {
+  //   content:{
+  //     scenes: [
+  //       {
+  //         img:'https://www.xinrong.com/webapp2.0/webapp3.0/images/banner/22.jpg',
+  //         snd:require('../assets/sound/test.mp3')
+  //       }
+  //       ,
+  //       {
+  //         img:'https://www.xinrong.com/webapp2.0/webapp3.0/images/banner/23.jpg',
+  //         snd:require('../assets/sound/test.mp3')
+  //       },
+  //       {
+  //         img:'https://www.xinrong.com/webapp2.0/webapp3.0/images/banner/4.jpg',
+  //         snd:require('../assets/sound/test.mp3')
+  //       }            
+  //     ]
+  //   }
+  // }
   render() {
     const data = this.props.data;
-    data.user._id = data.user.id
+    // data.user._id = data.user.id
     return (
       <View style={styles.container}>
         <MediaBox
-          images={data.content.images}
+          scenes={data.content.scenes}
           navigation={this.props.navigation}/>
         
         {this.props.showDelBtn && <TouchableOpacity style={styles.deleteBtn} onPress={this._showActionSheet}>

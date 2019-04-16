@@ -19,7 +19,7 @@ export const  collectFilesInfo=(basePath)=> {
         if (info.type === 'file') {
           return [info];
         }
-        return fs.ls(basePath)
+        return RNFetchBlob.fs.ls(basePath)
           .then(files => {
             const promises = _.map(files, file => {
               return collectFilesInfo(`${basePath}/${file}`);
@@ -78,7 +78,7 @@ export const getFileName=(uri)=>{
 
 
  export const deleteFile=(filePath) =>{
-    return fs.stat(filePath)
+    return RNFetchBlob.fs.stat(filePath)
       .then(res => res && res.type === 'file')
       .then(exists => exists && RNFetchBlob.fs.unlink(filePath))
       .catch((err) => {
@@ -91,7 +91,7 @@ export const  getDirPath=(filePath)=> {
   }
   
 export const ensurePath=(dirPath)=> {
-    return fs.isDir(dirPath)
+    return RNFetchBlob.fs.isDir(dirPath)
       .then(exists =>
         !exists && RNFetchBlob.fs.mkdir(dirPath)
       )

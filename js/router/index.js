@@ -48,7 +48,7 @@ const AppNavigator = createStackNavigator({
 
 },
 {
-  initialRouteName: 'Index',
+  initialRouteName: 'HomeIndex',
   /* The header config from HomeScreen is now here */
   initialRouteParams: {},
   mode: 'card',

@@ -7,6 +7,7 @@ import * as ImageCacheProvider from './ImageCacheProvider'
 import * as Progress from 'react-native-progress';
 import config from '../../config/Config';
 import PropTypes from 'prop-types';
+import * as  FileUtils from '../../utils/FileUtils'
 const flattenStyle = ReactNative.StyleSheet.flatten;
 const {
   Image,
@@ -55,7 +56,10 @@ export default class CachedImage extends React.Component {
   }
 
   static defaultProps = {
-    renderImage: props => (<Image ref={CACHED_IMAGE_REF} {...props}/>),
+    renderImage: (props) => {
+      let imgControl=(<Image ref={CACHED_IMAGE_REF} {...props}/>)
+      return imgControl;
+    },
     showIndicator: false,
     activityIndicatorProps: {color: '#fff'},
     useQueryParamsInCacheKey: true,
@@ -123,7 +127,7 @@ export default class CachedImage extends React.Component {
 
   processSource = (source) => {
     let url = _.get(source, ['uri'], null);
-    if (isLocalFile(url)) {
+    if (FileUtils.isLocalFile(url)) {
       this.safeSetState({
         cachedImagePath: null,
         isCacheable: false,
@@ -132,11 +136,11 @@ export default class CachedImage extends React.Component {
       return;
     }
 
-    if (isOSSFile(url)) {
-      url = config.OSS.photo + url;
-      if (!this.props.showOriginal)
-        url = url + config.OSS.photoThumb;
-    }
+    // if (isOSSFile(url)) {
+    //   url = config.OSS.photo + url;
+    //   if (!this.props.showOriginal)
+    //     url = url + config.OSS.photoThumb;
+    // }
 
     if (ImageCacheProvider.isCacheable(url)) {
       //add progress listener
@@ -147,11 +151,23 @@ export default class CachedImage extends React.Component {
       // try to get the image path from cache
       ImageCacheProvider.getCachedImagePath(url, options)
       // try to put the image in cache if
-        .catch(() => ImageCacheProvider.cacheImage(url, options, this.props.resolveHeaders))
-        .then(cachedImagePath => {
-          this.safeSetState({
-            cachedImagePath
-          });
+        .catch(
+          () => 
+          {
+            console.log('begin to cache,url ',url)
+            ImageCacheProvider.cacheImage(url, options, this.props.resolveHeaders)
+          }
+          )
+        .then(
+          cachedImagePath => {
+            {
+              let x=this.state;
+              this.safeSetState({
+                cachedImagePath
+              });
+              console.log('cached image and change state ',url,cachedImagePath,x,this.state)
+            }
+          
         })
         .catch(err => {
           this.safeSetState({
@@ -165,12 +181,14 @@ export default class CachedImage extends React.Component {
             ImageCacheProvider.removeListener(url, this.progressListener);
           }
         });
-      this.safeSetState({
-        cachedImagePath: null,
-        isCacheable: true,
-        isError: false
-      });
+        console.log('init state of url',url)
+        this.safeSetState({
+          cachedImagePath: null,
+          isCacheable: true,
+          isError: false
+        });
     } else {
+      console.log('source is not cachable!',url)
       this.safeSetState({
         cachedImagePath: null,
         isCacheable: false,
@@ -190,6 +208,7 @@ export default class CachedImage extends React.Component {
   }
 
   render() {
+    console.log('render url:',this.props.source,this.state)
     if (this.state.isCacheable && !this.state.cachedImagePath) {
       return this.renderLoader();
     }
