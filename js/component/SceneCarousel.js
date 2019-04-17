@@ -10,7 +10,7 @@ import {
   Image
 } from 'react-native'
 import Carousel from 'react-native-snap-carousel'
-import CachedImage from './cachedimage/CacheImage'
+import CachedImage from './cached/CacheImage'
 import AudioTrack from './AudioTrack'
 // import FullImageView from './FullImageView'
 import PropTypes from 'prop-types';

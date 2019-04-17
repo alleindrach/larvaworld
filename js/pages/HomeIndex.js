@@ -75,16 +75,16 @@ class HomeIndex extends BaseScreen {
         scenes: [
           {
             img:'https://www.xinrong.com/webapp2.0/webapp3.0/images/banner/22.jpg',
-            snd:require('../assets/sound/test.mp3')
+            snd:'http://192.168.2.149/s/test.mp3'
           }
           ,
           {
             img:'https://www.xinrong.com/webapp2.0/webapp3.0/images/banner/23.jpg',
-            snd:require('../assets/sound/test.mp3')
+            snd:'http://192.168.2.149/s/test.mp3'
           },
           {
-            img:'https://www.xinrong.com/webapp2.0/webapp3.0/images/banner/4.jpg',
-            snd:require('../assets/sound/test.mp3')
+            img:'https://www.xinrong.com/webapp2.0/webapp3.0/images/banner/20.jpg',
+            snd:'http://192.168.2.149/s/test.mp3'
           }            
         ]
       }

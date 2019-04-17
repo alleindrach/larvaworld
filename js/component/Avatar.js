@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   ColorPropType
 } from 'react-native'
-import CachedImage from './cachedimage/CacheImage'
+import CachedImage from './cached/CacheImage'
 import {connect} from 'react-redux'
 
 class Avatar extends Component {

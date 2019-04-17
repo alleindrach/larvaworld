@@ -1,8 +1,11 @@
 import React from 'react'
 import { View, Image, Text, Slider, TouchableOpacity, Platform, Alert} from 'react-native';
-
+import _ from 'lodash';
 import Sound from 'react-native-sound';
 import PropTypes from 'prop-types';
+import * as  FileUtils from '../utils/FileUtils'
+import * as CacheProvider from './cached/CacheProvider'
+
 const img_speaker = require('../assets/sound/ui_speaker.png');
 const img_pause = require('../assets/sound/ui_pause.png');
 const img_play = require('../assets/sound//ui_play.png');
@@ -12,7 +15,8 @@ const img_playjumpright = require('../assets/sound/ui_playjumpright.png');
 export default class AudioTrack extends React.Component{
     static defaultProps = {
         source: null,
-        style:null
+        style:null,
+        cache:false
       };
     
       static propTypes = {
@@ -40,7 +44,8 @@ export default class AudioTrack extends React.Component{
     }
 
     componentDidMount(){
-        this.play();
+        // this.play();
+        this.loadSound(false);
         //重绘进度条
         this.timeout = setInterval(() => {
             if(this.sound && this.sound.isLoaded() && this.state.playState == 'playing' && !this.sliderEditing){
@@ -59,7 +64,104 @@ export default class AudioTrack extends React.Component{
             clearInterval(this.timeout);
         }
     }
+    safeSetState = (newState) => {
+        if (!this._isMounted) {
+          return;
+        }
+        return this.setState(newState);
+      }
 
+    processSource = (source) => {
+        let url = _.get(source, ['uri'], null);
+        if (FileUtils.isLocalFile(url)) {
+        this.safeSetState({
+            cachedFilePath: null,
+            isCacheable: false,
+            isError: false
+        });
+        return;
+        }
+
+        if (CacheProvider.isCacheable(url)) {
+        if (this.props.showIndicator) {
+            CacheProvider.addListener(url, this.progressListener);
+        }
+        const options = _.pick(this.props, ['useQueryParamsInCacheKey', 'cacheGroup']);
+        CacheProvider.getCachedPath(url, options)
+        // try to put the image in cache if
+            .catch(
+            () => 
+            {
+                // console.log('begin to cache,url ',url)
+                CacheProvider.cacheFile(url, options, this.props.resolveHeaders)
+            }
+            )
+            .then(
+            cachedFilePath => {
+                {
+                let x=this.state;
+                this.safeSetState({
+                    cachedFilePath
+                });
+                // console.log('cached image and change state ',url,cachedImagePath,x,this.state)
+                }          
+            })
+            .catch(err => {
+            this.safeSetState({
+                cachedFilePath: null,
+                isCacheable: false,
+                isError: true
+            });
+            })
+            .finally(() => {
+            if (this.props.showIndicator) {
+                CacheProvider.removeListener(url, this.progressListener);
+            }
+            });
+            // console.log('init state of url',url)
+            this.safeSetState({
+                cachedFilePath: null,
+                isCacheable: true,
+                isError: false
+            });
+        } else {
+        // console.log('source is not cachable!',url)
+        this.safeSetState({
+            cachedFilePath: null,
+            isCacheable: false,
+            isError: true
+        });
+        }
+    }
+    progressListener = (progress) => {
+        this.safeSetState({progress});
+      }
+    loadSound=(play)=>{
+        if(!this.props.cache || this.state.cachedFilePath){
+            const filepath = this.props.cache?  this.state.cachedFilePath:this.props.source.uri;
+            console.log('[loading]', filepath)
+            this.sound = new Sound(filepath,'', ((error) => {
+                if (error) {
+                    console.log('failed to load the sound', error);
+                    Alert.alert('Notice', 'audio file error. (Error code : 1)');   
+                    this.setState({playState:'paused'});
+                }else{
+                    if(play)
+                    {
+                        this.setState({playState:'playing',duration:this.sound.getDuration()});
+                    }
+                    else
+                    {
+                        this.setState({playState:'paused', duration:this.sound.getDuration()});
+                        this.sound.play(this.playComplete);
+                    } 
+                }
+            }).bind(this));   
+        }else if(this.props.cache)
+        {
+            this.process(this.props.source.uri);
+        }
+    }
     onSliderEditStart = () => {
         this.sliderEditing = true;
     }
@@ -78,19 +180,7 @@ export default class AudioTrack extends React.Component{
             this.sound.play(this.playComplete);
             this.setState({playState:'playing'});
         }else{
-            const filepath = this.props.source.uri;
-            console.log('[Play]', filepath);
-    
-            this.sound = new Sound(require('../assets/sound/test.mp3'), (error) => {
-                if (error) {
-                    console.log('failed to load the sound', error);
-                    Alert.alert('Notice', 'audio file error. (Error code : 1)');
-                    this.setState({playState:'paused'});
-                }else{
-                    this.setState({playState:'playing', duration:this.sound.getDuration()});
-                    this.sound.play(this.playComplete);
-                }
-            });    
+            this.loadSound(true).bind(this);
         }
     }
     playComplete = (success) => {
@@ -137,6 +227,10 @@ export default class AudioTrack extends React.Component{
     }
 
     render(){
+        if(this.props.cache && !this.sound)
+        {
+            this.loadSound(false);
+        }
 
         const currentTimeString = this.getAudioTimeString(this.state.playSeconds);
         const durationString = this.getAudioTimeString(this.state.duration);
