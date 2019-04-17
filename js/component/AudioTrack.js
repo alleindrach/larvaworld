@@ -158,11 +158,12 @@ export default class AudioTrack extends React.Component{
                     if(play)
                     {
                         this.setState({playState:'playing',duration:this.sound.getDuration()});
+                        this.sound.play(this.playComplete);
                     }
                     else
                     {
                         this.setState({playState:'paused', duration:this.sound.getDuration()});
-                        this.sound.play(this.playComplete);
+                        
                     } 
                 }
             }).bind(this));   

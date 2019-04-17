@@ -86,7 +86,7 @@ export default class SceneCarousel extends Component {
   render() {
     const {scenes, style, sliderWidth, sliderHeight, itemWidth, itemHeight} = this.props
     return (
-      <View style={[{width: SCREEN_WIDTH,backgroundColor:'#888'}, style]}>
+      <View style={[{width: SCREEN_WIDTH,backgroundColor:'transparent'}, style]}>
         <Carousel
           data={scenes}
           renderItem={this._renderItem}
@@ -112,8 +112,8 @@ const styles = StyleSheet.create({
     justifyContent:'flex-start',
     // bottom:em(80),
     alignItems: 'center',
-    marginTop:em(44),
-    marginBottom:em(44),
+    marginTop:em(10),
+    marginBottom:em(10),
     overflow:'hidden',
     backgroundColor: 'black',
     borderBottomWidth: StyleSheet.hairlineWidth,

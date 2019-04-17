@@ -43,10 +43,10 @@ export default class FullImageView extends Component {
       }
       else {
         // url = getImageThumbUri(url)
-        ImageCacheProvider.getCachedImagePath(url)
-          .catch(() => ImageCacheProvider.cacheImage(url))
-          .then(cachedImagePath => {
-            this._savePhoto(cachedImagePath)
+        CacheProvider.getCachedPath(url)
+          .catch(() => CacheProvider.cacheFile(url))
+          .then(cachedPath => {
+            this._savePhoto(cachedPath)
           })
           .catch(err => {
             Toast.fail('保存失败')
