@@ -12,6 +12,7 @@ const img_playjumpright = require('../assets/sound/ui_playjumpright.png');
 export default class AudioTrack extends React.Component{
     static defaultProps = {
         source: null,
+        style:null
       };
     
       static propTypes = {
@@ -139,10 +140,10 @@ export default class AudioTrack extends React.Component{
 
         const currentTimeString = this.getAudioTimeString(this.state.playSeconds);
         const durationString = this.getAudioTimeString(this.state.duration);
-
+        const {style}=this.props;
         return (
-            <View style={{flex:1, justifyContent:'center', backgroundColor:'black'}}>
-               <View style={{flexDirection:'row', justifyContent:'center', marginVertical:15}}>
+            <View style={[{justifyContent:'center'},style]}>
+               <View style={{flexDirection:'row', justifyContent:'center', marginVertical:5}}>
                     <TouchableOpacity onPress={this.jumpPrev15Seconds} style={{justifyContent:'center'}}>
                         <Image source={img_playjumpleft} style={{width:30, height:30}}/>
                         <Text style={{position:'absolute', alignSelf:'center', marginTop:1, color:'white', fontSize:12}}>15</Text>
@@ -160,7 +161,7 @@ export default class AudioTrack extends React.Component{
                         <Text style={{position:'absolute', alignSelf:'center', marginTop:1, color:'white', fontSize:12}}>15</Text>
                     </TouchableOpacity>
                 </View>
-                <View style={{marginVertical:15, marginHorizontal:15, flexDirection:'row'}}>
+                <View style={{marginVertical:5, marginHorizontal:15, flexDirection:'row'}}>
                     <Text style={{color:'white', alignSelf:'center'}}>{currentTimeString}</Text>
                     <Slider
                         onTouchStart={this.onSliderEditStart}
