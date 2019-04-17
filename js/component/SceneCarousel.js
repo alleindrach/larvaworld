@@ -78,7 +78,7 @@ export default class SceneCarousel extends Component {
                 </View>
               </View>
             </TouchableHighlight>
-            <AudioTrack style={{width:SCREEN_WIDTH,height:em(100),backgroundColor:'transparent'}} source={{uri:item.snd}}/>
+            <AudioTrack style={{width:SCREEN_WIDTH,height:em(100),backgroundColor:'transparent'}} source={{uri:item.snd}} cache={true}/>
           </View>
     )
   }

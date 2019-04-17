@@ -35,16 +35,24 @@ export default class AudioTrack extends React.Component{
 
     constructor(){
         super();
+        this._isMounted = false;
         this.state = {
             playState:'paused', //playing, paused
             playSeconds:0,
-            duration:0
-        }
+            duration:0,
+            isCacheable: false,
+            cachedFilePath: null,
+            networkAvailable: true,
+            progress: 0,
+            isError: false
+        };
+        
         this.sliderEditing = false;
     }
 
     componentDidMount(){
         // this.play();
+        this._isMounted = true;
         this.loadSound(false);
         //重绘进度条
         this.timeout = setInterval(() => {
@@ -74,12 +82,12 @@ export default class AudioTrack extends React.Component{
     processSource = (source) => {
         let url = _.get(source, ['uri'], null);
         if (FileUtils.isLocalFile(url)) {
-        this.safeSetState({
-            cachedFilePath: null,
-            isCacheable: false,
-            isError: false
-        });
-        return;
+            this.safeSetState({
+                cachedFilePath: null,
+                isCacheable: false,
+                isError: false
+            });
+            return;
         }
 
         if (CacheProvider.isCacheable(url)) {
@@ -91,32 +99,33 @@ export default class AudioTrack extends React.Component{
         // try to put the image in cache if
             .catch(
             () => 
-            {
-                // console.log('begin to cache,url ',url)
-                CacheProvider.cacheFile(url, options, this.props.resolveHeaders)
-            }
+                {
+                    // console.log('begin to cache,url ',url)
+                    CacheProvider.cacheFile(url, options, this.props.resolveHeaders)
+                }
             )
             .then(
-            cachedFilePath => {
-                {
-                let x=this.state;
-                this.safeSetState({
-                    cachedFilePath
-                });
-                // console.log('cached image and change state ',url,cachedImagePath,x,this.state)
-                }          
+                cachedFilePath => {
+                    {
+                    let x=this.state;
+                    this.safeSetState({
+                        cachedFilePath
+                    });
+                    this.loadSound(false);
+                    // console.log('cached image and change state ',url,cachedImagePath,x,this.state)
+                    }          
             })
             .catch(err => {
-            this.safeSetState({
-                cachedFilePath: null,
-                isCacheable: false,
-                isError: true
-            });
+                this.safeSetState({
+                    cachedFilePath: null,
+                    isCacheable: false,
+                    isError: true
+                });
             })
             .finally(() => {
-            if (this.props.showIndicator) {
-                CacheProvider.removeListener(url, this.progressListener);
-            }
+                if (this.props.showIndicator) {
+                    CacheProvider.removeListener(url, this.progressListener);
+                }
             });
             // console.log('init state of url',url)
             this.safeSetState({
@@ -125,12 +134,12 @@ export default class AudioTrack extends React.Component{
                 isError: false
             });
         } else {
-        // console.log('source is not cachable!',url)
-        this.safeSetState({
-            cachedFilePath: null,
-            isCacheable: false,
-            isError: true
-        });
+            // console.log('source is not cachable!',url)
+            this.safeSetState({
+                cachedFilePath: null,
+                isCacheable: false,
+                isError: true
+            });
         }
     }
     progressListener = (progress) => {
@@ -159,7 +168,7 @@ export default class AudioTrack extends React.Component{
             }).bind(this));   
         }else if(this.props.cache)
         {
-            this.process(this.props.source.uri);
+            this.processSource(this.props.source);
         }
     }
     onSliderEditStart = () => {
@@ -227,10 +236,6 @@ export default class AudioTrack extends React.Component{
     }
 
     render(){
-        if(this.props.cache && !this.sound)
-        {
-            this.loadSound(false);
-        }
 
         const currentTimeString = this.getAudioTimeString(this.state.playSeconds);
         const durationString = this.getAudioTimeString(this.state.duration);
