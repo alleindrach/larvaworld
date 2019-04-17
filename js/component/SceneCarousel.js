@@ -18,7 +18,7 @@ const SLIDER_WIDTH = em(750)
 const SLIDER_HEIGHT = em(480+240)
 const IMAGE_WIDTH = em(700)
 const IMAGE_HEIGHT = em(480)
-const AUDIO_HEIGHT=em(240)
+const AUDIO_HEIGHT=em(100)
 export default class SceneCarousel extends Component {
   static defaultProps = {
     images: [],
@@ -67,18 +67,18 @@ export default class SceneCarousel extends Component {
               onPress={() => this._onImagePress(index)}
               style={{width: itemWidth, height: itemHeight-audioHeight}}
             >
-              <CachedImage
-                source={{uri: item.img}}
-                style={{width: itemWidth, height: itemHeight-audioHeight, alignSelf: 'center'}}
-                resizeMode="cover"
-              />
-            </TouchableHighlight>
-            <AudioTrack style={{width:SCREEN_WIDTH,height:em(200),backgroundColor:'#ccc'}} source={{uri:item.snd}}/>
-            <View style={{width:SCREEN_WIDTH,height:em(100),backgroundColor:'red'}}>
-              <View style={styles.pageView}>
-                <Text style={styles.pageText}>{`${this.state.index + 1}/${scenes.length}`}</Text>
+              <View style={{width: itemWidth, height: itemHeight-audioHeight, alignSelf: 'center'}}>
+                <CachedImage
+                  source={{uri: item.img}}
+                  style={{width: itemWidth, height: itemHeight-audioHeight, alignSelf: 'center'}}
+                  resizeMode="cover"
+                />
+                <View style={styles.pageView}>
+                  <Text style={styles.pageText}>{`${this.state.index + 1}/${scenes.length}`}</Text>
+                </View>
               </View>
-            </View>
+            </TouchableHighlight>
+            <AudioTrack style={{width:SCREEN_WIDTH,height:em(100),backgroundColor:'transparent'}} source={{uri:item.snd}}/>
           </View>
     )
   }
@@ -107,7 +107,7 @@ export default class SceneCarousel extends Component {
 
 const styles = StyleSheet.create({
   sceneWraper: {
-    height:em(780),
+    height:IMAGE_HEIGHT+AUDIO_HEIGHT,
     width:em(700),
     justifyContent:'flex-start',
     // bottom:em(80),

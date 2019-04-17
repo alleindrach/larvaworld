@@ -133,7 +133,7 @@ export default class AudioTrack extends React.Component{
         const m = parseInt(seconds%(60*60)/60);
         const s = parseInt(seconds%60);
 
-        return ((h<10?'0'+h:h) + ':' + (m<10?'0'+m:m) + ':' + (s<10?'0'+s:s));
+        return ( (m<10?'0'+m:m) + ':' + (s<10?'0'+s:s));
     }
 
     render(){
@@ -143,26 +143,17 @@ export default class AudioTrack extends React.Component{
         const {style}=this.props;
         return (
             <View style={[{justifyContent:'center'},style]}>
-               <View style={{flexDirection:'row', justifyContent:'center', marginVertical:5}}>
-                    <TouchableOpacity onPress={this.jumpPrev15Seconds} style={{justifyContent:'center'}}>
-                        <Image source={img_playjumpleft} style={{width:30, height:30}}/>
-                        <Text style={{position:'absolute', alignSelf:'center', marginTop:1, color:'white', fontSize:12}}>15</Text>
-                    </TouchableOpacity>
+               
+                <View style={{marginVertical:5, marginHorizontal:15, flexDirection:'row'}}>
+                    <Text style={{color:'white', alignSelf:'center',fontSize: em(20)}}>{currentTimeString}</Text>
                     {this.state.playState == 'playing' && 
-                    <TouchableOpacity onPress={this.pause} style={{marginHorizontal:20}}>
-                        <Image source={img_pause} style={{width:30, height:30}}/>
+                    <TouchableOpacity onPress={this.pause} style={{marginHorizontal:2,alignSelf:'center',}}>
+                        <Image source={img_pause} style={{width:30, height:30,alignSelf:'center',}}/>
                     </TouchableOpacity>}
                     {this.state.playState == 'paused' && 
-                    <TouchableOpacity onPress={this.play} style={{marginHorizontal:20}}>
-                        <Image source={img_play} style={{width:30, height:30}}/>
+                    <TouchableOpacity onPress={this.play} style={{marginHorizontal:2,alignSelf:'center',}}>
+                        <Image source={img_play} style={{width:30, height:30,alignSelf:'center',}}/>
                     </TouchableOpacity>}
-                    <TouchableOpacity onPress={this.jumpNext15Seconds} style={{justifyContent:'center'}}>
-                        <Image source={img_playjumpright} style={{width:30, height:30}}/>
-                        <Text style={{position:'absolute', alignSelf:'center', marginTop:1, color:'white', fontSize:12}}>15</Text>
-                    </TouchableOpacity>
-                </View>
-                <View style={{marginVertical:5, marginHorizontal:15, flexDirection:'row'}}>
-                    <Text style={{color:'white', alignSelf:'center'}}>{currentTimeString}</Text>
                     <Slider
                         onTouchStart={this.onSliderEditStart}
                         // onTouchMove={() => console.log('onTouchMove')}
@@ -172,7 +163,7 @@ export default class AudioTrack extends React.Component{
                         onValueChange={this.onSliderEditing}
                         value={this.state.playSeconds} maximumValue={this.state.duration} maximumTrackTintColor='gray' minimumTrackTintColor='white' thumbTintColor='white' 
                         style={{flex:1, alignSelf:'center', marginHorizontal:Platform.select({ios:5})}}/>
-                    <Text style={{color:'white', alignSelf:'center'}}>{durationString}</Text>
+                    <Text style={{color:'white', alignSelf:'center',fontSize: em(20)}}>{durationString}</Text>
                 </View>
             </View>
         )
