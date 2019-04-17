@@ -154,7 +154,7 @@ export default class CachedImage extends React.Component {
         .catch(
           () => 
           {
-            console.log('begin to cache,url ',url)
+            // console.log('begin to cache,url ',url)
             ImageCacheProvider.cacheImage(url, options, this.props.resolveHeaders)
           }
           )
@@ -165,7 +165,7 @@ export default class CachedImage extends React.Component {
               this.safeSetState({
                 cachedImagePath
               });
-              console.log('cached image and change state ',url,cachedImagePath,x,this.state)
+              // console.log('cached image and change state ',url,cachedImagePath,x,this.state)
             }
           
         })
@@ -181,14 +181,14 @@ export default class CachedImage extends React.Component {
             ImageCacheProvider.removeListener(url, this.progressListener);
           }
         });
-        console.log('init state of url',url)
+        // console.log('init state of url',url)
         this.safeSetState({
           cachedImagePath: null,
           isCacheable: true,
           isError: false
         });
     } else {
-      console.log('source is not cachable!',url)
+      // console.log('source is not cachable!',url)
       this.safeSetState({
         cachedImagePath: null,
         isCacheable: false,
@@ -208,7 +208,7 @@ export default class CachedImage extends React.Component {
   }
 
   render() {
-    console.log('render url:',this.props.source,this.state)
+    // console.log('render url:',this.props.source,this.state)
     if (this.state.isCacheable && !this.state.cachedImagePath) {
       return this.renderLoader();
     }

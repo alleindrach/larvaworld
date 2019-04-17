@@ -40,7 +40,7 @@ export default class AudioTrack extends React.Component{
     }
 
     componentDidMount(){
-        // this.play();
+        this.play();
         //重绘进度条
         this.timeout = setInterval(() => {
             if(this.sound && this.sound.isLoaded() && this.state.playState == 'playing' && !this.sliderEditing){
@@ -48,7 +48,7 @@ export default class AudioTrack extends React.Component{
                     this.setState({playSeconds:seconds});
                 })
             }
-        }, 1000);
+        }, 100);
     }
     componentWillUnmount(){
         if(this.sound){
@@ -81,7 +81,7 @@ export default class AudioTrack extends React.Component{
             const filepath = this.props.source.uri;
             console.log('[Play]', filepath);
     
-            this.sound = new Sound(filepath, '', (error) => {
+            this.sound = new Sound(require('../assets/sound/test.mp3'), (error) => {
                 if (error) {
                     console.log('failed to load the sound', error);
                     Alert.alert('Notice', 'audio file error. (Error code : 1)');
@@ -145,7 +145,7 @@ export default class AudioTrack extends React.Component{
             <View style={[{justifyContent:'center'},style]}>
                
                 <View style={{marginVertical:5, marginHorizontal:15, flexDirection:'row'}}>
-                    <Text style={{color:'white', alignSelf:'center',fontSize: em(20)}}>{currentTimeString}</Text>
+                    <Text style={{color:'white', alignSelf:'center',fontSize: em(20),width:em(60)}}>{currentTimeString}</Text>
                     {this.state.playState == 'playing' && 
                     <TouchableOpacity onPress={this.pause} style={{marginHorizontal:2,alignSelf:'center',}}>
                         <Image source={img_pause} style={{width:30, height:30,alignSelf:'center',}}/>
