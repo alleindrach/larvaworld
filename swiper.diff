@@ -1,0 +1,188 @@
+diff --git a/js/component/SceneCarousel.js b/js/component/SceneCarousel.js
+index e522db4..ac23dff 100644
+--- a/js/component/SceneCarousel.js
++++ b/js/component/SceneCarousel.js
+@@ -3,20 +3,20 @@
+ import React, {Component} from 'react'
+ import {
+   StyleSheet,
+-  View,
+   ViewPropTypes,
+   TouchableHighlight,
+-  Text,
+   Image
+ } from 'react-native'
++import {  Container, Header, View, DeckSwiper, Card, CardItem, Thumbnail, Text, Left, Body, Icon  } from 'native-base';
++
+ import Carousel from 'react-native-snap-carousel'
+ import CachedImage from './cached/CacheImage'
+ import AudioTrack from './AudioTrack'
+ // import FullImageView from './FullImageView'
+ import PropTypes from 'prop-types';
+ const SLIDER_WIDTH = em(750)
+-const SLIDER_HEIGHT = em(480+240)
+-const IMAGE_WIDTH = em(700)
++const SLIDER_HEIGHT = em(480+100)
++const IMAGE_WIDTH = em(750)
+ const IMAGE_HEIGHT = em(480)
+ const AUDIO_HEIGHT=em(100)
+ export default class SceneCarousel extends Component {
+@@ -57,14 +57,13 @@ export default class SceneCarousel extends Component {
+     // });
+   }
+ 
+-  _renderItem = ({item, index}) => {
++  _renderItem = (item) => {
+     const {scenes,itemWidth, itemHeight,audioHeight} = this.props
+     return (
+-       
+           <View style={styles.sceneWraper}>
+             <TouchableHighlight
+-              ref={ref => this._touchRefs[index] = ref}
+-              onPress={() => this._onImagePress(index)}
++              ref={ref => this._touchRefs[item.index] = ref}
++              onPress={() => this._onImagePress(item.index)}
+               style={{width: itemWidth, height: itemHeight-audioHeight}}
+             >
+               <View style={{width: itemWidth, height: itemHeight-audioHeight, alignSelf: 'center'}}>
+@@ -74,7 +73,7 @@ export default class SceneCarousel extends Component {
+                   resizeMode="cover"
+                 />
+                 <View style={styles.pageView}>
+-                  <Text style={styles.pageText}>{`${this.state.index + 1}/${scenes.length}`}</Text>
++                  <Text style={styles.pageText}>{`${item.index }/${scenes.length}`}</Text>
+                 </View>
+               </View>
+             </TouchableHighlight>
+@@ -86,20 +85,17 @@ export default class SceneCarousel extends Component {
+   render() {
+     const {scenes, style, sliderWidth, sliderHeight, itemWidth, itemHeight} = this.props
+     return (
+-      <View style={[{width: SCREEN_WIDTH,backgroundColor:'transparent'}, style]}>
+-        <Carousel
+-          data={scenes}
+-          renderItem={this._renderItem}
+-          sliderWidth={sliderWidth}
+-          sliderHeight={sliderHeight}
+-          itemWidth={itemWidth}
+-          itemHeight={itemHeight}
+-          useNativeOnScroll={true}
+-          inactiveSlideScale={0.95}
+-          onSnapToItem={(index) => this.setState({index})}
++      <View style={{height:SLIDER_HEIGHT,width:SLIDER_WIDTH}}>
++        <DeckSwiper 
++            ref={(c) => this._deckSwiper = c}
++            dataSource={scenes}
++            renderEmpty={() =>
++              <View style={{ alignSelf: "center" }}>
++                <Text>Over</Text>
++              </View>
++            }
++            renderItem={this._renderItem}
+         />
+-        
+-        
+       </View>
+     )
+   }
+@@ -114,6 +110,7 @@ const styles = StyleSheet.create({
+     alignItems: 'center',
+     marginTop:em(10),
+     marginBottom:em(10),
++    paddingLeft:em(20),
+     overflow:'hidden',
+     backgroundColor: 'black',
+     borderBottomWidth: StyleSheet.hairlineWidth,
+diff --git a/js/component/Work.js b/js/component/Work.js
+index 4bd396c..600a862 100644
+--- a/js/component/Work.js
++++ b/js/component/Work.js
+@@ -9,6 +9,7 @@ import {
+   Modal,
+   Alert
+ } from 'react-native'
++import SceneCarousel from './SceneCarousel'
+ import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
+ import Colors from '../common/Colors'
+ import MediaBox from '../component/MediaBox'
+@@ -92,34 +93,36 @@ export default class Work extends Component {
+       <Container>
+       <Header style={{height:em(10)}}/>
+       <Content>
+-        <Card>
++        <Card style={{justifyContent:'center'}}>
+           <CardItem>
+             <Left>
+-              <Thumbnail source={{uri: 'Image URL'}} />
++              <Thumbnail source={data.content.titleIcon.source} />
+               <Body>
+-                <Text>作品</Text>
+-                <Text note>作品描述</Text>
++                <Text>{data.content.title}</Text>
++                <Text note>{data.content.titleDescription}</Text>
+               </Body>
+             </Left>
+           </CardItem>
+           <CardItem cardBody>
+-            <MediaBox   scenes={data.content.scenes}  navigation={this.props.navigation}/>
++            
++            <SceneCarousel style={{marginTop: em(10)}} navigation={this.props.navigation} showPreview={true} scenes={data.content.scenes}/>
++            
+           </CardItem>
+-          <CardItem>
++          <CardItem >
+             <Left>
+               <Button transparent>
+                 <Icon active name="thumbs-up" />
+-                <Text>12 Likes</Text>
++                <Text >{data.content.likes}赞</Text>
+               </Button>
+             </Left>
+             <Body>
+-              <Button transparent>
++              <Button transparent style={{justifyContent:'center'}}>
+                 <Icon active name="chatbubbles" />
+-                <Text>4 Comments</Text>
++                <Text>{data.content.comments}评论</Text>
+               </Button>
+             </Body>
+             <Right>
+-              <Text>11h ago</Text>
++              <Text>{data.content.age}</Text>
+             </Right>
+           </CardItem>
+         </Card>
+diff --git a/js/pages/HomeIndex.js b/js/pages/HomeIndex.js
+index bb85b43..882f81a 100644
+--- a/js/pages/HomeIndex.js
++++ b/js/pages/HomeIndex.js
+@@ -70,19 +70,29 @@ class HomeIndex extends BaseScreen {
+   }
+ 
+   rowData = ()=>{
++    let source = require('../assets/icon_nan.png');
+     return {
+       content:{
++        titleIcon:{source},
++        title:'作品',
++        titleDescription:'作品描述',
++        likes:90,
++        comments:10,
++        age:'11小时前',
+         scenes: [
+           {
++            index:1,
+             img:'https://www.xinrong.com/webapp2.0/webapp3.0/images/banner/22.jpg',
+             snd:'http://192.168.2.149/s/test.mp3'
+           }
+           ,
+           {
++            index:2,
+             img:'https://www.xinrong.com/webapp2.0/webapp3.0/images/banner/23.jpg',
+             snd:'http://192.168.2.149/s/test.mp3'
+           },
+           {
++            index:3,
+             img:'https://www.xinrong.com/webapp2.0/webapp3.0/images/banner/20.jpg',
+             snd:'http://192.168.2.149/s/test.mp3'
+           }            

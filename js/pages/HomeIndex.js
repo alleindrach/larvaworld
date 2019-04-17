@@ -70,8 +70,15 @@ class HomeIndex extends BaseScreen {
   }
 
   rowData = ()=>{
+    let source = require('../assets/icon_nan.png');
     return {
       content:{
+        titleIcon:{source},
+        title:'作品',
+        titleDescription:'作品描述',
+        likes:90,
+        comments:10,
+        age:'11小时前',
         scenes: [
           {
             img:'https://www.xinrong.com/webapp2.0/webapp3.0/images/banner/22.jpg',

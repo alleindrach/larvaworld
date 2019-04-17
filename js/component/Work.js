@@ -95,10 +95,10 @@ export default class Work extends Component {
         <Card>
           <CardItem>
             <Left>
-              <Thumbnail source={{uri: 'Image URL'}} />
+              <Thumbnail source={data.content.titleIcon.source} />
               <Body>
-                <Text>作品</Text>
-                <Text note>作品描述</Text>
+                <Text>{data.content.title}</Text>
+                <Text note>{data.content.titleDescription}</Text>
               </Body>
             </Left>
           </CardItem>
@@ -109,17 +109,17 @@ export default class Work extends Component {
             <Left>
               <Button transparent>
                 <Icon active name="thumbs-up" />
-                <Text>12 Likes</Text>
+                <Text>{data.content.likes}赞</Text>
               </Button>
             </Left>
             <Body>
-              <Button transparent>
+              <Button transparent style={{justifyContent:'center'}}>
                 <Icon active name="chatbubbles" />
-                <Text>4 Comments</Text>
+                <Text>{data.content.comments}评论</Text>
               </Button>
             </Body>
             <Right>
-              <Text>11h ago</Text>
+              <Text>{data.content.age}</Text>
             </Right>
           </CardItem>
         </Card>
