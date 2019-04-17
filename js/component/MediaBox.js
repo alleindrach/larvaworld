@@ -27,7 +27,7 @@ class MediaBox extends Component {
 
   _renderScene = () => {
     return this.props.scenes && this.props.scenes.length ?
-      <SceneCarousel style={{marginTop: em(44)}} showPreview={true} scenes={this.props.scenes}/> : null
+      <SceneCarousel style={{marginTop: em(10)}} showPreview={true} scenes={this.props.scenes}/> : null
   }
 
 //   _renderAudio = () => {

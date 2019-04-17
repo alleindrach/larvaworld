@@ -6,11 +6,10 @@ import {
   ViewPropTypes,
   TouchableOpacity,
   Image,
-  Text,
   Modal,
   Alert
 } from 'react-native'
-
+import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
 import Colors from '../common/Colors'
 import MediaBox from '../component/MediaBox'
 import {Menu} from 'teaset'
@@ -89,15 +88,44 @@ export default class Work extends Component {
     const data = this.props.data;
     // data.user._id = data.user.id
     return (
-      <View style={styles.container}>
-        <MediaBox
-          scenes={data.content.scenes}
-          navigation={this.props.navigation}/>
-        
-        {this.props.showDelBtn && <TouchableOpacity style={styles.deleteBtn} onPress={this._showActionSheet}>
-          <Image source={require('../assets/home/del.png')}/>
-        </TouchableOpacity>}
-      </View>
+
+      <Container>
+      <Header style={{height:em(10)}}/>
+      <Content>
+        <Card>
+          <CardItem>
+            <Left>
+              <Thumbnail source={{uri: 'Image URL'}} />
+              <Body>
+                <Text>作品</Text>
+                <Text note>作品描述</Text>
+              </Body>
+            </Left>
+          </CardItem>
+          <CardItem cardBody>
+            <MediaBox   scenes={data.content.scenes}  navigation={this.props.navigation}/>
+          </CardItem>
+          <CardItem>
+            <Left>
+              <Button transparent>
+                <Icon active name="thumbs-up" />
+                <Text>12 Likes</Text>
+              </Button>
+            </Left>
+            <Body>
+              <Button transparent>
+                <Icon active name="chatbubbles" />
+                <Text>4 Comments</Text>
+              </Button>
+            </Body>
+            <Right>
+              <Text>11h ago</Text>
+            </Right>
+          </CardItem>
+        </Card>
+      </Content>
+    </Container>
+      
     )
   }
 
