@@ -30,10 +30,10 @@ const eventPersistConfig = {
 }
 const RootReducer = combineReducers({
   app:    AppReducer,
+  work:   WorkReducer,
   user:   persistReducer(userPersistConfig, UserReducer),
   message: persistReducer(messagePersistConfig, MessageReducer),
   event:  persistReducer(eventPersistConfig, EventReducer),
-  work:   WorkReducer
 });
 
 export default RootReducer
