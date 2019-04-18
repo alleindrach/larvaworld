@@ -74,7 +74,24 @@ export const getFileName=(uri)=>{
         return ''
       }
   }
-
+  export const getFileNameWithoutSuffix=(uri)=>{
+    if (uri.match('^\\S+/\\S+$')) {
+        let array = uri.split("/");
+        if (array.length > 0) {
+          filename=array[array.length - 1];
+          let array = filename.split(".");
+            if (array.length > 0) {
+              return array[0];
+            }
+          return filename; 
+        }
+        else {
+          return ''
+        }
+      } else {
+        return ''
+      }
+  }
 
 
  export const deleteFile=(filePath) =>{
@@ -172,6 +189,38 @@ export const uploadFile=(file,onProgress,onFinish)=>
         console.log('err', err)
     })
 
+export const  uploadWork=(url,work,onProgress,onFinish) =>
+{
+    const workJson=JSON.stringify(work.content);
+    const {scenes}=work.content;
+    files=
+    _.reduce(scenes,(files,scene)=>{
+
+      if (isLocalFile(scene.img) &&  _.indexOf(files,scene.img)<0)
+          files.push(scene.img);
+      if (isLocalFile(scene.snd) &&  _.indexOf(files,scene.snd)<0)
+          files.push(scene.snd);
+      return files;
+    },[]).map(file=>{return {name:getFileNameWithoutSuffix(file),filename:getFileName(file),data:RNFetchBlob.wrap(file)}})
+    
+    return RNFetchBlob.fetch('POST', url, {
+      // header...
+      'Content-Type': 'multipart/form-data'
+      }, [
+        // path是指文件的路径，wrap方法可以根据文件路径获取到文件信息
+        ...files,
+        { name: 'work', data: workJson },
+        //... 可能还会有其他非文件字段{name:'字段名',data:'对应值'}
+      ])
+      .uploadProgress((written, total) => {
+          onProgress && onProgress(file,written,total)
+      })
+      .then((res) => {
+          onFinish && onFinish(work,res)
+      }).catch((err) => {
+          console.log('err', err)
+      })
+}
     
 export const uploadFiles = (uri, host, formInput, onprogress) => {
     let promiseArray = [];

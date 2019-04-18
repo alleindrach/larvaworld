@@ -203,6 +203,15 @@ function cacheFile(url, options = defaultOptions, resolveHeaders = defaultResolv
     .then(headers => downloadFile(url, filePath, headers));
 }
 
+function cacheLocalFile(url,localUrl, options = defaultOptions, resolveHeaders = defaultResolveHeaders){
+  const   filePath = getCachedFilePath(url, options);
+  const   dirPath = FileUtils.getDirPath(filePath);
+  return  FileUtils.ensurePath(dirPath)
+          .then(
+            ()=>fs.cp(localUrl,dirPath).then(()=>{}).catch((err)=>{console.log('cacheLocalFile '+url +' from '+localUrl+' to '+dirPath+' fail!',err )})
+            )
+          .catch((err)=>{console.log('ensurePath '+dirPath+' failed',err)})
+}
 /**
  * Delete the cached file corresponding to the given url and options.
  * @param url
@@ -277,5 +286,6 @@ module.exports = {
   deleteCachedFile,
   cacheMultipleFiles,
   deleteMultipleCachedFiles,
-  seedCache 
+  seedCache ,
+  cacheLocalFile
 };
