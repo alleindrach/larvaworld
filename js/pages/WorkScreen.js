@@ -12,7 +12,7 @@ import {connect} from 'react-redux'
 // import BaseListView from '../component/BaseListView'
 import {WorkAction} from '../redux/action'
 import {Projector, SegmentedBar, Theme, Toast} from 'teaset'
-
+import * as Picker from '../utils/PickerUtils'
 
 import { Container, Header, Content, Footer, FooterTab, Button, Icon, Text } from 'native-base';
 
@@ -70,6 +70,12 @@ class WorkScreen extends BaseScreen {
     this.refs[ref] && this.refs[ref].scrollTo({x: 0, y: 0, animated: true})
   }
 
+  onImageSelect=(index)=>{
+    Picker.selectPhotoTapped((uri)=>{
+      console.log("select:",uri)
+      this.props.selectImage(this.props.work,index,uri);
+    })
+  }
   getWork = ()=>{
     let source = require('../assets/icon_nan.png');
     return {
@@ -140,7 +146,8 @@ class WorkScreen extends BaseScreen {
         <View style={{flex: 1}}>
           <Work navigation={this.props.navigation} 
           user={user} 
-          data={work} 
+          work={work} 
+          imageSelector={this.onImageSelect}
           />
         </View>
     

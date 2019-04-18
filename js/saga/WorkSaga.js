@@ -18,7 +18,7 @@ export function  watchWorkCach() {
                         files.push(scene.snd);
                     return files;
                 },[])
-                files=_.sortedUniq(files)
+                // files=_.sortedUniq(files)
                 return CacheProvider.cacheMultipleFiles(files)
                 .then(()=>{
                     return true;

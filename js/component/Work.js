@@ -11,7 +11,7 @@ import {
 } from 'react-native'
 import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
 import Colors from '../common/Colors'
-import MediaBox from '../component/MediaBox'
+import SceneCarousel from '../component/SceneCarousel'
 import {Menu} from 'teaset'
 import ActionSheet from 'teaset/components/ActionSheet/ActionSheet'
 import config from '../config/Config'
@@ -85,7 +85,7 @@ export default class Work extends Component {
   //   }
   // }
   render() {
-    const data = this.props.data;
+    const work = this.props.work;
     // data.user._id = data.user.id
     return (
 
@@ -95,31 +95,32 @@ export default class Work extends Component {
         <Card>
           <CardItem>
             <Left>
-              <Thumbnail source={data.content.titleIcon.source} />
+              <Thumbnail source={work.content.titleIcon.source} />
               <Body>
-                <Text>{data.content.title}</Text>
-                <Text note>{data.content.titleDescription}</Text>
+                <Text>{work.content.title}</Text>
+                <Text note>{work.content.titleDescription}</Text>
               </Body>
             </Left>
           </CardItem>
           <CardItem cardBody>
-            <MediaBox   scenes={data.content.scenes}  navigation={this.props.navigation}/>
+            <SceneCarousel style={{marginTop: em(10)}}   scenes={work.content.scenes}  navigation={this.props.navigation}
+            onImageSelect={this.props.imageSelector}/>
           </CardItem>
           <CardItem>
             <Left>
               <Button transparent>
                 <Icon active name="thumbs-up" />
-                <Text>{data.content.likes}赞</Text>
+                <Text>{work.content.likes}赞</Text>
               </Button>
             </Left>
             <Body>
               <Button transparent style={{justifyContent:'center'}}>
                 <Icon active name="chatbubbles" />
-                <Text>{data.content.comments}评论</Text>
+                <Text>{work.content.comments}评论</Text>
               </Button>
             </Body>
             <Right>
-              <Text>{data.content.age}</Text>
+              <Text>{work.content.age}</Text>
             </Right>
           </CardItem>
         </Card>

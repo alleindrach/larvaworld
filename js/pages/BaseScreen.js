@@ -6,7 +6,7 @@
 
 import React, {Component} from 'react'
 import PropTypes from 'prop-types';
-import {StyleSheet,  View,  Image,  ColorPropType,Platform,Dimensions} from 'react-native'
+import {StyleSheet,  View,  Image,  ColorPropType,Platform,Dimensions,Orientation} from 'react-native'
 import Colors from '../common/Colors';
 import global from '../common/Global';
 import { Container, Header, Left, Body, Right, Button, Icon, Title, Text } from 'native-base';
@@ -25,9 +25,12 @@ export default class BaseScreen extends Component {
     title: PropTypes.string,
     showBackButton: PropTypes.bool,
   };
-
+  state = {
+    curOrt : 'PORTRAIT' //默认竖屏
+  }
   constructor(props) {
     super(props);
+    
     // this.pageWillLeave.bind(this);
     // this.renderNavigationTitle.bind(this);
     // this.renderNavigationLeftView.bind(this);
@@ -38,6 +41,7 @@ export default class BaseScreen extends Component {
 
   componentDidMount() {
     this._isMounted = true
+    Orientation.addOrientationListener(this._onOrientationChange);
   }
 
   componentWillUnmount() {
@@ -46,6 +50,9 @@ export default class BaseScreen extends Component {
 
   pageWillLeave() {
     return true
+  }
+  _onOrientationChange(curOrt){
+    this.setState({curOrt});
   }
 
   renderNavigationTitle() {

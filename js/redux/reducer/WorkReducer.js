@@ -56,7 +56,7 @@ export default function messageReducer(state = initState, action) {
         error:action.error
 
     }
-    case types.WORKS_UPDATE:
+    case types.WORK_UPDATE:
       return {
         ...state,
         isSyncing: true,
@@ -66,7 +66,7 @@ export default function messageReducer(state = initState, action) {
           ...action.work.content
         }
       }
-    case types.WORKS_UPDATE_SUCCESS:
+    case types.WORK_UPDATE_SUCCESS:
       return {
         ...state,
         isSyncing: false,
@@ -76,7 +76,7 @@ export default function messageReducer(state = initState, action) {
           ...action.work.content
         }
       }
-    case types.WORKS_UPDATE_FAIL:
+    case types.WORK_UPDATE_FAIL:
       return {
         ...state,
         isSyncing: false,
@@ -84,7 +84,7 @@ export default function messageReducer(state = initState, action) {
         error:action.error,
         
       }
-    case types.WORKS_UPDATE_SUCCESS:
+    case types.WORK_UPDATE_SUCCESS:
       return {
         ...state,
         isSyncing: false,
@@ -94,40 +94,40 @@ export default function messageReducer(state = initState, action) {
           ...action.work.content
         }
       }
-    case types.WORKS_SCENE_DEL:
+    case types.WORK_SCENE_DEL:
       return {
         ...state,
         content:{
           ...action.work.content,
-          scenes:action.work.content.scenes.splice(action.index-1,1)
+          scenes:action.work.content.scenes.splice(action.index,1)
         }
       }
-    case types.WORKS_SCENE_ADD:
+    case types.WORK_SCENE_ADD:
       return {
         ...state,
         content:{
           ...action.work.content,
-          scenes:action.work.content.scenes.splice(action.insertAfter-1,action.scene)
+          scenes:action.work.content.scenes.splice(action.insertAfter,action.scene)
         }
       }
-    case types.WORKS_SCENE_IMAGE_SELECT:
+    case types.WORK_SCENE_IMAGE_SELECT:
 
-      scene=action.work.content.scenes.findIndex(action.index-1);
+      scene=action.work.content.scenes[action.index];
       scene={
         ...scene,
         img:action.filepath
       }
       preScenes=[];
-      if(action.index>1){
+      if(action.index>0){
         preScenes=[
-          ...action.work.content.scenes.slice(0,action.index-2)
+          ...action.work.content.scenes.slice(0,action.index)
         ]
       }
       postScenes=[];
-      if(action.index<action.work.content.scenes.length)
+      if(action.index<action.work.content.scenes.length-1)
       {
         postScenes=[
-          ...action.work.content.scenes.slice(action.index)
+          ...action.work.content.scenes.slice(action.index+1)
         ]
       } 
       return {
@@ -142,23 +142,23 @@ export default function messageReducer(state = initState, action) {
         }
       }
 
-    case types.WORKS_SCENE_AUDIO_SELECT:
-      scene=action.work.content.scenes.findIndex(action.index-1);
+    case types.WORK_SCENE_AUDIO_SELECT:
+      scene=action.work.content.scenes[action.index];
       scene={
         ...scene,
         snd:action.filepath
       }
       preScenes=[];
-      if(action.index>1){
+      if(action.index>0){
         preScenes=[
-          ...action.work.content.scenes.slice(0,action.index-2)
+          ...action.work.content.scenes.slice(0,action.index)
         ]
       }
       postScenes=[];
-      if(action.index<action.work.content.scenes.length)
+      if(action.index<action.work.content.scenes.length-1)
       {
         postScenes=[
-          ...action.work.content.scenes.slice(action.index)
+          ...action.work.content.scenes.slice(action.index+1)
         ]
       } 
       return {

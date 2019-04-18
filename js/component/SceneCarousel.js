@@ -49,9 +49,9 @@ export default class SceneCarousel extends Component {
   }
 
   _onImagePress = (index) => {
-    if (!this.props.showPreview)
+    if (!this.props.onImageSelect)
       return
-
+    this.props.onImageSelect(index)
     // this._touchRefs[index].measureInWindow((x, y, width, height) => {
     //   this._fullImageView.show({x, y, width, height}, this.props.images, index)
     // });
