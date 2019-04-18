@@ -66,6 +66,9 @@ export default class BaseScreen extends Component {
   renderNavigationRightView() {
     return null;
   }
+  renderFooterView(){
+    return null;
+  }
 
   renderNavigationBar() {
     return (
@@ -91,6 +94,7 @@ export default class BaseScreen extends Component {
           {this.renderPage()}
         </View>
         {this.renderNavigationBar()}
+        {this.renderFooterView()}
       </View>
     )
   }

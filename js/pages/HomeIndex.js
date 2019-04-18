@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import {ActivityIndicator, Image, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View} from 'react-native';
+import {ActivityIndicator, Image, StyleSheet, TouchableHighlight, TouchableOpacity, View} from 'react-native';
 import BaseScreen from '../pages/BaseScreen'
 import Avatar from '../component/Avatar'
 import Work from '../component/Work'
@@ -11,9 +11,10 @@ import Colors from '../common/Colors'
 import {connect} from 'react-redux'
 // import BaseListView from '../component/BaseListView'
 import {EventAction} from '../redux/action'
-import {Button, Projector, SegmentedBar, Theme, Toast} from 'teaset'
-import Icon from 'react-native-vector-icons/Ionicons'
+import {Projector, SegmentedBar, Theme, Toast} from 'teaset'
 
+
+import { Container, Header, Content, Footer, FooterTab, Button, Icon, Text } from 'native-base';
 
 
 class HomeIndex extends BaseScreen {
@@ -107,7 +108,31 @@ class HomeIndex extends BaseScreen {
       this.props.navigation.navigate('Login');
     }
   }
-
+  renderFooterView(){
+    return (
+      <Footer>
+      <FooterTab>
+        <Button vertical>
+          <Icon name="apps" />
+          <Text>Apps</Text>
+        </Button>
+        <Button vertical>
+          <Icon name="camera" />
+          <Text>Camera</Text>
+        </Button>
+        <Button vertical active={true}>
+          <Icon  name="navigate" />
+          <Text>Navigate</Text>
+        </Button>
+        <Button vertical>
+          <Icon name="person" />
+          <Text>Contact</Text>
+        </Button>
+      </FooterTab>
+    </Footer>
+    )
+    
+  }
   renderPage() {
     return (
  

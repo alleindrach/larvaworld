@@ -38,6 +38,19 @@ export const MESSAGE_CHAT_WITH_USER_MSG_HANDLE_DOING = 'message/chatWithUser/msg
 export const MESSAGE_CHAT_WITH_USER_MSG_HANDLE_SUCCESS = 'message/chatWithUser/msg/handleSuccess'
 export const MESSAGE_CHAT_WITH_USER_MSG_HANDLE_FAIL = 'message/chatWithUser/msg/handleFail'
 
+//work edit activity
+export const WORKS_SELECT='work/select'
+export const WORKS_CACHING='work/caching'
+export const WORKS_CACHED='work/cached'
+export const WORKS_SCENE_ADD='work/scene/add'
+export const WORKS_SCENE_DEL='work/scene/del'
+export const WORKS_UPDATE='work/update'
+export const WORKS_UPDATE_SUCCESS='work/update/success'
+export const WORKS_UPDATE_FAIL='work/update/fail'
+export const WORKS_SCENE_IMAGE_SELECT='work/scene/image/select'
+export const WORKS_SCENE_AUDIO_SELECT='work/scene/audio/select'
+
+
 //home page event list
 export const EVENT_LIST_FETCH_DOING = 'event/fetching'
 export const EVENT_LIST_FETCH_SUCCESS = 'event/fetchSuccess'

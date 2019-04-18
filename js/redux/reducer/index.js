@@ -3,6 +3,7 @@ import  UserReducer from './UserReducer'
 import AppReducer from './AppReducer'
 import MessageReducer from './MessageReducer'
 import  EventReducer from './EventReducer'
+import  WorkReducer from './WorkReducer'
 import {persistStore, persistReducer, createMigrate} from 'redux-persist'
 import {AsyncStorage} from 'react-native'
 import hardSet from 'redux-persist/lib/stateReconciler/hardSet'
@@ -28,10 +29,11 @@ const eventPersistConfig = {
   // stateReconciler:hardSet
 }
 const RootReducer = combineReducers({
-  app: AppReducer,
-  user: persistReducer(userPersistConfig, UserReducer),
+  app:    AppReducer,
+  user:   persistReducer(userPersistConfig, UserReducer),
   message: persistReducer(messagePersistConfig, MessageReducer),
-  event:persistReducer(eventPersistConfig, EventReducer),
+  event:  persistReducer(eventPersistConfig, EventReducer),
+  work:   WorkReducer
 });
 
 export default RootReducer
