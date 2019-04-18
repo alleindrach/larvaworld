@@ -10,14 +10,14 @@ import Work from '../component/Work'
 import Colors from '../common/Colors'
 import {connect} from 'react-redux'
 // import BaseListView from '../component/BaseListView'
-import {EventAction} from '../redux/action'
+import {WorkAction} from '../redux/action'
 import {Projector, SegmentedBar, Theme, Toast} from 'teaset'
 
 
 import { Container, Header, Content, Footer, FooterTab, Button, Icon, Text } from 'native-base';
 
 
-class HomeIndex extends BaseScreen {
+class WorkScreen extends BaseScreen {
   static navigationOptions = {
     header: null
   };
@@ -62,7 +62,7 @@ class HomeIndex extends BaseScreen {
   }
 
   componentDidMount() {
-
+    this.props.selectWork(this.getWork());
   }
 
   scrollToTop = () => {
@@ -70,7 +70,7 @@ class HomeIndex extends BaseScreen {
     this.refs[ref] && this.refs[ref].scrollTo({x: 0, y: 0, animated: true})
   }
 
-  rowData = ()=>{
+  getWork = ()=>{
     let source = require('../assets/icon_nan.png');
     return {
       content:{
@@ -134,16 +134,21 @@ class HomeIndex extends BaseScreen {
     
   }
   renderPage() {
-    return (
- 
+    const {user,work}=this.props;
+    if(work.content)
+      return (
         <View style={{flex: 1}}>
           <Work navigation={this.props.navigation} 
-          user={this.props.user} 
-          data={this.rowData()} 
+          user={user} 
+          data={work} 
           />
         </View>
     
     );
+    else
+      return (
+        null
+      )
 
   }
 }
@@ -151,29 +156,26 @@ class HomeIndex extends BaseScreen {
 const matStateToProps = (state) => {
   return {
     user: state.user,
+    work: state.work
     // eventList: state.eventList
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    onRefresh: (index) => {
-      dispatch(EventAction.fetch(index, 'refresh'))
+    selectWork: (work) => {
+      dispatch(WorkAction.selectWork(work))
     },
-    onLoadMore: (index) => {
-      dispatch(EventAction.fetch(index, 'more'))
+    selectImage: (work,index,filepath) => {
+      dispatch(WorkAction.selectImage(work,index, filepath))
     },
-    onDeleteRow: (index, rowID) => {
-      dispatch(EventAction.deleteRow(index, rowID))
-    },
-    switch: (index) => {
-      dispatch(EventAction.switchIndex(index))
-    },
-   
+    selectAudio: (work,index,filepath) => {
+      dispatch(WorkAction.selectAudio(work,index, filepath))
+    }
   }
 }
 
-export default connect(matStateToProps, mapDispatchToProps, null, {withforwardRefRef: true})(HomeIndex)
+export default connect(matStateToProps, mapDispatchToProps, null, {withforwardRefRef: true})(WorkScreen)
 
 const styles = StyleSheet.create({
   container: {

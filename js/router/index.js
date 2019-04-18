@@ -6,15 +6,15 @@ import RegisterScreen from "../pages/RegisterScreen";
 import ForgetPasswordScreen from '../pages/ForgetPasswordScreen';
 import QrCodeScreen from "../pages/QrCodeScreen";
 import MakeFriendScreen from '../pages/MakeFriendScreen';
-import HomeIndex from '../pages/HomeIndex'
+import WorkScreen from '../pages/WorkScreen'
 
 const AppNavigator = createStackNavigator({
   
   Index: {
     screen: IndexScreen
   },
-  HomeIndex: {
-    screen: HomeIndex
+  Work: {
+    screen: WorkScreen
   },
   MyProfile: {
     screen: MyProfileScreen
@@ -48,7 +48,7 @@ const AppNavigator = createStackNavigator({
 
 },
 {
-  initialRouteName: 'HomeIndex',
+  initialRouteName: 'Work',
   /* The header config from HomeScreen is now here */
   initialRouteParams: {},
   mode: 'card',

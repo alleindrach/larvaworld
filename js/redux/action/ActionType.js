@@ -39,16 +39,17 @@ export const MESSAGE_CHAT_WITH_USER_MSG_HANDLE_SUCCESS = 'message/chatWithUser/m
 export const MESSAGE_CHAT_WITH_USER_MSG_HANDLE_FAIL = 'message/chatWithUser/msg/handleFail'
 
 //work edit activity
-export const WORKS_SELECT='work/select'
-export const WORKS_CACHING='work/caching'
-export const WORKS_CACHED='work/cached'
-export const WORKS_SCENE_ADD='work/scene/add'
-export const WORKS_SCENE_DEL='work/scene/del'
-export const WORKS_UPDATE='work/update'
-export const WORKS_UPDATE_SUCCESS='work/update/success'
-export const WORKS_UPDATE_FAIL='work/update/fail'
-export const WORKS_SCENE_IMAGE_SELECT='work/scene/image/select'
-export const WORKS_SCENE_AUDIO_SELECT='work/scene/audio/select'
+export const WORK_SELECT='work/select'
+export const WORK_CACHING='work/caching'
+export const WORK_CACHED='work/cached'
+export const WORK_CACHE_FAIL='work/cach/fail'
+export const WORK_SCENE_ADD='work/scene/add'
+export const WORK_SCENE_DEL='work/scene/del'
+export const WORK_UPDATE='work/update'
+export const WORK_UPDATE_SUCCESS='work/update/success'
+export const WORK_UPDATE_FAIL='work/update/fail'
+export const WORK_SCENE_IMAGE_SELECT='work/scene/image/select'
+export const WORK_SCENE_AUDIO_SELECT='work/scene/audio/select'
 
 
 //home page event list

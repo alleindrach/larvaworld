@@ -44,6 +44,18 @@ export default function messageReducer(state = initState, action) {
           ...action.work.content
         }
       }
+    case types.WORK_CACHE_FAIL:
+      return {
+        ...state,
+        isCaching: false,
+        isCached: true,
+        content:{
+          ...state.content,
+          ...action.work.content
+        },
+        error:action.error
+
+    }
     case types.WORKS_UPDATE:
       return {
         ...state,
