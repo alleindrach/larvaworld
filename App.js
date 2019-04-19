@@ -5,7 +5,7 @@ import {Provider} from 'react-redux'
 import {AppContainer} from "./js/router/index"
 import { Root } from "native-base";
 import {StompEventTypes, withStomp} from 'react-stompjs'
-
+import config from './js/config/Config'
 import * as Action from './js/redux/action/index'
 class App extends Component {
   constructor(props) {

@@ -23,21 +23,27 @@ export default config = {
       avvod: '',//'?avvod/m3u8/s/960x640/vb/1250k',
       photoThumb: '?imageView2/2/w/960/h/600/format/jpg/q/100'
     },
+    websocket:{
+      address:'/websocket',
+      single:'/user/topic/message',
+      broadcast:'/topic/message',
+    },
     api: {
       //debug server ip
       // base: 'http://192.168.1.104:3000/',
       // base: 'http://60.205.171.124:3000/',
   
       //production server
-      base: 'http://192.168.2.149:8762/',
+      base: 'http://192.168.2.233:8762',
   
-      login: 'user/login',
-      captcha: 'common/captcha.jpg',
-      register: 'user/register',
-      authentication: 'user/authentication',
-      resetPassword: 'user/resetPassword',
-      homepage: 'user/homepage',
-      userInfo: 'user/userInfo',
+      login: '/user/login',
+      captcha: '/common/captcha.jpg',
+      register: '/user/register',
+      authentication: '/user/authentication',
+      resetPassword: '/user/resetPassword',
+      homepage: '/user/homepage',
+      userInfo: '/user/userInfo',
+      storySync:'/story/sync',
       kidInfo: 'user/kidInfo',
       verifyCode: 'common/mobile/captcha',
       modifyUserInfo: 'user/modifyUserInfo',

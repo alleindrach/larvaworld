@@ -5284,6 +5284,13 @@ react-native-keyboard-aware-scroll-view@0.8.0:
     prop-types "^15.6.2"
     react-native-iphone-x-helper "^1.0.3"
 
+react-native-loading-spinner-overlay@^1.0.1:
+  version "1.0.1"
+  resolved "http://registry.npm.taobao.org/react-native-loading-spinner-overlay/download/react-native-loading-spinner-overlay-1.0.1.tgz#07f85a072b6f7d05b8749668cd626df4cc330347"
+  integrity sha1-B/haBytvfQW4dJZozWJt9MwzA0c=
+  dependencies:
+    prop-types "^15.6.2"
+
 react-native-permissions@^1.1.1:
   version "1.1.1"
   resolved "http://registry.npm.taobao.org/react-native-permissions/download/react-native-permissions-1.1.1.tgz#4876004681ff8556454613d85249b01baff9b35b"

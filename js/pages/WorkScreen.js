@@ -13,9 +13,15 @@ import {connect} from 'react-redux'
 import {WorkAction} from '../redux/action'
 import {Projector, SegmentedBar, Theme, Toast} from 'teaset'
 import * as Picker from '../utils/PickerUtils'
-
+import * as FileUtils from '../utils/FileUtils'
+import config from '../config/Config'
 import { Container, Header, Content, Footer, FooterTab, Button, Icon, Text } from 'native-base';
+import * as Progress from 'react-native-progress';
 
+import Spinner from 'react-native-loading-spinner-overlay';
+// import BlurView from 'react-native-blur';
+// var Overlay = require('react-native-overlay');
+// var BlurView = require('react-native-blur').BlurView;
 
 class WorkScreen extends BaseScreen {
   static navigationOptions = {
@@ -76,10 +82,25 @@ class WorkScreen extends BaseScreen {
       this.props.selectImage(this.props.work,index,uri);
     })
   }
+  syncWork=()=>{
+    this.setState({isSyncing:true});
+    try{
+      FileUtils.uploadWork(config.api.base+config.api.storySync,this.props.work,((write,total)=>{
+          this.setState({progress:write/total})
+      }).bind(this),(resopnse=>{
+          this.setState({isSyncing:false})
+      }).bind(this))
+    }catch(err)
+    {
+      this.setState({isSyncing:false})
+    }
+    
+  }
   getWork = ()=>{
     let source = require('../assets/icon_nan.png');
     return {
       content:{
+        channel:1,
         titleIcon:{source},
         title:'作品',
         titleDescription:'作品描述',
@@ -118,7 +139,7 @@ class WorkScreen extends BaseScreen {
     return (
       <Footer>
       <FooterTab>
-        <Button vertical>
+        <Button vertical >
           <Icon name="apps" />
           <Text>Apps</Text>
         </Button>
@@ -126,7 +147,7 @@ class WorkScreen extends BaseScreen {
           <Icon name="camera" />
           <Text>Camera</Text>
         </Button>
-        <Button vertical active={true}>
+        <Button vertical active={true} onPress={this.syncWork}>
           <Icon  name="navigate" />
           <Text>Navigate</Text>
         </Button>
@@ -139,18 +160,28 @@ class WorkScreen extends BaseScreen {
     )
     
   }
+  renderProgress(){
+    return (
+        <Spinner
+          visible={this.state.isSyncing}
+          textContent={'Sync...'}
+          textStyle={styles.spinnerTextStyle}
+        />
+      )
+  }
   renderPage() {
     const {user,work}=this.props;
     if(work.content)
       return (
         <View style={{flex: 1}}>
+          {this.renderProgress()}
           <Work navigation={this.props.navigation} 
           user={user} 
           work={work} 
           imageSelector={this.onImageSelect}
           />
         </View>
-    
+        
     );
     else
       return (
@@ -185,6 +216,14 @@ const mapDispatchToProps = (dispatch) => {
 export default connect(matStateToProps, mapDispatchToProps, null, {withforwardRefRef: true})(WorkScreen)
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems:'center'
+  },
+  spinnerTextStyle: {
+    color: '#FFF'
+  },
   container: {
     flex: 1,
     backgroundColor: Colors.bgColor

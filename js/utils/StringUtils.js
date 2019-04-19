@@ -34,5 +34,4 @@ function param(json) {
       encodeURIComponent(json[key])
   })).join('&')
 }
-
 export default { isStringEmpty, checkTel, checkPwd, checkNickname, param }

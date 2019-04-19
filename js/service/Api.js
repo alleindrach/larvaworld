@@ -61,7 +61,7 @@ const publicAPI = (baseURL: string = config.api.base) => {
             return response.json();
         });        
     const login = (username, password, captcha) =>
-        fetch(baseURL + 'user/login', {
+        fetch(baseURL + config.api.login, {
             ...baseOptions,
             body: 'username=' + username + '&password=' + password + '&captcha=' + captcha
         })
@@ -71,7 +71,7 @@ const publicAPI = (baseURL: string = config.api.base) => {
 
 
     function* connect(stompContext: any) {
-        stompClient = stompContext.newStompClient(baseURL + 'websocket')
+        stompClient = stompContext.newStompClient(baseURL +config.websocket.address)
         yield put(Actions.MessageAction.doConect(stompClient));
     }
     const register = (username, password, captcha, mobile) =>
@@ -92,10 +92,6 @@ const publicAPI = (baseURL: string = config.api.base) => {
                 return response.json();
             });
 
-    function* connect(stompContext: any) {
-        stompClient = stompContext.newStompClient(baseURL + 'websocket')
-        yield put(Actions.MessageAction.doConect(stompClient));
-    }
     const checkVersion = () =>
         fetch(baseURL + config.api.getVersion, {
             ...baseOptions,

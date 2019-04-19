@@ -2,6 +2,7 @@
 import config from '../config/Config'
 import _ from 'lodash'
 import RNFetchBlob from 'rn-fetch-blob'
+import {Platform} from 'react-native';
 
 export const baseCacheDir = RNFetchBlob.fs.dirs.CacheDir + '/imagesCacheDir';
 
@@ -75,22 +76,9 @@ export const getFileName=(uri)=>{
       }
   }
   export const getFileNameWithoutSuffix=(uri)=>{
-    if (uri.match('^\\S+/\\S+$')) {
-        let array = uri.split("/");
-        if (array.length > 0) {
-          filename=array[array.length - 1];
-          let array = filename.split(".");
-            if (array.length > 0) {
-              return array[0];
-            }
-          return filename; 
-        }
-        else {
-          return ''
-        }
-      } else {
-        return ''
-      }
+    let filename=getFileName(uri);
+    let sufix=getSuffix(uri);
+    return _.trimEnd(filename,'.'+sufix)
   }
 
 
@@ -188,7 +176,13 @@ export const uploadFile=(file,onProgress,onFinish)=>
     }).catch((err) => {
         console.log('err', err)
     })
-
+export const cleanLocalFilePath=(url)=>{
+  if(isLocalFile(url) && Platform.OS==='ios')
+  {
+      url=url.replace("file://",'')
+  }
+  return url;
+}
 export const  uploadWork=(url,work,onProgress,onFinish) =>
 {
     const workJson=JSON.stringify(work.content);
@@ -201,24 +195,26 @@ export const  uploadWork=(url,work,onProgress,onFinish) =>
       if (isLocalFile(scene.snd) &&  _.indexOf(files,scene.snd)<0)
           files.push(scene.snd);
       return files;
-    },[]).map(file=>{return {name:getFileNameWithoutSuffix(file),filename:getFileName(file),data:RNFetchBlob.wrap(file)}})
+    },[]).map(file=>{return {name:getFileNameWithoutSuffix(file),filename:getFileName(file),data:RNFetchBlob.wrap(cleanLocalFilePath(file))}})
     
-    return RNFetchBlob.fetch('POST', url, {
+    RNFetchBlob.fetch('PUT', url, {
       // header...
       'Content-Type': 'multipart/form-data'
       }, [
         // path是指文件的路径，wrap方法可以根据文件路径获取到文件信息
         ...files,
         { name: 'work', data: workJson },
+        { name: 'id',data:work.content.id? work.content.id:''}
         //... 可能还会有其他非文件字段{name:'字段名',data:'对应值'}
       ])
       .uploadProgress((written, total) => {
-          onProgress && onProgress(file,written,total)
+          onProgress && onProgress(written,total)
       })
       .then((res) => {
-          onFinish && onFinish(work,res)
+          onFinish && onFinish(res)
       }).catch((err) => {
           console.log('err', err)
+          throw new Error(err)
       })
 }
     
