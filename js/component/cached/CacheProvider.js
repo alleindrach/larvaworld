@@ -147,6 +147,37 @@ function runPrefetchTask(prefetcher, options) {
   return runPrefetchTask(prefetcher, options);
 }
 
+//串行下载
+function runPrefetchTaskEx(prefetcher, options) {
+  const url = prefetcher.next();
+  if (!url) {
+    return Promise.resolve();
+  }
+  // if url is cacheable - cache it
+  if (url.remote && isCacheable(url.remote) && url.local) {
+     // check cache
+     return getCachedPath(url.remote, options)
+     // if not found download
+       .catch(() => cacheLocalFile(url.remote,url.local, options))
+       // allow prefetch task to fail without terminating other prefetch tasks
+       .catch(_.noop)
+       // then run next task
+       .then(() => runPrefetchTaskEx(prefetcher, options));
+  }
+  else{
+    // check cache
+    return getCachedPath(url, options)
+    // if not found download
+      .catch(() => cacheFile(url, options))
+      // allow prefetch task to fail without terminating other prefetch tasks
+      .catch(_.noop)
+      // then run next task
+      .then(() => runPrefetchTaskEx(prefetcher, options));
+  }
+  // else get next
+  return runPrefetchTaskEx(prefetcher, options);
+}
+
 
 // API
 
@@ -234,7 +265,7 @@ function cacheMultipleFiles(urls, options = defaultOptions) {
   const prefetcher = createPrefetcer(urls);
   const numberOfWorkers = urls.length;
   const promises = _.times(numberOfWorkers, () =>
-    runPrefetchTask(prefetcher, options)
+    runPrefetchTaskEx(prefetcher, options)
   );
   return Promise.all(promises);
 }

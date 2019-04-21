@@ -65,9 +65,11 @@ const publicAPI = (baseURL: string = config.api.base) => {
             ...baseOptions,
             body: 'username=' + username + '&password=' + password + '&captcha=' + captcha
         })
-            .then((response) => {
+        .then((response) => {
                 return response.json();
-            });
+        }).catch(error=>{
+            return false
+        });
 
 
     function* connect(stompContext: any) {

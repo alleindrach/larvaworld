@@ -41,7 +41,7 @@ export default class BaseScreen extends Component {
 
   componentDidMount() {
     this._isMounted = true
-    Orientation.addOrientationListener(this._onOrientationChange);
+    // Orientation.addOrientationListener(this._onOrientationChange);
   }
 
   componentWillUnmount() {
@@ -52,7 +52,7 @@ export default class BaseScreen extends Component {
     return true
   }
   _onOrientationChange(curOrt){
-    this.setState({curOrt});
+    // this.setState({curOrt});
   }
 
   renderNavigationTitle() {

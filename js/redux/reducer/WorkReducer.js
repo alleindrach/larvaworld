@@ -1,6 +1,7 @@
 
 import * as types from '../action/ActionType'
 import {AsyncStorage} from 'react-native'
+
 const initState = {
   isCaching: false,
   isCached: false,
@@ -69,13 +70,18 @@ export default function messageReducer(state = initState, action) {
     case types.WORK_UPDATE_SUCCESS:
       return {
         ...state,
-        isSyncing: false,
-        isSynced: true,
-        content:{
-          ...state.content,
-          ...action.work.content
-        }
+        merging:action.merging
       }
+    case types.WORK_UPDATE_MERGED:
+    return {
+      ...state,
+      isSyncing: false,
+      isSynced: true,
+      content:{
+        ...state.merging.content, 
+      },
+      merging:null
+    }
     case types.WORK_UPDATE_FAIL:
       return {
         ...state,
@@ -84,16 +90,7 @@ export default function messageReducer(state = initState, action) {
         error:action.error,
         
       }
-    case types.WORK_UPDATE_SUCCESS:
-      return {
-        ...state,
-        isSyncing: false,
-        isSynced: true,
-        content:{
-          ...state.content,
-          ...action.work.content
-        }
-      }
+  
     case types.WORK_SCENE_DEL:
       return {
         ...state,

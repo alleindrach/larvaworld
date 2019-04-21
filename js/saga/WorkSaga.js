@@ -43,6 +43,8 @@ export function  watchWorkCach() {
                result=yield call(cacheFiles,state.work)
                if(result)
                     yield put(WorkActions.workcached(state.work))
+                else
+                    yield put(WorkActions.workcachefail(state.work,'缓存网络文件失败'))
             }catch(error)
             {
                 yield put(WorkActions.workcachefail(state.work,error))
@@ -62,3 +64,53 @@ export function  watchWorkCach() {
         worker
     };
 }
+export function  watchWorkSync() {
+    function cacheFiles(local,merging)
+    {
+        
+        allUrls=_.reduce(_.mergeWith(local.scenes,merging.scenes,(local,remote)=>{
+            return {
+                img:{local:local.img,remote:remote.img},
+                snd:{local:local.snd,remote:remote.snd},
+            }
+        }),(acc,scene) =>{
+            acc.push(scene.img);
+            acc.push(scene.snd);
+            return acc;
+        } ,[]);
+        CacheProvider.cacheMultipleFiles(allUrls).then(()=>{return true}).catch(()=>{return false;})
+    }
+
+    function * worker() {
+
+        const state = yield select();
+       
+            try{
+               result=yield call(cacheFiles,state.work,state.merging)
+               if(result)
+                    yield put(WorkActions.updateWorkMerged(state.work))
+                else
+                    yield put(WorkActions.updateWorkFail(state.work,'缓存本地文件失败'))
+            }catch(error)
+            {
+                yield put(WorkActions.updateWorkFail(state.work,error))
+            }
+        
+      }
+    
+    function * watcher() {
+        while (true) {
+            yield take(Types.WORK_UPDATE_SUCCESS);
+            yield call(worker);
+        }
+    }
+    
+    return {
+        watcher,
+        worker
+    };
+}
+
+
+
+

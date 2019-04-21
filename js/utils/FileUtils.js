@@ -183,7 +183,7 @@ export const cleanLocalFilePath=(url)=>{
   }
   return url;
 }
-export const  uploadWork=(url,work,onProgress,onFinish) =>
+export const  uploadWork=(url,work) =>
 {
     const workJson=JSON.stringify(work.content);
     const {scenes}=work.content;
@@ -197,9 +197,10 @@ export const  uploadWork=(url,work,onProgress,onFinish) =>
       return files;
     },[]).map(file=>{return {name:getFileNameWithoutSuffix(file),filename:getFileName(file),data:RNFetchBlob.wrap(cleanLocalFilePath(file))}})
     
-    RNFetchBlob.fetch('PUT', url, {
+    return RNFetchBlob.fetch('POST', url, {
       // header...
-      'Content-Type': 'multipart/form-data'
+      'Content-Type': 'multipart/form-data',
+      'enctype': 'multipart/form-data'
       }, [
         // path是指文件的路径，wrap方法可以根据文件路径获取到文件信息
         ...files,
@@ -207,15 +208,7 @@ export const  uploadWork=(url,work,onProgress,onFinish) =>
         { name: 'id',data:work.content.id? work.content.id:''}
         //... 可能还会有其他非文件字段{name:'字段名',data:'对应值'}
       ])
-      .uploadProgress((written, total) => {
-          onProgress && onProgress(written,total)
-      })
-      .then((res) => {
-          onFinish && onFinish(res)
-      }).catch((err) => {
-          console.log('err', err)
-          throw new Error(err)
-      })
+      
 }
     
 export const uploadFiles = (uri, host, formInput, onprogress) => {

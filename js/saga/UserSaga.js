@@ -11,7 +11,7 @@ export function  watchUserLogin() {
         if (!state.user.isLogin) {
             try{
                 response =yield call(Api().login,state.user.username,state.user.password,state.user.captcha) ;
-                if(response.state==1){
+                if( response && response.state==1){
                     yield put(UserActions.loginSuccess(response.data,state.user.goBack))
                     if(state.user.goBack)
                         state.user.goBack();
@@ -39,24 +39,24 @@ export function  watchUserLogin() {
         worker
     };
 }
-export function  watchUserLoginSuccess() {
+// export function  watchUserLoginSuccess() {
 
-    function * worker() {
-         yield put(MessageActions.doConect);
-    }
+//     function * worker() {
+//          yield put(MessageActions.doConect);
+//     }
     
-    function * watcher() {
-        while (true) {
-            yield take(Types.USER_LOGIN_SUCCESS);
-            yield call(worker);
-        }
-    }
+//     function * watcher() {
+//         while (true) {
+//             yield take(Types.USER_LOGIN_SUCCESS);
+//             yield call(worker);
+//         }
+//     }
     
-    return {
-        watcher,
-        worker
-    };
-}
+//     return {
+//         watcher,
+//         worker
+//     };
+// }
 
 export function  watchHomepageUpdate() {
 

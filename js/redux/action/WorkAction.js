@@ -31,12 +31,20 @@ export function updateWork(work) {
       work
     }
 }
-export function updateWorkSuccess(work) {
+export function updateWorkSuccess(work,merging) {
 return {
     type: types.WORK_UPDATE_SUCCESS,
-    work
+    work,
+    merging
     }
 }
+export function updateWorkMerged(work) {
+return {
+    type: types.WORK_UPDATE_MERGED,
+    work,
+    }
+}
+
 
 export function updateWorkFail(work) {
     return {

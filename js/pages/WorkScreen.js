@@ -17,6 +17,7 @@ import * as FileUtils from '../utils/FileUtils'
 import config from '../config/Config'
 import { Container, Header, Content, Footer, FooterTab, Button, Icon, Text } from 'native-base';
 import * as Progress from 'react-native-progress';
+import { ModalIndicator} from 'teaset'
 
 import Spinner from 'react-native-loading-spinner-overlay';
 // import BlurView from 'react-native-blur';
@@ -83,18 +84,28 @@ class WorkScreen extends BaseScreen {
     })
   }
   syncWork=()=>{
-    this.setState({isSyncing:true});
-    try{
-      FileUtils.uploadWork(config.api.base+config.api.storySync,this.props.work,((write,total)=>{
-          this.setState({progress:write/total})
-      }).bind(this),(resopnse=>{
-          this.setState({isSyncing:false})
-      }).bind(this))
-    }catch(err)
-    {
-      this.setState({isSyncing:false})
-    }
-    
+    this.props.updateWork(this.props.work);
+    FileUtils.uploadWork(config.api.base+config.api.storySync,this.props.work)
+    .uploadProgress((written, total) => {
+      // onProgress && onProgress(written,total)
+    })
+    .then((res) => {
+      if(res.data && JSON.parse(res.data).state==1)
+      {
+          merging=JSON.parse(JSON.parse(res.data).data)
+          this.props.syncWorkSuccess(this.props.work,merging)
+      }else if(JSON.parse(res.data).state!=1){
+        this.props.updateWorkFail(this.props.work,JSON.parse(res.data).message)
+      }
+      else{
+        this.props.updateWorkFail(this.props.work,'')
+      }
+      console.log(res);
+    }).catch((err) => {
+      this.props.updateWorkFail(this.props.work,'网络错误')
+    }).finally(()=>{
+      }
+    )    
   }
   getWork = ()=>{
     let source = require('../assets/icon_nan.png');
@@ -161,13 +172,13 @@ class WorkScreen extends BaseScreen {
     
   }
   renderProgress(){
-    return (
-        <Spinner
-          visible={this.state.isSyncing}
-          textContent={'Sync...'}
-          textStyle={styles.spinnerTextStyle}
-        />
+    if(this.props.work.isSyncing)
+    {
+      return (
+        <ModalIndicator.IndicatorView text= '正在同步' />
       )
+    }else
+    return (null)
   }
   renderPage() {
     const {user,work}=this.props;
@@ -209,6 +220,19 @@ const mapDispatchToProps = (dispatch) => {
     },
     selectAudio: (work,index,filepath) => {
       dispatch(WorkAction.selectAudio(work,index, filepath))
+    },
+    updateWork:(work,merging)=>{
+      dispatch(WorkAction.updateWork(work))
+    },
+    
+    syncWorkSuccess:(work,merging)=>{
+      dispatch(WorkAction.updateWorkSuccess(work,merging))
+    },
+    syncWOrkFail:(work)=>{
+      dispatch(WorkAction.updateWorkFail(work))
+    },
+    syncWork:(work)=>{
+      dispatch(WorkAction.updateWork(work))
     }
   }
 }
