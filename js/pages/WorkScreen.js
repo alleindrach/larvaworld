@@ -85,27 +85,27 @@ class WorkScreen extends BaseScreen {
   }
   syncWork=()=>{
     this.props.syncWork(this.props.work);
-    FileUtils.uploadWork(config.api.base+config.api.storySync,this.props.work)
-    .uploadProgress((written, total) => {
-      // onProgress && onProgress(written,total)
-    })
-    .then((res) => {
-      if(res.data && JSON.parse(res.data).state==1)
-      {
-          merging=JSON.parse(JSON.parse(res.data).data)
-          this.props.syncWorkSuccess(this.props.work,merging)
-      }else if(JSON.parse(res.data).state!=1){
-        this.props.updateWorkFail(this.props.work,JSON.parse(res.data).message)
-      }
-      else{
-        this.props.updateWorkFail(this.props.work,'')
-      }
-      console.log(res);
-    }).catch((err) => {
-      this.props.updateWorkFail(this.props.work,'网络错误')
-    }).finally(()=>{
-      }
-    )    
+    // FileUtils.uploadWork(config.api.base+config.api.storySync,this.props.work)
+    // .uploadProgress((written, total) => {
+    //   // onProgress && onProgress(written,total)
+    // })
+    // .then((res) => {
+    //   if(res.data && JSON.parse(res.data).state==1)
+    //   {
+    //       merging=JSON.parse(JSON.parse(res.data).data)
+    //       this.props.syncWorkSuccess(this.props.work,merging)
+    //   }else if(JSON.parse(res.data).state!=1){
+    //     this.props.updateWorkFail(this.props.work,JSON.parse(res.data).message)
+    //   }
+    //   else{
+    //     this.props.updateWorkFail(this.props.work,'')
+    //   }
+    //   console.log(res);
+    // }).catch((err) => {
+    //   this.props.updateWorkFail(this.props.work,'网络错误')
+    // }).finally(()=>{
+    //   }
+    // )    
   }
   getWork = ()=>{
     let source = require('../assets/icon_nan.png');
@@ -174,10 +174,11 @@ class WorkScreen extends BaseScreen {
   renderProgress(){
     if(this.props.work.isSyncing)
     {
-      return (
-        <ModalIndicator.IndicatorView text= '正在同步' />
-      )
+      ModalIndicator.show(`正在同步`);  
     }else
+    {
+      ModalIndicator.hide();  
+    }
     return (null)
   }
   renderPage() {
