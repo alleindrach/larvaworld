@@ -9,7 +9,7 @@ export function  watchUserLogin() {
 
         const state = yield select();
         if (!state.user.isLogin) {
-            try{
+            // try{
                 response =yield call(Api().login,state.user.username,state.user.password,state.user.captcha) ;
                 if( response && response.state==1){
                     yield put(UserActions.loginSuccess(response.data,state.user.goBack))
@@ -20,10 +20,10 @@ export function  watchUserLogin() {
                 {
                     yield put(UserActions.loginFail(response.message))
                 }
-            }catch(error)
-            {
-                yield put(UserActions.loginFail('网络请求失败，请检查网络连接'));
-            }
+            // }catch(error)
+            // {
+            //     yield put(UserActions.loginFail('网络请求失败，请检查网络连接'));
+            // }
         }
       }
     

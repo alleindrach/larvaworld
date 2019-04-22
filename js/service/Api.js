@@ -70,12 +70,6 @@ const publicAPI = (baseURL: string = config.api.base) => {
         }).catch(error=>{
             return false
         });
-
-
-    function* connect(stompContext: any) {
-        stompClient = stompContext.newStompClient(baseURL +config.websocket.address)
-        yield put(Actions.MessageAction.doConect(stompClient));
-    }
     const register = (username, password, captcha, mobile) =>
         fetch(baseURL + config.api.register, {
             ...baseOptions,
@@ -121,7 +115,7 @@ const publicAPI = (baseURL: string = config.api.base) => {
 
 
     return {
-        post,get,put,del, login, register, mobileCaptcha, connect, checkVersion, fetchHomepageInfo
+        post,get,put,del, login, register, mobileCaptcha, checkVersion, fetchHomepageInfo
     }
 
 }

@@ -25,31 +25,32 @@ export function workcachefail(work,error) {
       error
     }
   }  
-export function updateWork(work) {
+export function syncWork(work) {
     return {
-      type: types.WORK_UPDATE,
+      type: types.WORK_SYNC,
       work
     }
 }
-export function updateWorkSuccess(work,merging) {
+export function syncWorkUploadSuccess(work,merging) {
 return {
-    type: types.WORK_UPDATE_SUCCESS,
+    type: types.WORK_SYNC_UPLOAD_SUCCESS,
     work,
     merging
     }
 }
-export function updateWorkMerged(work) {
+export function syncWorkMerged(work) {
 return {
-    type: types.WORK_UPDATE_MERGED,
+    type: types.WORK_SYNC_MERGED,
     work,
     }
 }
 
 
-export function updateWorkFail(work) {
+export function syncWorkUploadFail(work,error) {
     return {
-        type: types.WORK_UPDATE_FAIL,
-        work
+        type: types.WORK_SYNC_UPLOAD_FAIL,
+        work,
+        error
     }
 }
 

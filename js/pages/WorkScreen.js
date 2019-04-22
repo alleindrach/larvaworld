@@ -84,7 +84,7 @@ class WorkScreen extends BaseScreen {
     })
   }
   syncWork=()=>{
-    this.props.updateWork(this.props.work);
+    this.props.syncWork(this.props.work);
     FileUtils.uploadWork(config.api.base+config.api.storySync,this.props.work)
     .uploadProgress((written, total) => {
       // onProgress && onProgress(written,total)
@@ -221,18 +221,14 @@ const mapDispatchToProps = (dispatch) => {
     selectAudio: (work,index,filepath) => {
       dispatch(WorkAction.selectAudio(work,index, filepath))
     },
-    updateWork:(work,merging)=>{
-      dispatch(WorkAction.updateWork(work))
+    syncWorkMerge:(work,merging)=>{
+      dispatch(WorkAction.syncWorkUploadSuccess(work,merging))
     },
-    
-    syncWorkSuccess:(work,merging)=>{
-      dispatch(WorkAction.updateWorkSuccess(work,merging))
-    },
-    syncWOrkFail:(work)=>{
-      dispatch(WorkAction.updateWorkFail(work))
+    syncWorkFail:(work)=>{
+      dispatch(WorkAction.syncWorkUploadFail(work))
     },
     syncWork:(work)=>{
-      dispatch(WorkAction.updateWork(work))
+      dispatch(WorkAction.syncWork(work))
     }
   }
 }

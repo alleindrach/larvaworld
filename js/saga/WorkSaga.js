@@ -4,6 +4,8 @@ import * as Types from '../redux/action/ActionType';
 import * as WorkActions from '../redux/action/WorkAction';
 import * as MessageActions from '../redux/action/MessageAction';
 import * as CacheProvider from '../component/cached/CacheProvider';
+import config from '../config/Config'
+import * as FileUtils from '../utils/FileUtils'
 import _  from 'lodash'
 export function  watchWorkCach() {
     function cacheFiles(work)
@@ -64,11 +66,65 @@ export function  watchWorkCach() {
         worker
     };
 }
-export function  watchWorkSync() {
-    function cacheFiles(local,merging)
+
+export function  watchWorkStartSync() {
+    function uploadFiles(work)
     {
         
-        allUrls=_.reduce(_.mergeWith(local.scenes,merging.scenes,(local,remote)=>{
+        return FileUtils.uploadWork(config.api.base+config.api.storySync,work)
+        .uploadProgress((written, total) => {
+          progress=written/total;
+        })
+        .then((res) => {
+          if(res.data && JSON.parse(res.data).state==1)
+          {
+              merging=JSON.parse(JSON.parse(res.data).data)
+              return {success:true,merging}
+          }else if(JSON.parse(res.data).state!=1){
+              return {success:false,error:JSON.parse(res.data).message}
+          }
+          else{
+            return {success:false,error:''}
+          }
+          console.log(res);
+        }).catch((err) => {
+          return {success:false,error:'网络错误'}
+        })
+    }
+    function * worker() {
+        console.log('start uploadding')
+        const state = yield select();
+        // if (!state.work.isSynced) {
+            // try{
+               result=yield call(uploadFiles,state.work)
+               if(result.success)
+                    yield put(WorkActions.syncWorkUploadSuccess(state.work,result.merging))
+                else
+                    yield put(WorkActions.syncWorkUploadFail(state.work,result.error))
+            // }catch(error)
+            // {
+            //     yield put(WorkActions.syncWorkUploadFail(state.work,error))
+            // }
+        // }
+      }
+    
+    function * watcher() {
+        while (true) {
+            yield take(Types.WORK_SYNC);
+            yield call(worker);
+        }
+    }
+    
+    return {
+        watcher,
+        worker
+    };
+}
+export function  watchWorkMerge() {
+    function mergeFiles(local,merging)
+    {
+        
+        allUrls=_.filter(_.reduce(_.mergeWith(_.cloneDeep(local.scenes),merging.scenes,(local,remote)=>{
             return {
                 img:{local:local.img,remote:remote.img},
                 snd:{local:local.snd,remote:remote.snd},
@@ -77,8 +133,20 @@ export function  watchWorkSync() {
             acc.push(scene.img);
             acc.push(scene.snd);
             return acc;
-        } ,[]);
-        CacheProvider.cacheMultipleFiles(allUrls).then(()=>{return true}).catch(()=>{return false;})
+        } ,[]),(item)=>{ 
+            if( item.local!=item.remote && FilesUtils.isLocalFile(item.local.img)) 
+            return true;
+            else 
+            return false;
+        });
+        if(allUrls && allUrls.length>0)
+            return  CacheProvider.cacheMultipleFiles(allUrls).then(()=>{
+                return true;
+            }).catch(()=>{
+                return false;
+            })
+        else
+            return true;
     }
 
     function * worker() {
@@ -86,21 +154,21 @@ export function  watchWorkSync() {
         const state = yield select();
        
             try{
-               result=yield call(cacheFiles,state.work,state.merging)
+               result=yield call(mergeFiles,state.work.content,state.work.merging)
                if(result)
-                    yield put(WorkActions.updateWorkMerged(state.work))
+                    yield put(WorkActions.syncWorkMerged(state.work))
                 else
-                    yield put(WorkActions.updateWorkFail(state.work,'缓存本地文件失败'))
+                    yield put(WorkActions.syncWorkUploadFail(state.work,'缓存本地文件失败'))
             }catch(error)
             {
-                yield put(WorkActions.updateWorkFail(state.work,error))
+                yield put(WorkActions.syncWorkUploadFail(state.work,error))
             }
         
       }
     
     function * watcher() {
         while (true) {
-            yield take(Types.WORK_UPDATE_SUCCESS);
+            yield take(Types.WORK_SYNC_UPLOAD_SUCCESS);
             yield call(worker);
         }
     }

@@ -28,9 +28,16 @@ const eventPersistConfig = {
   whitelist:[],// ['isConnecting','isConnected','error','stompClient','stompContext','msgReceiver'],
   // stateReconciler:hardSet
 }
+const workPersistConfig = {
+  key: 'work',
+  storage: AsyncStorage,
+  version: 1.1,
+  whitelist:[],// ['isConnecting','isConnected','error','stompClient','stompContext','msgReceiver'],
+  // stateReconciler:hardSet
+}
 const RootReducer = combineReducers({
   app:    AppReducer,
-  work:   WorkReducer,
+  work:   persistReducer(workPersistConfig,WorkReducer),
   user:   persistReducer(userPersistConfig, UserReducer),
   message: persistReducer(messagePersistConfig, MessageReducer),
   event:  persistReducer(eventPersistConfig, EventReducer),

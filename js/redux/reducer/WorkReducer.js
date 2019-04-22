@@ -7,6 +7,7 @@ const initState = {
   isCached: false,
   isSyncing:false,
   isSynced:false,
+  uploadingProcess:100,
   content:null
 }
 
@@ -19,6 +20,7 @@ export default function messageReducer(state = initState, action) {
         isCached: false,
         isSyncing:false,
         isSynced:false,
+        uploadingProcess:100,
         error: '',
         content:{
           ...state.content,
@@ -57,36 +59,44 @@ export default function messageReducer(state = initState, action) {
         error:action.error
 
     }
-    case types.WORK_UPDATE:
+    case types.WORK_SYNC:
       return {
         ...state,
         isSyncing: true,
         isSynced: false,
+        uploadingProcess:0,
         content:{
           ...state.content,
           ...action.work.content
         }
       }
-    case types.WORK_UPDATE_SUCCESS:
+    case types.WORK_SYNC_UPLOADING:
       return {
         ...state,
+        uploadingProcess:action.process,
+      }
+    case types.WORK_SYNC_UPLOAD_SUCCESS:
+      return {
+        ...state,
+        uploadingProcess:100,
         merging:action.merging
       }
-    case types.WORK_UPDATE_MERGED:
+    case types.WORK_SYNC_MERGED:
     return {
       ...state,
       isSyncing: false,
       isSynced: true,
       content:{
-        ...state.merging.content, 
+        ...state.merging, 
       },
       merging:null
     }
-    case types.WORK_UPDATE_FAIL:
+    case types.WORK_SYNC_UPLOAD_FAIL:
       return {
         ...state,
         isSyncing: false,
         isSynced: false,
+        uploadingProcess:100,
         error:action.error,
         
       }

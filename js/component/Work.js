@@ -95,7 +95,10 @@ export default class Work extends Component {
         <Card>
           <CardItem>
             <Left>
-              <Thumbnail source={work.content.titleIcon.source} />
+            {work.content.titleIcon && work.content.titleIcon.source ?
+              <Thumbnail source={work.content.titleIcon.source} />:
+              null
+            }
               <Body>
                 <Text>{work.content.title}</Text>
                 <Text note>{work.content.titleDescription}</Text>

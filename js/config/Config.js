@@ -6,24 +6,11 @@ export default config = {
         'Content-Type': 'application/json',
       }
     },
-    OSS: {
-      //debug oss
-      // photo: 'http://oxqwow36h.bkt.clouddn.com/',
-      // video: 'http://oxquzy4gt.bkt.clouddn.com/',
-      // audio: 'http://oxquzki2i.bkt.clouddn.com/',
-  
-      //production oss
-      photo: 'http://image.iyababy.cn/',
-      video: 'http://video.iyababy.cn/',
-      audio: 'http://audio.iyababy.cn/',
-      source: 'http://ow9txy6ol.bkt.clouddn.com/',
-  
-      //oss api
-      videoThumb: '?vframe/jpg/offset/1',
-      avvod: '',//'?avvod/m3u8/s/960x640/vb/1250k',
-      photoThumb: '?imageView2/2/w/960/h/600/format/jpg/q/100'
+    file: {
+      downloadTimeout:50000
     },
     websocket:{
+      base: 'http://192.168.2.233:8762',
       address:'/websocket',
       single:'/user/topic/message',
       broadcast:'/topic/message',

@@ -1,15 +1,16 @@
-import { take, call, select  } from 'redux-saga/effects';
+import { take, call, select ,put } from 'redux-saga/effects';
 
 import * as Types from '../redux/action/ActionType';
 import Api from '../service/Api'
 import * as Actions from '../redux/action/index';
 import config from '../config/Config'
 export function  watchStompStart () {
-
+    
     function * worker() {
         const state = yield select();
         if (state.user.isLogin) {
-            yield call(Api().connect,state.message.stompContext);
+            stompClient = state.message.stompContext.newStompClient(config.websocket.base +config.websocket.address)
+            yield put(Actions.MessageAction.doConect(stompClient));
         }
       }
     

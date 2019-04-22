@@ -10,6 +10,7 @@ import SHA1 from "crypto-js/sha1"
 import URL  from 'url-parse';
 import {EventEmitter} from 'events';
 import * as FileUtils from '../../utils/FileUtils'
+import config from '../../config/Config'
 const defaultHeaders = {};
 // const defaultImageTypes = ['png', 'jpeg', 'jpg', 'gif', 'bmp', 'tiff', 'tif'];
 const defaultResolveHeaders = _.constant(defaultHeaders);
@@ -90,7 +91,7 @@ function downloadFile(fromUrl, toFile, headers = {}) {
     const tmpFile = toFile + '.tmp';
     activeDownloads[toFile] = new Promise((resolve, reject) => {
       RNFetchBlob
-        .config({path: tmpFile})
+        .config({path: tmpFile,timeout:config.file.downloadTimeout})
         .fetch('GET', fromUrl, headers)
         // listen to download progress event, every 10%
         .progress({interval: 250}, (received, total) => {
