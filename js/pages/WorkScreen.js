@@ -151,20 +151,24 @@ class WorkScreen extends BaseScreen {
       <Footer>
       <FooterTab>
         <Button vertical >
-          <Icon name="apps" />
-          <Text>Apps</Text>
+          <Icon type="EvilIcons"  name="plus" />
+          <Text>加页</Text>
         </Button>
         <Button vertical>
-          <Icon name="camera" />
-          <Text>Camera</Text>
+          <Icon type="EvilIcons"   name="minus" />
+          <Text>删页</Text>
+        </Button>
+        <Button vertical>
+          <Icon type="EvilIcons"   name="sc-instagram" />
+          <Text>录音</Text>
         </Button>
         <Button vertical active={true} onPress={this.syncWork}>
-          <Icon  name="navigate" />
-          <Text>Navigate</Text>
+          <Icon  type="EvilIcons"   name="refresh" />
+          <Text>同步</Text>
         </Button>
         <Button vertical>
-          <Icon name="person" />
-          <Text>Contact</Text>
+          <Icon  type="EvilIcons"  name="trash" />
+          <Text>删除</Text>
         </Button>
       </FooterTab>
     </Footer>
