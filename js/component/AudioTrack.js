@@ -1,11 +1,12 @@
 import React from 'react'
-import { View, Image, Text, Slider, TouchableOpacity, Platform, Alert} from 'react-native';
+import {StyleSheet, View, Image, Text, TouchableOpacity, Platform, Alert} from 'react-native';
 import _ from 'lodash';
 import Sound from 'react-native-sound';
 import PropTypes from 'prop-types';
 import * as  FileUtils from '../utils/FileUtils'
 import * as CacheProvider from './cached/CacheProvider'
-
+import Slider from "react-native-slider";
+import {  Icon } from 'native-base';
 const img_speaker = require('../assets/sound/ui_speaker.png');
 const img_pause = require('../assets/sound/ui_pause.png');
 const img_play = require('../assets/sound//ui_play.png');
@@ -235,7 +236,8 @@ export default class AudioTrack extends React.Component{
 
         return ( (m<10?'0'+m:m) + ':' + (s<10?'0'+s:s));
     }
-
+    
+      
     render(){
 
         const currentTimeString = this.getAudioTimeString(this.state.playSeconds);
@@ -243,29 +245,53 @@ export default class AudioTrack extends React.Component{
         const {style}=this.props;
         return (
             <View style={[{justifyContent:'center'},style]}>
-               
                 <View style={{marginVertical:5, marginHorizontal:15, flexDirection:'row'}}>
                     <Text style={{color:'white', alignSelf:'center',fontSize: em(20),width:em(60)}}>{currentTimeString}</Text>
                     {this.state.playState == 'playing' && 
                     <TouchableOpacity onPress={this.pause} style={{marginHorizontal:2,alignSelf:'center',}}>
-                        <Image source={img_pause} style={{width:30, height:30,alignSelf:'center',}}/>
+                        <Icon type="FontAwesome"   name="pause"  style={{alignSelf:'center',fontSize: 20, width:22,color: '#31a4db'}}/>
                     </TouchableOpacity>}
                     {this.state.playState == 'paused' && 
                     <TouchableOpacity onPress={this.play} style={{marginHorizontal:2,alignSelf:'center',}}>
-                        <Image source={img_play} style={{width:30, height:30,alignSelf:'center',}}/>
+                        <Icon type="FontAwesome"   name="play"   style={{alignSelf:'center',fontSize: 20,width:22, color: '#31a4db'}}/>
                     </TouchableOpacity>}
                     <Slider
-                        onTouchStart={this.onSliderEditStart}
-                        // onTouchMove={() => console.log('onTouchMove')}
-                        onTouchEnd={this.onSliderEditEnd}
-                        // onTouchEndCapture={() => console.log('onTouchEndCapture')}
-                        // onTouchCancel={() => console.log('onTouchCancel')}
+                        style={sliderStyle.container}
+                        trackStyle={sliderStyle.track}
+                        thumbStyle={sliderStyle.thumb}
+                        minimumTrackTintColor='#31a4db'
+                        thumbTouchSize={{width: 50, height: 40}}
+                        value={this.state.playSeconds}
                         onValueChange={this.onSliderEditing}
-                        value={this.state.playSeconds} maximumValue={this.state.duration} maximumTrackTintColor='gray' minimumTrackTintColor='white' thumbTintColor='white' 
-                        style={{flex:1, alignSelf:'center', marginHorizontal:Platform.select({ios:5})}}/>
+                        onSlidingStart={this.onSliderEditStart}
+                        onSlidingComplete={this.onSliderEditEnd}
+                    />
                     <Text style={{color:'white', alignSelf:'center',fontSize: em(20)}}>{durationString}</Text>
                 </View>
             </View>
         )
     }
 }
+
+
+const sliderStyle = StyleSheet.create({
+    container: {
+      height: 30,
+      flex:1,
+      alignSelf:'center'
+    },
+    track: {
+      height: 2,
+      backgroundColor: '#303030',
+    },
+    thumb: {
+      width: 10,
+      height: 10,
+      backgroundColor: '#31a4db',
+      borderRadius: 10 / 2,
+      shadowColor: '#31a4db',
+      shadowOffset: {width: 0, height: 0},
+      shadowRadius: 2,
+      shadowOpacity: 1,
+    }
+  });
