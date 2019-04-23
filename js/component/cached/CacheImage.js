@@ -8,6 +8,10 @@ import * as Progress from 'react-native-progress';
 import config from '../../config/Config';
 import PropTypes from 'prop-types';
 import * as  FileUtils from '../../utils/FileUtils'
+import { Icon } from 'native-base';
+import {
+  View
+} from 'react-native'
 const flattenStyle = ReactNative.StyleSheet.flatten;
 const {
   Image,
@@ -58,6 +62,14 @@ export default class CachedImage extends React.Component {
   static defaultProps = {
     renderImage: (props) => {
       let imgControl=(<Image ref={CACHED_IMAGE_REF} {...props}/>)
+      return imgControl;
+    },
+    renderIcon: (props) => {
+      let imgControl=(
+        <View {...props} style={[{...props.style},{alignItems:'center',justifyContent:'center'}]}>
+         <Icon ref={CACHED_IMAGE_REF} style={{alignSelf:'center',fontSize:80,width:70}} name={props.name} type={props.type}/>
+        </View>
+        )
       return imgControl;
     },
     showIndicator: false,
@@ -209,6 +221,7 @@ export default class CachedImage extends React.Component {
 
   render() {
     // console.log('render url:',this.props.source,this.state)
+    
     if (this.state.isCacheable && !this.state.cachedImagePath) {
       return this.renderLoader();
     }
@@ -217,6 +230,46 @@ export default class CachedImage extends React.Component {
     const source = (this.state.isCacheable && this.state.cachedImagePath) ? {
       uri: 'file://' + this.state.cachedImagePath
     } : this.props.source;
+    if(this.props.source.uri==config.flags.plus)
+    {
+        const aprops={
+          ...props,
+          name:'plus',
+          type:'EvilIcons',
+        }
+      return this.props.renderIcon({
+        ...aprops,
+        key: aprops.key ,
+        style,
+        source: this.state.isError ? this.props.errorSource : source
+      });
+    }
+    // if(CacheProvider.isIcon( this.props.source.uri))
+    // {
+    //   iconUri=_.trimStart(this.props.source.uri,'icon://');
+    //   iconParts=_.split(iconUri,'@');
+    //   if(iconParts.length>1){
+    //     props={
+    //       ...props,
+    //       name:iconParts[0],
+    //       type:iconParts[1],
+    //     }
+    //   }
+    //   else
+    //   {
+    //     props={
+    //       ...props,
+    //       name:iconUri
+    //     }
+    //   }
+    //   return this.props.rednerIcon({
+    //     ...props,
+    //     key: props.key || source.uri,
+    //     style,
+    //     source: this.state.isError ? this.props.errorSource : source
+    //   });
+    
+
     return this.props.renderImage({
       ...props,
       key: props.key || source.uri,

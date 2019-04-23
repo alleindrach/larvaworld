@@ -107,7 +107,7 @@ export default class Work extends Component {
           </CardItem>
           <CardItem cardBody>
             <SceneCarousel style={{marginTop: em(10)}}   scenes={work.content.scenes}  navigation={this.props.navigation}
-            onImageSelect={this.props.imageSelector}/>
+            onImageSelect={this.props.imageSelector} onSnapToItem={this.props.onSnapToItem}/>
           </CardItem>
           <CardItem>
             <Left>

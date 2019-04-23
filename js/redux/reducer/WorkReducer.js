@@ -110,12 +110,10 @@ export default function messageReducer(state = initState, action) {
         }
       }
     case types.WORK_SCENE_ADD:
+      state.content.scenes.splice(action.insertAs,0,action.scene)
       return {
         ...state,
-        content:{
-          ...action.work.content,
-          scenes:action.work.content.scenes.splice(action.insertAfter,action.scene)
-        }
+        
       }
     case types.WORK_SCENE_IMAGE_SELECT:
 

@@ -15,6 +15,9 @@ export default config = {
       single:'/user/topic/message',
       broadcast:'/topic/message',
     },
+    flags:{
+      plus:'+'
+    },
     api: {
       //debug server ip
       // base: 'http://192.168.1.104:3000/',

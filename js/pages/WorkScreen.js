@@ -69,9 +69,13 @@ class WorkScreen extends BaseScreen {
   }
 
   componentDidMount() {
+    this.state.index=0;
     this.props.selectWork(this.getWork());
   }
-
+  onSnapToItem=(index)=>
+  {
+    this.state.index=index;
+  }
   scrollToTop = () => {
     const ref = 'list' + this.props.eventList.index
     this.refs[ref] && this.refs[ref].scrollTo({x: 0, y: 0, animated: true})
@@ -85,27 +89,13 @@ class WorkScreen extends BaseScreen {
   }
   syncWork=()=>{
     this.props.syncWork(this.props.work);
-    // FileUtils.uploadWork(config.api.base+config.api.storySync,this.props.work)
-    // .uploadProgress((written, total) => {
-    //   // onProgress && onProgress(written,total)
-    // })
-    // .then((res) => {
-    //   if(res.data && JSON.parse(res.data).state==1)
-    //   {
-    //       merging=JSON.parse(JSON.parse(res.data).data)
-    //       this.props.syncWorkSuccess(this.props.work,merging)
-    //   }else if(JSON.parse(res.data).state!=1){
-    //     this.props.updateWorkFail(this.props.work,JSON.parse(res.data).message)
-    //   }
-    //   else{
-    //     this.props.updateWorkFail(this.props.work,'')
-    //   }
-    //   console.log(res);
-    // }).catch((err) => {
-    //   this.props.updateWorkFail(this.props.work,'网络错误')
-    // }).finally(()=>{
-    //   }
-    // )    
+  }
+  deleteCurrentScene=()=>{
+    this.props.deleteCurrentScene(this.props.work,this.state.index)
+  }
+  insertScene=()=>{
+    scene={img:'+',snd:'+'};
+    this.props.insertScene(this.props.work,this.state.index,scene)
   }
   getWork = ()=>{
     let source = require('../assets/icon_nan.png');
@@ -151,11 +141,11 @@ class WorkScreen extends BaseScreen {
       <Footer>
       <FooterTab>
         <Button vertical >
-          <Icon type="EvilIcons"  name="plus" />
+          <Icon type="EvilIcons"  name="plus" onPress={this.insertScene} />
           <Text>加页</Text>
         </Button>
         <Button vertical>
-          <Icon type="EvilIcons"   name="minus" />
+          <Icon type="EvilIcons"   name="minus"  onPress={this.deleteCurrentScene}/>
           <Text>删页</Text>
         </Button>
         <Button vertical>
@@ -195,6 +185,7 @@ class WorkScreen extends BaseScreen {
           user={user} 
           work={work} 
           imageSelector={this.onImageSelect}
+          onSnapToItem={this.onSnapToItem}
           />
         </View>
         
@@ -225,6 +216,12 @@ const mapDispatchToProps = (dispatch) => {
     },
     selectAudio: (work,index,filepath) => {
       dispatch(WorkAction.selectAudio(work,index, filepath))
+    },
+    deleteCurrentScene:(work,index) => {
+      dispatch(WorkAction.deleteScene(work,index))
+    },
+    insertScene:(work,index,scene) => {
+      dispatch(WorkAction.addScene(work,index,scene))
     },
     syncWorkMerge:(work,merging)=>{
       dispatch(WorkAction.syncWorkUploadSuccess(work,merging))

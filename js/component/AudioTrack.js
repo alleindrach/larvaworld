@@ -7,6 +7,7 @@ import * as  FileUtils from '../utils/FileUtils'
 import * as CacheProvider from './cached/CacheProvider'
 import Slider from "react-native-slider";
 import {  Icon } from 'native-base';
+import config from '../config/Config';
 const img_speaker = require('../assets/sound/ui_speaker.png');
 const img_pause = require('../assets/sound/ui_pause.png');
 const img_play = require('../assets/sound//ui_play.png');
@@ -147,30 +148,32 @@ export default class AudioTrack extends React.Component{
         this.safeSetState({progress});
       }
     loadSound=(play)=>{
-        if(!this.props.cache || this.state.cachedFilePath){
-            const filepath = this.props.cache?  this.state.cachedFilePath:this.props.source.uri;
-            console.log('[loading]', filepath)
-            this.sound = new Sound(filepath,'', ((error) => {
-                if (error) {
-                    console.log('failed to load the sound', error);
-                    Alert.alert('Notice', 'audio file error. (Error code : 1)');   
-                    this.setState({playState:'paused'});
-                }else{
-                    if(play)
-                    {
-                        this.setState({playState:'playing',duration:this.sound.getDuration()});
-                        this.sound.play(this.playComplete);
+        if(this.props.source.uri==config.flags.plus){
+            if(!this.props.cache || this.state.cachedFilePath){
+                const filepath = this.props.cache?  this.state.cachedFilePath:this.props.source.uri;
+                console.log('[loading]', filepath)
+                this.sound = new Sound(filepath,'', ((error) => {
+                    if (error) {
+                        console.log('failed to load the sound', error);
+                        Alert.alert('Notice', 'audio file error. (Error code : 1)');   
+                        this.setState({playState:'paused'});
+                    }else{
+                        if(play)
+                        {
+                            this.setState({playState:'playing',duration:this.sound.getDuration()});
+                            this.sound.play(this.playComplete);
+                        }
+                        else
+                        {
+                            this.setState({playState:'paused', duration:this.sound.getDuration()});
+                            
+                        } 
                     }
-                    else
-                    {
-                        this.setState({playState:'paused', duration:this.sound.getDuration()});
-                        
-                    } 
-                }
-            }).bind(this));   
-        }else if(this.props.cache)
-        {
-            this.processSource(this.props.source);
+                }).bind(this));   
+            }else if(this.props.cache)
+            {
+                this.processSource(this.props.source);
+            }
         }
     }
     onSliderEditStart = () => {

@@ -191,7 +191,9 @@ function runPrefetchTaskEx(prefetcher, options) {
 function isCacheable(url) {
   return _.isString(url) && (_.startsWith(url, 'http://') || _.startsWith(url, 'https://'));
 }
-
+function isIcon(url) {
+  return _.isString(url) && (_.startsWith(url, 'icon://'));
+}
 /**
  * Get the local path corresponding to the given url and options.
  * @param url
@@ -310,6 +312,7 @@ function addListener(event, listener) {
 
 module.exports = {
   isCacheable,
+  isIcon,
   addListener,
   removeListener,
   getCachedPath,

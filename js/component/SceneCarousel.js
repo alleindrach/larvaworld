@@ -70,7 +70,7 @@ export default class SceneCarousel extends Component {
               <View style={{width: itemWidth, height: itemHeight-audioHeight, alignSelf: 'center'}}>
                 <CachedImage
                   source={{uri: item.img}}
-                  style={{width: itemWidth, height: itemHeight-audioHeight, alignSelf: 'center'}}
+                  style={{width: itemWidth, height: itemHeight-audioHeight, alignSelf: 'center',backgroundColor:'white'}}
                   resizeMode="cover"
                 />
                 <View style={styles.pageView}>
@@ -96,7 +96,7 @@ export default class SceneCarousel extends Component {
           itemHeight={itemHeight}
           useNativeOnScroll={true}
           inactiveSlideScale={0.95}
-          onSnapToItem={(index) => this.setState({index})}
+          onSnapToItem={this.onSnapToItem}
         />
         
         
