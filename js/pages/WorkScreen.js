@@ -74,7 +74,7 @@ class WorkScreen extends BaseScreen {
   }
   onSnapToItem=(index)=>
   {
-    this.state.index=index;
+    this.props.selectScene(this.props.work,index);
   }
   scrollToTop = () => {
     const ref = 'list' + this.props.eventList.index
@@ -91,12 +91,12 @@ class WorkScreen extends BaseScreen {
     this.props.syncWork(this.props.work);
   }
   deleteCurrentScene=()=>{
-    this.props.deleteCurrentScene(this.props.work,this.state.index)
+    this.props.deleteCurrentScene(this.props.work)
   }
   insertScene=()=>{
     scene={img:'+',snd:'+',duration:10};
-    this.props.insertScene(this.props.work,this.state.index,scene)
-    this._workControl.snapToItem(this.state.index+1);
+    this.props.insertScene(this.props.work,scene)
+    this._workControl.snapToItem(this.props.work.current+1);
   }
   getWork = ()=>{
     let source = require('../assets/icon_nan.png');
@@ -221,11 +221,11 @@ const mapDispatchToProps = (dispatch) => {
     selectAudio: (work,index,filepath) => {
       dispatch(WorkAction.selectAudio(work,index, filepath))
     },
-    deleteCurrentScene:(work,index) => {
-      dispatch(WorkAction.deleteScene(work,index))
+    deleteCurrentScene:(work) => {
+      dispatch(WorkAction.deleteScene(work))
     },
-    insertScene:(work,index,scene) => {
-      dispatch(WorkAction.addScene(work,index,scene))
+    insertScene:(work,scene) => {
+      dispatch(WorkAction.addScene(work,scene))
     },
     syncWorkMerge:(work,merging)=>{
       dispatch(WorkAction.syncWorkUploadSuccess(work,merging))
@@ -235,6 +235,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     syncWork:(work)=>{
       dispatch(WorkAction.syncWork(work))
+    },
+    selectScene:(work,index)=>{
+      dispatch(WorkAction.selectScene(work,index));
     }
   }
 }

@@ -61,11 +61,17 @@ export function deleteScene(work,index) {
         index
     }
 }
-export function addScene(work,insertAfter,scene) {
+export function selectScene(work,index){
+    return {
+      type:types.WORK_SCENE_SELECT,
+      work,
+      index
+    }
+}
+export function addScene(work,scene) {
     return {
         type: types.WORK_SCENE_ADD,
         work,
-        insertAfter,
         scene
     }
 }

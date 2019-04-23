@@ -42,9 +42,6 @@ export default class SceneCarousel extends Component {
 
   constructor(props) {
     super(props)
-    this.state = {
-      index: 0
-    }
     this._touchRefs = []
   }
 
@@ -62,9 +59,7 @@ export default class SceneCarousel extends Component {
     this._carousel.snapToItem(index);
   }
   _onSnapToItem=(index)=>{
-    this.setState( {
-      index
-    });
+
     if (!this.props.onSnapToItem)
           return
     this.props.onSnapToItem(index)
@@ -87,7 +82,7 @@ export default class SceneCarousel extends Component {
                   resizeMode="cover"
                 />
                 <View style={styles.pageView}>
-                  <Text style={styles.pageText}>{`${this.state.index + 1}/${scenes.length}`}</Text>
+                  <Text style={styles.pageText}>{`${index + 1}/${scenes.length}`}</Text>
                 </View>
               </View>
             </TouchableHighlight>

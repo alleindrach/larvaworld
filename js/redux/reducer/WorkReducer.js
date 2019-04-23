@@ -6,7 +6,8 @@ const initState = {
   isSyncing:false,
   isSynced:false,
   uploadingProcess:100,
-  content:null
+  content:null,
+  current:0
 }
 
 export default function messageReducer(state = initState, action) {
@@ -19,6 +20,7 @@ export default function messageReducer(state = initState, action) {
         isSyncing:false,
         isSynced:false,
         uploadingProcess:100,
+        current:0,
         error: '',
         content:{
           ...state.content,
@@ -98,29 +100,54 @@ export default function messageReducer(state = initState, action) {
         error:action.error,
         
       }
-  
-    case types.WORK_SCENE_DEL:
+    case types.WORK_SCENE_SELECT:
       return {
-        ...state,
-        content:{
-          ...action.work.content,
-          scenes:action.work.content.scenes.splice(action.index,1)
-        }
+        ...state ,
+        current:action.index
       }
-    case types.WORK_SCENE_ADD:
-      
-  
+    case types.WORK_SCENE_DEL:
       preScenes=[];
-      if(action.insertAfter>=0){
+      current=state.current
+      if(current>=0){
         preScenes=[
-          ...action.work.content.scenes.slice(0,action.insertAfter+1)
+          ...action.work.content.scenes.slice(0,current)
         ]
       }
       postScenes=[];
-      if(action.insertAfter<action.work.content.scenes.length-1)
+      if(current<action.work.content.scenes.length-1)
       {
         postScenes=[
-          ...action.work.content.scenes.slice(action.insertAfter+1)
+          ...action.work.content.scenes.slice(current+1)
+        ]
+      } 
+      if(current=action.work.content.scenes.length-1)
+        current--;
+
+      return {
+        ...state,
+        current,
+        content:{
+          ...action.work.content,
+          scenes:[
+            ...preScenes,
+            ...postScenes
+          ]
+        }
+      }
+
+    case types.WORK_SCENE_ADD:
+      current=state.current;
+      preScenes=[];
+      if(current>=0){
+        preScenes=[
+          ...action.work.content.scenes.slice(0,current+1)
+        ]
+      }
+      postScenes=[];
+      if(current<action.work.content.scenes.length-1)
+      {
+        postScenes=[
+          ...action.work.content.scenes.slice(current+1)
         ]
       } 
       return {
@@ -137,22 +164,22 @@ export default function messageReducer(state = initState, action) {
 
     case types.WORK_SCENE_IMAGE_SELECT:
 
-      scene=action.work.content.scenes[action.index];
+      scene=action.work.content.scenes[state.current];
       scene={
         ...scene,
         img:action.filepath
       }
       preScenes=[];
-      if(action.index>0){
+      if(state.current>0){
         preScenes=[
-          ...action.work.content.scenes.slice(0,action.index)
+          ...action.work.content.scenes.slice(0,state.current)
         ]
       }
       postScenes=[];
-      if(action.index<action.work.content.scenes.length-1)
+      if(state.current<action.work.content.scenes.length-1)
       {
         postScenes=[
-          ...action.work.content.scenes.slice(action.index+1)
+          ...action.work.content.scenes.slice(state.current+1)
         ]
       } 
       return {
@@ -168,22 +195,22 @@ export default function messageReducer(state = initState, action) {
       }
 
     case types.WORK_SCENE_AUDIO_SELECT:
-      scene=action.work.content.scenes[action.index];
+      scene=action.work.content.scenes[state.current];
       scene={
         ...scene,
         snd:action.filepath
       }
       preScenes=[];
-      if(action.index>0){
+      if(state.current>0){
         preScenes=[
-          ...action.work.content.scenes.slice(0,action.index)
+          ...action.work.content.scenes.slice(0,state.current)
         ]
       }
       postScenes=[];
-      if(action.index<action.work.content.scenes.length-1)
+      if(state.current<action.work.content.scenes.length-1)
       {
         postScenes=[
-          ...action.work.content.scenes.slice(action.index+1)
+          ...action.work.content.scenes.slice(state.current+1)
         ]
       } 
       return {
