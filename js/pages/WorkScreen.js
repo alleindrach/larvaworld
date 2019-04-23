@@ -94,8 +94,9 @@ class WorkScreen extends BaseScreen {
     this.props.deleteCurrentScene(this.props.work,this.state.index)
   }
   insertScene=()=>{
-    scene={img:'+',snd:'+'};
+    scene={img:'+',snd:'+',duration:10};
     this.props.insertScene(this.props.work,this.state.index,scene)
+    this._workControl.snapToItem(this.state.index+1);
   }
   getWork = ()=>{
     let source = require('../assets/icon_nan.png');
@@ -111,16 +112,19 @@ class WorkScreen extends BaseScreen {
         scenes: [
           {
             img:'https://www.xinrong.com/webapp2.0/webapp3.0/images/banner/22.jpg',
-            snd:'http://192.168.2.149/s/test.mp3'
+            snd:'http://192.168.2.149/s/1.mp3',
+            duration:100,
           }
           ,
           {
             img:'https://www.xinrong.com/webapp2.0/webapp3.0/images/banner/23.jpg',
-            snd:'http://192.168.2.149/s/test.mp3'
+            snd:'http://192.168.2.149/s/2.mp3',
+            duration:200
           },
           {
             img:'https://www.xinrong.com/webapp2.0/webapp3.0/images/banner/20.jpg',
-            snd:'http://192.168.2.149/s/test.mp3'
+            snd:'http://192.168.2.149/s/3.mp3',
+            duration:300
           }            
         ]
       }
@@ -181,7 +185,7 @@ class WorkScreen extends BaseScreen {
       return (
         <View style={{flex: 1}}>
           {this.renderProgress()}
-          <Work navigation={this.props.navigation} 
+          <Work  navigation={this.props.navigation}  ref={ref => this._workControl = ref} 
           user={user} 
           work={work} 
           imageSelector={this.onImageSelect}

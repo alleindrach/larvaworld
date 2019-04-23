@@ -5,7 +5,7 @@ import MessageReducer from './MessageReducer'
 import  EventReducer from './EventReducer'
 import  WorkReducer from './WorkReducer'
 import {persistStore, persistReducer, createMigrate} from 'redux-persist'
-import {AsyncStorage} from 'react-native'
+import {AsyncStorage} from 'react-native';
 import hardSet from 'redux-persist/lib/stateReconciler/hardSet'
 const userPersistConfig = {
   key: 'user',

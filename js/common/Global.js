@@ -1,5 +1,6 @@
 
-import {Dimensions, PixelRatio, Platform, AsyncStorage} from 'react-native';
+import {Dimensions, PixelRatio, Platform} from 'react-native';
+
 
 let {height, width} = Dimensions.get('window');
 

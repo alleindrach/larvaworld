@@ -1,7 +1,5 @@
 
 import * as types from '../action/ActionType'
-import {AsyncStorage} from 'react-native'
-
 const initState = {
   isCaching: false,
   isCached: false,
@@ -110,11 +108,33 @@ export default function messageReducer(state = initState, action) {
         }
       }
     case types.WORK_SCENE_ADD:
-      state.content.scenes.splice(action.insertAs,0,action.scene)
+      
+  
+      preScenes=[];
+      if(action.insertAfter>=0){
+        preScenes=[
+          ...action.work.content.scenes.slice(0,action.insertAfter+1)
+        ]
+      }
+      postScenes=[];
+      if(action.insertAfter<action.work.content.scenes.length-1)
+      {
+        postScenes=[
+          ...action.work.content.scenes.slice(action.insertAfter+1)
+        ]
+      } 
       return {
         ...state,
-        
+        content:{
+          ...action.work.content,
+          scenes:[
+            ...preScenes,
+            action.scene,
+            ...postScenes
+          ]
+        }
       }
+
     case types.WORK_SCENE_IMAGE_SELECT:
 
       scene=action.work.content.scenes[action.index];

@@ -49,16 +49,29 @@ export default class SceneCarousel extends Component {
   }
 
   _onImagePress = (index) => {
+    
     if (!this.props.onImageSelect)
       return
     this.props.onImageSelect(index)
+
     // this._touchRefs[index].measureInWindow((x, y, width, height) => {
     //   this._fullImageView.show({x, y, width, height}, this.props.images, index)
     // });
   }
-
+  snapToItem=(index)=>{
+    this._carousel.snapToItem(index);
+  }
+  _onSnapToItem=(index)=>{
+    this.setState( {
+      index
+    });
+    if (!this.props.onSnapToItem)
+          return
+    this.props.onSnapToItem(index)
+  }
   _renderItem = ({item, index}) => {
     const {scenes,itemWidth, itemHeight,audioHeight} = this.props
+    console.log('scenes:',scenes)
     return (
        
           <View style={styles.sceneWraper}>
@@ -78,7 +91,7 @@ export default class SceneCarousel extends Component {
                 </View>
               </View>
             </TouchableHighlight>
-            <AudioTrack style={{width:SCREEN_WIDTH,height:em(100),backgroundColor:'transparent'}} source={{uri:item.snd}} cache={true}/>
+            <AudioTrack style={{width:SCREEN_WIDTH,height:em(100),backgroundColor:'transparent'}} source={{uri:item.snd,duration:item.duration}} cache={true}/>
           </View>
     )
   }
@@ -87,7 +100,7 @@ export default class SceneCarousel extends Component {
     const {scenes, style, sliderWidth, sliderHeight, itemWidth, itemHeight} = this.props
     return (
       <View style={[{width: SCREEN_WIDTH,backgroundColor:'transparent'}, style]}>
-        <Carousel
+        <Carousel ref={ref => this._carousel = ref}
           data={scenes}
           renderItem={this._renderItem}
           sliderWidth={sliderWidth}
@@ -96,7 +109,7 @@ export default class SceneCarousel extends Component {
           itemHeight={itemHeight}
           useNativeOnScroll={true}
           inactiveSlideScale={0.95}
-          onSnapToItem={this.onSnapToItem}
+          onSnapToItem={this._onSnapToItem.bind(this)}
         />
         
         

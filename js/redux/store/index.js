@@ -1,8 +1,7 @@
 
 import {persistStore, persistReducer, createMigrate} from 'redux-persist'
-import {AsyncStorage} from 'react-native'
+import {AsyncStorage} from 'react-native';
 import {createStore, applyMiddleware} from 'redux'
-import thunk from 'redux-thunk'
 import logger from 'redux-logger'
 import rootReducer from '../reducer/index'
 import createSagaMiddleware from 'redux-saga';       // 引入redux-saga中的createSagaMiddleware函数

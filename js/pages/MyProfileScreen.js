@@ -5,7 +5,6 @@ import {
   Text,
   View,
   TouchableOpacity,
-  AsyncStorage,
   NativeModules,
   ScrollView,
   Alert

@@ -1,6 +1,6 @@
 
 import * as types from '../action/ActionType'
-import {AsyncStorage} from 'react-native'
+
 const initState = {
   isConnecting: false,
   isConnected: false,

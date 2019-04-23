@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {NetInfo} from 'react-native'
+import NetInfo from "@react-native-community/netinfo";
 import configureStore from './js/redux/store/index'
 import {Provider} from 'react-redux'
 import {AppContainer} from "./js/router/index"

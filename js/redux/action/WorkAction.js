@@ -61,11 +61,11 @@ export function deleteScene(work,index) {
         index
     }
 }
-export function addScene(work,insertAs,scene) {
+export function addScene(work,insertAfter,scene) {
     return {
         type: types.WORK_SCENE_ADD,
         work,
-        insertAs,
+        insertAfter,
         scene
     }
 }

@@ -12,12 +12,15 @@ import { Icon } from 'native-base';
 import {
   View
 } from 'react-native'
+
+import NetInfo from "@react-native-community/netinfo";
+
 const flattenStyle = ReactNative.StyleSheet.flatten;
 const {
   Image,
-  NetInfo,
   Platform
 } = ReactNative;
+
 const {
   StyleSheet
 } = ReactNative;
@@ -98,6 +101,7 @@ export default class CachedImage extends React.Component {
       progress: 0,
       isError: false
     };
+    console.log('init img:',this.props.source.uri,this.state)
   }
 
   safeSetState = (newState) => {
@@ -108,8 +112,9 @@ export default class CachedImage extends React.Component {
   }
 
   componentWillMount() {
+    console.log('mount img ',this.props.source.uri)
     this._isMounted = true;
-    NetInfo.isConnected.addEventListener('change', this.handleConnectivityChange);
+    NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
     // initial
     NetInfo.isConnected.fetch()
       .then(isConnected => {
@@ -131,9 +136,9 @@ export default class CachedImage extends React.Component {
     }
   }
 
-  handleConnectivityChange = (isConnected) => {
+  handleConnectivityChange = (data) => {
     this.safeSetState({
-      networkAvailable: isConnected
+      networkAvailable: (data.type=='none'||data.type=='unknown')?false:true
     });
   }
 

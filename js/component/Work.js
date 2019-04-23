@@ -45,7 +45,9 @@ export default class Work extends Component {
     super(props);
     this.state = {}
   }
-
+  snapToItem=(index)=>{
+    this._scenesCarousel.snapToItem(index);
+  }
   showMenu = () => {
     if (!this.menu) {
       return;
@@ -106,7 +108,7 @@ export default class Work extends Component {
             </Left>
           </CardItem>
           <CardItem cardBody>
-            <SceneCarousel style={{marginTop: em(10)}}   scenes={work.content.scenes}  navigation={this.props.navigation}
+            <SceneCarousel ref={ref => this._scenesCarousel = ref} style={{marginTop: em(10)}}   scenes={work.content.scenes}  navigation={this.props.navigation}
             onImageSelect={this.props.imageSelector} onSnapToItem={this.props.onSnapToItem}/>
           </CardItem>
           <CardItem>

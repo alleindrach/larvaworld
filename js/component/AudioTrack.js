@@ -5,7 +5,7 @@ import Sound from 'react-native-sound';
 import PropTypes from 'prop-types';
 import * as  FileUtils from '../utils/FileUtils'
 import * as CacheProvider from './cached/CacheProvider'
-import Slider from "react-native-slider";
+import Slider from 'react-native-slider'
 import {  Icon } from 'native-base';
 import config from '../config/Config';
 const img_speaker = require('../assets/sound/ui_speaker.png');
@@ -35,8 +35,8 @@ export default class AudioTrack extends React.Component{
     //     title:props.navigation.state.params.title,
     // })
 
-    constructor(){
-        super();
+    constructor(props){
+        super(props);
         this._isMounted = false;
         this.state = {
             playState:'paused', //playing, paused
@@ -48,13 +48,14 @@ export default class AudioTrack extends React.Component{
             progress: 0,
             isError: false
         };
-        
+        console.log('init audio:',this.props.source.uri,this.state)
         this.sliderEditing = false;
     }
 
     componentDidMount(){
         // this.play();
         this._isMounted = true;
+        console.log('mount audio:',this.props.source.uri,this.state)
         this.loadSound(false);
         //重绘进度条
         this.timeout = setInterval(() => {
@@ -148,7 +149,7 @@ export default class AudioTrack extends React.Component{
         this.safeSetState({progress});
       }
     loadSound=(play)=>{
-        if(this.props.source.uri==config.flags.plus){
+        if(this.props.source.uri!=config.flags.plus){
             if(!this.props.cache || this.state.cachedFilePath){
                 const filepath = this.props.cache?  this.state.cachedFilePath:this.props.source.uri;
                 console.log('[loading]', filepath)
@@ -242,7 +243,7 @@ export default class AudioTrack extends React.Component{
     
       
     render(){
-
+        console.log('render audio:',this.props.source.uri,this.state)
         const currentTimeString = this.getAudioTimeString(this.state.playSeconds);
         const durationString = this.getAudioTimeString(this.state.duration);
         const {style}=this.props;
