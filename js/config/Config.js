@@ -7,7 +7,9 @@ export default config = {
       }
     },
     file: {
-      downloadTimeout:50000
+      downloadTimeout:50000,
+      soundMediaType:'aac',
+      maxSoundLength:100,
     },
     websocket:{
       base: 'http://192.168.2.233:8762',

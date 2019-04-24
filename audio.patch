@@ -1,0 +1,732 @@
+diff --git a/ios/lavaworld/Info.plist b/ios/lavaworld/Info.plist
+index adf557f..3fc79d4 100644
+--- a/ios/lavaworld/Info.plist
++++ b/ios/lavaworld/Info.plist
+@@ -25,7 +25,7 @@
+ 	<key>LSRequiresIPhoneOS</key>
+ 	<true/>
+ 	<key>NSLocationWhenInUseUsageDescription</key>
+-	<string></string>
++	<string/>
+ 	<key>UILaunchStoryboardName</key>
+ 	<string>LaunchScreen</string>
+ 	<key>UIRequiredDeviceCapabilities</key>
+@@ -75,14 +75,14 @@
+ 		<string>rubicon-icon-font.ttf</string>
+ 	</array>
+ 	<key>NSPhotoLibraryUsageDescription</key>
+-	<string></string>
++	<string/>
+ 	<key>NSAppleMusicUsageDescription</key>
+-	<string></string>
++	<string/>
+ 	<key>NSCameraUsageDescription</key>
+-	<string></string>
++	<string/>
+ 	<key>NSMicrophoneUsageDescription</key>
+-	<string></string>
++	<string/>
+ 	<key>NSPhotoLibraryAddUsageDescription</key>
+-	<string></string>
++	<string/>
+ </dict>
+ </plist>
+diff --git a/js/component/AudioTrack.js b/js/component/AudioTrack.js
+index 80f356e..b0d7e04 100644
+--- a/js/component/AudioTrack.js
++++ b/js/component/AudioTrack.js
+@@ -8,6 +8,8 @@ import * as CacheProvider from './cached/CacheProvider'
+ import Slider from 'react-native-slider'
+ import {  Icon } from 'native-base';
+ import config from '../config/Config';
++import uuid from 'react-native-uuid';
++import {AudioRecorder, AudioUtils} from 'react-native-audio';
+ const img_speaker = require('../assets/sound/ui_speaker.png');
+ const img_pause = require('../assets/sound/ui_pause.png');
+ const img_play = require('../assets/sound//ui_play.png');
+@@ -34,19 +36,109 @@ export default class AudioTrack extends React.Component{
+     // static navigationOptions = props => ({
+     //     title:props.navigation.state.params.title,
+     // })
++    getNewAudioPath=()=>{
++        const filePath= `${FileUtils.baseCacheDir}/${uuid.v1()}`;
++        this.setState({record:{source:{uri:`file://${filePath}`}}});
++        return filePath;
++    }
++
++    pause =async ()=> {
++        if (this.state.state=='recording') {
++            try {
++                const filePath = await AudioRecorder.pauseRecording();
++                this.setState({state: 'record.pause',record:{source:{uri:`file://${filePath}`}}});
++              } catch (error) {
++                console.error(error);
++              }
++            return;  
++        }
++        else if(this.state.state=='playing')
++        {
++            if(this.sound){
++                this.sound.pause();
++            }
++            this.setState({state:'play.paused'});
++        }
++        
++      }
++
++    resume=async ()=> {
++        if (this.state.state=='record.pause') {
++            try {
++                await AudioRecorder.resumeRecording();
++                this.setState({state: 'recording'});
++            } catch (error) {
++                console.error(error);
++            }
++        }else if (this.state.state=='play.paused'){
++            if(this.sound){
++                this.sound.play(this.playComplete);
++                this.setState({state:'playing'});
++            }else{
++                this.loadSound(true).bind(this);
++            }
++        }   
++    }
++
++    stop=async ()=> {
++        if (this.state.state=='recording'||this.state.state=='recod.pause') {
++            
++  
++            try {
++              const filePath = await AudioRecorder.stopRecording();
++      
++              if (Platform.OS === 'android') {
++                this._finishRecording(true, filePath);
++              }
++              this.state.source=this.state.record.source;
++              this.setState({state: 'play.paused',source:this.state.record.source});
++              this.loadSound(false)
++              return filePath;
++            } catch (error) {
++              console.error(error);
++            }
++        }
++        else if(this.state.state=='playing')
++        {
++            if(this.sound){
++                this.sound.pause();
++            }
++            this.setState({state:'play.paused'});
++        }
++  
++        
++    }
+ 
++    prepareRecordingPath=(path)=>{
++        AudioRecorder.prepareRecordingAtPath(path, {
++            SampleRate: 22050,
++            Channels: 1,
++            AudioQuality: "Low",
++            AudioEncoding: "aac"
++          });
++       
++    }
++    // onRecordProgress=(data)=>{
++    //     console.log(data.currentMetering, data.currentPeakMetering)
++    // }
++    // checkRecorderPermission() {
++    //     if (Platform.OS !== 'android') {
++    //         return Promise.resolve(true);
++    //     }
++    // }
+     constructor(props){
+         super(props);
+         this._isMounted = false;
+         this.state = {
+-            playState:'paused', //playing, paused
++            state:'play.paused', //playing, paused
+             playSeconds:0,
+             duration:0,
+             isCacheable: false,
+             cachedFilePath: null,
+             networkAvailable: true,
+             progress: 0,
+-            isError: false
++            isError: false,
++            hasRecordPermission:false
+         };
+         console.log('init audio:',this.props.source.uri,this.state)
+         this.sliderEditing = false;
+@@ -56,16 +148,42 @@ export default class AudioTrack extends React.Component{
+         // this.play();
+         this._isMounted = true;
+         console.log('mount audio:',this.props.source.uri,this.state)
++        this.state.source=this.props.source;
+         this.loadSound(false);
+         //重绘进度条
+         this.timeout = setInterval(() => {
+-            if(this.sound && this.sound.isLoaded() && this.state.playState == 'playing' && !this.sliderEditing){
++            if(this.sound && this.sound.isLoaded() && this.state.state == 'playing' && !this.sliderEditing){
+                 this.sound.getCurrentTime((seconds, isPlaying) => {
+                     this.setState({playSeconds:seconds});
+                 })
+             }
+         }, 100);
++
++
++
++        AudioRecorder.requestAuthorization().then((isAuthorised) => {
++            this.setState({ hasRecordPermission: isAuthorised });
++    
++            if (!isAuthorised) return;
++    
++            this.prepareRecordingPath(this.getNewAudioPath);
++            
++            AudioRecorder.onProgress = (data) => {
++              this.setState({record:{currentTime: Math.floor(data.currentTime)}});
++            };
++    
++            AudioRecorder.onFinished = (data) => {
++              // Android callback comes in the form of a promise instead.
++              if (Platform.OS === 'ios') {
++                this._finishRecording(data.status === "OK", data.audioFileURL, data.audioFileSize);
++              }
++            };
++          });
+     }
++    _finishRecording(didSucceed, filePath, fileSize) {
++        this.setState({record:{ finished: didSucceed,duration:this.state.record.currentTime }});
++        console.log(`Finished recording of duration ${this.state.currentTime} seconds at path: ${filePath} and size of ${fileSize || 0} bytes`);
++      }
+     componentWillUnmount(){
+         if(this.sound){
+             this.sound.release();
+@@ -86,7 +204,7 @@ export default class AudioTrack extends React.Component{
+         let url = _.get(source, ['uri'], null);
+         if (FileUtils.isLocalFile(url)) {
+             this.safeSetState({
+-                cachedFilePath: null,
++                cachedFilePath: url,
+                 isCacheable: false,
+                 isError: false
+             });
+@@ -149,24 +267,24 @@ export default class AudioTrack extends React.Component{
+         this.safeSetState({progress});
+       }
+     loadSound=(play)=>{
+-        if(this.props.source.uri!=config.flags.plus){
++        if(this.state.source.uri!=config.flags.plus){
+             if(!this.props.cache || this.state.cachedFilePath){
+-                const filepath = this.props.cache?  this.state.cachedFilePath:this.props.source.uri;
++                const filepath = this.props.cache?  this.state.cachedFilePath:this.state.source.uri;
+                 console.log('[loading]', filepath)
+                 this.sound = new Sound(filepath,'', ((error) => {
+                     if (error) {
+                         console.log('failed to load the sound', error);
+                         Alert.alert('Notice', 'audio file error. (Error code : 1)');   
+-                        this.setState({playState:'paused'});
++                        this.setState({state:'play.paused'});
+                     }else{
+                         if(play)
+                         {
+-                            this.setState({playState:'playing',duration:this.sound.getDuration()});
++                            this.setState({state:'playing',duration:this.sound.getDuration()});
+                             this.sound.play(this.playComplete);
+                         }
+                         else
+                         {
+-                            this.setState({playState:'paused', duration:this.sound.getDuration()});
++                            this.setState({state:'play.paused', duration:this.sound.getDuration()});
+                             
+                         } 
+                     }
+@@ -190,14 +308,7 @@ export default class AudioTrack extends React.Component{
+         }
+     }
+ 
+-    play = async () => {
+-        if(this.sound){
+-            this.sound.play(this.playComplete);
+-            this.setState({playState:'playing'});
+-        }else{
+-            this.loadSound(true).bind(this);
+-        }
+-    }
++   
+     playComplete = (success) => {
+         if(this.sound){
+             if (success) {
+@@ -206,18 +317,12 @@ export default class AudioTrack extends React.Component{
+                 console.log('playback failed due to audio decoding errors');
+                 Alert.alert('Notice', 'audio file error. (Error code : 2)');
+             }
+-            this.setState({playState:'paused', playSeconds:0});
++            this.setState({state:'play.paused', playSeconds:0});
+             this.sound.setCurrentTime(0);
+         }
+     }
+ 
+-    pause = () => {
+-        if(this.sound){
+-            this.sound.pause();
+-        }
+-
+-        this.setState({playState:'paused'});
+-    }
++    
+ 
+     jumpPrev15Seconds = () => {this.jumpSeconds(-15);}
+     jumpNext15Seconds = () => {this.jumpSeconds(15);}
+@@ -243,7 +348,7 @@ export default class AudioTrack extends React.Component{
+     
+       
+     render(){
+-        console.log('render audio:',this.props.source.uri,this.state)
++        console.log('render audio:',this.state.source.uri,this.state)
+         const currentTimeString = this.getAudioTimeString(this.state.playSeconds);
+         const durationString = this.getAudioTimeString(this.state.duration);
+         const {style}=this.props;
+@@ -251,11 +356,11 @@ export default class AudioTrack extends React.Component{
+             <View style={[{justifyContent:'center'},style]}>
+                 <View style={{marginVertical:5, marginHorizontal:15, flexDirection:'row'}}>
+                     <Text style={{color:'white', alignSelf:'center',fontSize: em(20),width:em(60)}}>{currentTimeString}</Text>
+-                    {this.state.playState == 'playing' && 
++                    {this.state.state == 'playing' && 
+                     <TouchableOpacity onPress={this.pause} style={{marginHorizontal:2,alignSelf:'center',}}>
+                         <Icon type="FontAwesome"   name="pause"  style={{alignSelf:'center',fontSize: 20, width:22,color: '#31a4db'}}/>
+                     </TouchableOpacity>}
+-                    {this.state.playState == 'paused' && 
++                    {this.state.state == 'play.paused' && 
+                     <TouchableOpacity onPress={this.play} style={{marginHorizontal:2,alignSelf:'center',}}>
+                         <Icon type="FontAwesome"   name="play"   style={{alignSelf:'center',fontSize: 20,width:22, color: '#31a4db'}}/>
+                     </TouchableOpacity>}
+diff --git a/js/config/Config.js b/js/config/Config.js
+index d786778..2779b72 100644
+--- a/js/config/Config.js
++++ b/js/config/Config.js
+@@ -7,7 +7,8 @@ export default config = {
+       }
+     },
+     file: {
+-      downloadTimeout:50000
++      downloadTimeout:50000,
++      cacheDir:'/cache'
+     },
+     websocket:{
+       base: 'http://192.168.2.233:8762',
+diff --git a/js/utils/FileUtils.js b/js/utils/FileUtils.js
+index d1b9c31..3c5d52d 100644
+--- a/js/utils/FileUtils.js
++++ b/js/utils/FileUtils.js
+@@ -4,7 +4,7 @@ import _ from 'lodash'
+ import RNFetchBlob from 'rn-fetch-blob'
+ import {Platform} from 'react-native';
+ 
+-export const baseCacheDir = RNFetchBlob.fs.dirs.CacheDir + '/imagesCacheDir';
++export const baseCacheDir = RNFetchBlob.fs.dirs.CacheDir + config.file.cacheDir;
+ 
+ export const clearCache=() =>{
+     return RNFetchBlob.fs.unlink(baseCacheDir)
+diff --git a/package-lock.json b/package-lock.json
+index be66458..53137c5 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -2737,6 +2737,11 @@
+         "@types/yargs": "^12.0.9"
+       }
+     },
++    "@react-native-community/async-storage": {
++      "version": "1.3.3",
++      "resolved": "http://registry.npm.taobao.org/@react-native-community/async-storage/download/@react-native-community/async-storage-1.3.3.tgz",
++      "integrity": "sha1-+80Jxovg+RNiwbxWloAtjigc9n0="
++    },
+     "@react-native-community/cli": {
+       "version": "1.6.0",
+       "resolved": "http://registry.npm.taobao.org/@react-native-community/cli/download/@react-native-community/cli-1.6.0.tgz",
+@@ -2837,6 +2842,16 @@
+         }
+       }
+     },
++    "@react-native-community/netinfo": {
++      "version": "2.0.4",
++      "resolved": "http://registry.npm.taobao.org/@react-native-community/netinfo/download/@react-native-community/netinfo-2.0.4.tgz",
++      "integrity": "sha1-0Nf33Hetyd6GITURKYFrwNys9Fc="
++    },
++    "@react-native-community/slider": {
++      "version": "1.0.4",
++      "resolved": "http://registry.npm.taobao.org/@react-native-community/slider/download/@react-native-community/slider-1.0.4.tgz",
++      "integrity": "sha1-PvkoyHxobWc66Cnkkseq1NBh1mY="
++    },
+     "@react-navigation/core": {
+       "version": "3.2.1",
+       "resolved": "http://registry.npm.taobao.org/@react-navigation/core/download/@react-navigation/core-3.2.1.tgz",
+@@ -3742,6 +3757,11 @@
+         }
+       }
+     },
++    "base-64": {
++      "version": "0.1.0",
++      "resolved": "http://registry.npm.taobao.org/base-64/download/base-64-0.1.0.tgz",
++      "integrity": "sha1-eAqZyE59YAJgNhURxId2E78k9rs="
++    },
+     "base64-js": {
+       "version": "1.3.0",
+       "resolved": "http://registry.npm.taobao.org/base64-js/download/base64-js-1.3.0.tgz",
+@@ -4228,6 +4248,11 @@
+         "which": "^1.2.9"
+       }
+     },
++    "crypto-js": {
++      "version": "3.1.9-1",
++      "resolved": "http://registry.npm.taobao.org/crypto-js/download/crypto-js-3.1.9-1.tgz",
++      "integrity": "sha1-/aGedh/Ad+Af+/3G6f38WeiAbNg="
++    },
+     "cssom": {
+       "version": "0.3.6",
+       "resolved": "http://registry.npm.taobao.org/cssom/download/cssom-0.3.6.tgz",
+@@ -4581,6 +4606,11 @@
+       "resolved": "http://registry.npm.taobao.org/eventemitter3/download/eventemitter3-3.1.0.tgz",
+       "integrity": "sha1-CQtNbNvWRe0Qv3UNS1QHlC17oWM="
+     },
++    "events": {
++      "version": "3.0.0",
++      "resolved": "http://registry.npm.taobao.org/events/download/events-3.0.0.tgz",
++      "integrity": "sha1-mgoN+vYok9krh1uPJpjKQRSXPog="
++    },
+     "eventsource": {
+       "version": "1.0.7",
+       "resolved": "http://registry.npm.taobao.org/eventsource/download/eventsource-1.0.7.tgz",
+@@ -5671,6 +5701,11 @@
+       "resolved": "http://registry.npm.taobao.org/image-size/download/image-size-0.6.3.tgz",
+       "integrity": "sha1-5+XGW7U0vXzc7dbLUWYnKoX3X7I="
+     },
++    "immutable": {
++      "version": "3.7.6",
++      "resolved": "http://registry.npm.taobao.org/immutable/download/immutable-3.7.6.tgz",
++      "integrity": "sha1-E7TTyxK++hVIKib+Gy665kAHHks="
++    },
+     "import-fresh": {
+       "version": "2.0.0",
+       "resolved": "http://registry.npm.taobao.org/import-fresh/download/import-fresh-2.0.0.tgz",
+@@ -10556,6 +10591,14 @@
+         }
+       }
+     },
++    "randombytes": {
++      "version": "2.1.0",
++      "resolved": "http://registry.npm.taobao.org/randombytes/download/randombytes-2.1.0.tgz",
++      "integrity": "sha1-32+ENy8CcNxlzfYpE0mrekc9Tyo=",
++      "requires": {
++        "safe-buffer": "^5.1.0"
++      }
++    },
+     "range-parser": {
+       "version": "1.2.0",
+       "resolved": "http://registry.npm.taobao.org/range-parser/download/range-parser-1.2.0.tgz",
+@@ -10572,6 +10615,36 @@
+         "scheduler": "^0.13.3"
+       }
+     },
++    "react-addons-shallow-compare": {
++      "version": "15.6.2",
++      "resolved": "http://registry.npm.taobao.org/react-addons-shallow-compare/download/react-addons-shallow-compare-15.6.2.tgz",
++      "integrity": "sha1-GYoAuR/DdiPbZKKP0XtZa6NicC8=",
++      "requires": {
++        "fbjs": "^0.8.4",
++        "object-assign": "^4.1.0"
++      },
++      "dependencies": {
++        "core-js": {
++          "version": "1.2.7",
++          "resolved": "http://registry.npm.taobao.org/core-js/download/core-js-1.2.7.tgz",
++          "integrity": "sha1-ZSKUwUZR2yj6k70tX/KYOk8IxjY="
++        },
++        "fbjs": {
++          "version": "0.8.17",
++          "resolved": "http://registry.npm.taobao.org/fbjs/download/fbjs-0.8.17.tgz",
++          "integrity": "sha1-xNWY6taUkRJlPWWIsBpc3Nn5D90=",
++          "requires": {
++            "core-js": "^1.0.0",
++            "isomorphic-fetch": "^2.1.1",
++            "loose-envify": "^1.0.0",
++            "object-assign": "^4.1.0",
++            "promise": "^7.1.1",
++            "setimmediate": "^1.0.5",
++            "ua-parser-js": "^0.7.18"
++          }
++        }
++      }
++    },
+     "react-clone-referenced-element": {
+       "version": "1.1.0",
+       "resolved": "http://registry.npm.taobao.org/react-clone-referenced-element/download/react-clone-referenced-element-1.1.0.tgz",
+@@ -10738,6 +10811,64 @@
+         }
+       }
+     },
++    "react-native-actionsheet": {
++      "version": "2.4.2",
++      "resolved": "http://registry.npm.taobao.org/react-native-actionsheet/download/react-native-actionsheet-2.4.2.tgz",
++      "integrity": "sha1-agDdUade8siXQxITDkBa9zGRUA8="
++    },
++    "react-native-audio": {
++      "version": "4.3.0",
++      "resolved": "http://registry.npm.taobao.org/react-native-audio/download/react-native-audio-4.3.0.tgz",
++      "integrity": "sha1-+uIrgfak3acG/Ug30MaonGbPLn4="
++    },
++    "react-native-deprecated-custom-components": {
++      "version": "github:facebookarchive/react-native-custom-components#d5201e53221a2460b096ee82ff4480f3b0de7fe4",
++      "from": "github:facebookarchive/react-native-custom-components",
++      "requires": {
++        "create-react-class": "15.6.0",
++        "fbjs": "~0.8.9",
++        "immutable": "~3.7.6",
++        "prop-types": "^15.5.10",
++        "react-timer-mixin": "^0.13.2",
++        "rebound": "^0.0.13"
++      },
++      "dependencies": {
++        "core-js": {
++          "version": "1.2.7",
++          "resolved": "http://registry.npm.taobao.org/core-js/download/core-js-1.2.7.tgz",
++          "integrity": "sha1-ZSKUwUZR2yj6k70tX/KYOk8IxjY="
++        },
++        "create-react-class": {
++          "version": "15.6.0",
++          "resolved": "http://registry.npm.taobao.org/create-react-class/download/create-react-class-15.6.0.tgz",
++          "integrity": "sha1-q0SEl8JlZuHilBPogyB9V8/nvtQ=",
++          "requires": {
++            "fbjs": "^0.8.9",
++            "loose-envify": "^1.3.1",
++            "object-assign": "^4.1.1"
++          }
++        },
++        "fbjs": {
++          "version": "0.8.17",
++          "resolved": "http://registry.npm.taobao.org/fbjs/download/fbjs-0.8.17.tgz",
++          "integrity": "sha1-xNWY6taUkRJlPWWIsBpc3Nn5D90=",
++          "requires": {
++            "core-js": "^1.0.0",
++            "isomorphic-fetch": "^2.1.1",
++            "loose-envify": "^1.0.0",
++            "object-assign": "^4.1.0",
++            "promise": "^7.1.1",
++            "setimmediate": "^1.0.5",
++            "ua-parser-js": "^0.7.18"
++          }
++        }
++      }
++    },
++    "react-native-device-info": {
++      "version": "1.5.0",
++      "resolved": "http://registry.npm.taobao.org/react-native-device-info/download/react-native-device-info-1.5.0.tgz",
++      "integrity": "sha1-CeF8gZmsUQgtchk/F+tEXpyD5o0="
++    },
+     "react-native-drawer": {
+       "version": "2.5.1",
+       "resolved": "http://registry.npm.taobao.org/react-native-drawer/download/react-native-drawer-2.5.1.tgz",
+@@ -10772,6 +10903,16 @@
+         }
+       }
+     },
++    "react-native-image-crop-picker": {
++      "version": "0.23.1",
++      "resolved": "http://registry.npm.taobao.org/react-native-image-crop-picker/download/react-native-image-crop-picker-0.23.1.tgz",
++      "integrity": "sha1-JsG4mdvkNYufLJg2kQmkKoFBaCo="
++    },
++    "react-native-image-picker": {
++      "version": "0.28.1",
++      "resolved": "http://registry.npm.taobao.org/react-native-image-picker/download/react-native-image-picker-0.28.1.tgz",
++      "integrity": "sha1-ESdGBSLgyXQfxi89BAJx0pj7am4="
++    },
+     "react-native-iphone-x-helper": {
+       "version": "1.2.0",
+       "resolved": "http://registry.npm.taobao.org/react-native-iphone-x-helper/download/react-native-iphone-x-helper-1.2.0.tgz",
+@@ -10786,6 +10927,27 @@
+         "react-native-iphone-x-helper": "^1.0.3"
+       }
+     },
++    "react-native-loading-spinner-overlay": {
++      "version": "1.0.1",
++      "resolved": "http://registry.npm.taobao.org/react-native-loading-spinner-overlay/download/react-native-loading-spinner-overlay-1.0.1.tgz",
++      "integrity": "sha1-B/haBytvfQW4dJZozWJt9MwzA0c=",
++      "requires": {
++        "prop-types": "^15.6.2"
++      }
++    },
++    "react-native-permissions": {
++      "version": "1.1.1",
++      "resolved": "http://registry.npm.taobao.org/react-native-permissions/download/react-native-permissions-1.1.1.tgz",
++      "integrity": "sha1-SHYARoH/hVZFRhPYUkmwG6/5s1s="
++    },
++    "react-native-progress": {
++      "version": "3.6.0",
++      "resolved": "http://registry.npm.taobao.org/react-native-progress/download/react-native-progress-3.6.0.tgz",
++      "integrity": "sha1-/q83SR+Ru0ISB/12HiDLcliio6Y=",
++      "requires": {
++        "prop-types": "^15.7.2"
++      }
++    },
+     "react-native-safe-area-view": {
+       "version": "0.13.1",
+       "resolved": "http://registry.npm.taobao.org/react-native-safe-area-view/download/react-native-safe-area-view-0.13.1.tgz",
+@@ -10806,10 +10968,30 @@
+       "resolved": "http://registry.npm.taobao.org/react-native-screens/download/react-native-screens-1.0.0-alpha.22.tgz",
+       "integrity": "sha1-ehIDd7Uqqbu5TQuFQaAUAmvpKJs="
+     },
++    "react-native-slider": {
++      "version": "0.11.0",
++      "resolved": "http://registry.npm.taobao.org/react-native-slider/download/react-native-slider-0.11.0.tgz",
++      "integrity": "sha1-tooLxDyEIrJM1XlHzFrCvNtY+tw=",
++      "requires": {
++        "prop-types": "^15.5.6"
++      }
++    },
+     "react-native-smart-barcode": {
+-      "version": "1.0.6",
+-      "resolved": "http://registry.npm.taobao.org/react-native-smart-barcode/download/react-native-smart-barcode-1.0.6.tgz",
+-      "integrity": "sha1-dBFYbGh+0ltq30VvlJs5aZxj214="
++      "version": "file:node_modules_private/react-native-smart-barcode"
++    },
++    "react-native-snap-carousel": {
++      "version": "3.7.5",
++      "resolved": "http://registry.npm.taobao.org/react-native-snap-carousel/download/react-native-snap-carousel-3.7.5.tgz",
++      "integrity": "sha1-cXJFbUCrkWFSMFXrMC+bA7JEJAo=",
++      "requires": {
++        "prop-types": "^15.6.1",
++        "react-addons-shallow-compare": "15.6.2"
++      }
++    },
++    "react-native-sound": {
++      "version": "0.10.12",
++      "resolved": "http://registry.npm.taobao.org/react-native-sound/download/react-native-sound-0.10.12.tgz",
++      "integrity": "sha1-+RLW+dbp4rQrOR4CJnh2KNlA8Bo="
+     },
+     "react-native-tab-view": {
+       "version": "1.3.4",
+@@ -10819,6 +11001,14 @@
+         "prop-types": "^15.6.1"
+       }
+     },
++    "react-native-uuid": {
++      "version": "1.4.9",
++      "resolved": "http://registry.npm.taobao.org/react-native-uuid/download/react-native-uuid-1.4.9.tgz",
++      "integrity": "sha1-pSZ0L4/d/mQUUAZVISyo0QnEAik=",
++      "requires": {
++        "randombytes": "^2.0.3"
++      }
++    },
+     "react-native-vector-icons": {
+       "version": "6.1.0",
+       "resolved": "http://registry.npm.taobao.org/react-native-vector-icons/download/react-native-vector-icons-6.1.0.tgz",
+@@ -10993,6 +11183,11 @@
+         "util.promisify": "^1.0.0"
+       }
+     },
++    "rebound": {
++      "version": "0.0.13",
++      "resolved": "http://registry.npm.taobao.org/rebound/download/rebound-0.0.13.tgz",
++      "integrity": "sha1-SiJSVMr32nVnl7GcWBe/enlB+sE="
++    },
+     "redux": {
+       "version": "4.0.1",
+       "resolved": "http://registry.npm.taobao.org/redux/download/redux-4.0.1.tgz",
+@@ -11249,6 +11444,30 @@
+         "glob": "^7.1.3"
+       }
+     },
++    "rn-fetch-blob": {
++      "version": "0.10.15",
++      "resolved": "http://registry.npm.taobao.org/rn-fetch-blob/download/rn-fetch-blob-0.10.15.tgz",
++      "integrity": "sha1-NSaGDBxX4L9MCb2+QJyRkmSv/7o=",
++      "requires": {
++        "base-64": "0.1.0",
++        "glob": "7.0.6"
++      },
++      "dependencies": {
++        "glob": {
++          "version": "7.0.6",
++          "resolved": "http://registry.npm.taobao.org/glob/download/glob-7.0.6.tgz",
++          "integrity": "sha1-IRuvr0nlJbjNkyYNFKsTYVKz9Xo=",
++          "requires": {
++            "fs.realpath": "^1.0.0",
++            "inflight": "^1.0.4",
++            "inherits": "2",
++            "minimatch": "^3.0.2",
++            "once": "^1.3.0",
++            "path-is-absolute": "^1.0.0"
++          }
++        }
++      }
++    },
+     "rsvp": {
+       "version": "3.6.2",
+       "resolved": "http://registry.npm.taobao.org/rsvp/download/rsvp-3.6.2.tgz",
+@@ -12143,6 +12362,15 @@
+       "integrity": "sha1-rifbOPZgp64uHDt9G8KQgZuFGeY=",
+       "dev": true
+     },
++    "teaset": {
++      "version": "0.6.3",
++      "resolved": "http://registry.npm.taobao.org/teaset/download/teaset-0.6.3.tgz",
++      "integrity": "sha1-6urtu2WGxTcHtsCjjGMa1sqMV+c=",
++      "requires": {
++        "prop-types": "^15.5.10",
++        "react-native-deprecated-custom-components": "github:facebookarchive/react-native-custom-components#d5201e53221a2460b096ee82ff4480f3b0de7fe4"
++      }
++    },
+     "temp": {
+       "version": "0.8.3",
+       "resolved": "http://registry.npm.taobao.org/temp/download/temp-0.8.3.tgz",
+diff --git a/package.json b/package.json
+index c1036c8..715bb5c 100644
+--- a/package.json
++++ b/package.json
+@@ -30,6 +30,7 @@
+     "react-native-smart-barcode": "file:./node_modules_private/react-native-smart-barcode",
+     "react-native-snap-carousel": "^3.7.5",
+     "react-native-sound": "^0.10.12",
++    "react-native-uuid": "^1.4.9",
+     "react-navigation": "^3.6.1",
+     "react-redux": "^6.0.1",
+     "react-stompjs": "^0.5.3",
+diff --git a/yarn.lock b/yarn.lock
+index 5c9f3ee..5da8f4c 100644
+--- a/yarn.lock
++++ b/yarn.lock
+@@ -5180,6 +5180,13 @@ randomatic@^3.0.0:
+     kind-of "^6.0.0"
+     math-random "^1.0.1"
+ 
++randombytes@^2.0.3:
++  version "2.1.0"
++  resolved "http://registry.npm.taobao.org/randombytes/download/randombytes-2.1.0.tgz#df6f84372f0270dc65cdf6291349ab7a473d4f2a"
++  integrity sha1-32+ENy8CcNxlzfYpE0mrekc9Tyo=
++  dependencies:
++    safe-buffer "^5.1.0"
++
+ range-parser@~1.2.0:
+   version "1.2.0"
+   resolved "http://registry.npm.taobao.org/range-parser/download/range-parser-1.2.0.tgz#f49be6b487894ddc40dcc94a322f611092e00d5e"
+@@ -5365,6 +5372,13 @@ react-native-tab-view@^1.0.0, react-native-tab-view@^1.2.0:
+   dependencies:
+     prop-types "^15.6.1"
+ 
++react-native-uuid@^1.4.9:
++  version "1.4.9"
++  resolved "http://registry.npm.taobao.org/react-native-uuid/download/react-native-uuid-1.4.9.tgz#a526742f8fddfe6414500655212ca8d109c40229"
++  integrity sha1-pSZ0L4/d/mQUUAZVISyo0QnEAik=
++  dependencies:
++    randombytes "^2.0.3"
++
+ react-native-vector-icons@6.1.0:
+   version "6.1.0"
+   resolved "http://registry.npm.taobao.org/react-native-vector-icons/download/react-native-vector-icons-6.1.0.tgz#770a3f8ced692d75deb3afbb9829195ceed1eedd"
+@@ -5857,7 +5871,7 @@ rx-lite@*, rx-lite@^4.0.8:
+   resolved "http://registry.npm.taobao.org/rx-lite/download/rx-lite-4.0.8.tgz#0b1e11af8bc44836f04a6407e92da42467b79444"
+   integrity sha1-Cx4Rr4vESDbwSmQH6S2kJGe3lEQ=
+ 
+-safe-buffer@5.1.2, safe-buffer@^5.0.1, safe-buffer@^5.1.2, safe-buffer@~5.1.0, safe-buffer@~5.1.1:
++safe-buffer@5.1.2, safe-buffer@^5.0.1, safe-buffer@^5.1.0, safe-buffer@^5.1.2, safe-buffer@~5.1.0, safe-buffer@~5.1.1:
+   version "5.1.2"
+   resolved "http://registry.npm.taobao.org/safe-buffer/download/safe-buffer-5.1.2.tgz#991ec69d296e0313747d59bdfd2b745c35f8828d"
+   integrity sha1-mR7GnSluAxN0fVm9/St0XDX4go0=

@@ -83,11 +83,10 @@ export function selectImage(work,index,filepath){
         filepath
     }
 }
-export function selectAudio(work,index,filepath){
+export function selectAudio(work,filepath){
     return {
         type:types.WORK_SCENE_AUDIO_SELECT,
         work,
-        index,
         filepath
     }
 }

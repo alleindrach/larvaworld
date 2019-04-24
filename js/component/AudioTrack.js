@@ -6,15 +6,14 @@ import PropTypes from 'prop-types';
 import * as  FileUtils from '../utils/FileUtils'
 import * as CacheProvider from './cached/CacheProvider'
 import Slider from 'react-native-slider'
-import {  Icon } from 'native-base';
+import {Icon} from 'native-base';
 import config from '../config/Config';
-const img_speaker = require('../assets/sound/ui_speaker.png');
-const img_pause = require('../assets/sound/ui_pause.png');
-const img_play = require('../assets/sound//ui_play.png');
-const img_playjumpleft = require('../assets/sound/ui_playjumpleft.png');
-const img_playjumpright = require('../assets/sound/ui_playjumpright.png');
+import UUIDGenerator from 'react-native-uuid-generator';
+import {AudioRecorder, AudioUtils} from 'react-native-audio';
+import {WorkAction} from '../redux/action'
+import {connect} from 'react-redux'
 
-export default class AudioTrack extends React.Component{
+class AudioTrack extends React.Component{
     static defaultProps = {
         source: null,
         style:null,
@@ -34,19 +33,218 @@ export default class AudioTrack extends React.Component{
     // static navigationOptions = props => ({
     //     title:props.navigation.state.params.title,
     // })
+    soundStop=async ()=>{
+        return new Promise(function(resolve,reject)
+        {
+            if(!this.sound)
+                resolve(true);
+            else
+                this.sound.stop(()=>{
+                    resolve(true)
+                })
+        })
+    }
+    soundPause=async ()=>{
+        return new Promise(function(resolve,reject)
+        {
+            if(!this.sound)
+                resolve(true);
+            else
+                this.sound.pause(()=>{
+                    resolve(true)
+                })
+        })
+    }
+    soundStop=async()=>{
+        return new Promise(function(resolve,reject)
+        {
+            if(!this.sound)
+                resolve(true);
+            else
+                this.sound.stop(()=>{
+                    resolve(true)
+                })
+        })
+    }
+    play=async ()=>{
+        if(this.state.audioState=='play.paused'){
+            if(this.sound){
+                this.sound.play(this.playComplete);
+                this.setState({audioState:'playing'});
+            }else{
+                setTimeout((() => {
+                    this.loadSound(true).bind(this)
+                }).bind(this),100)
+                
+            }
+        }
+        else if(this.state.audioState=='recording'||this.state.audioState=='record.paused'){
+            const filePath = await AudioRecorder.stopRecording();
+      
+            if (Platform.OS === 'android') {
+                this._finishRecording(true, filePath);
+            }
+            // this.setState({source:{uri:`file://${filePath}`}, audioState: 'record.pause',record:{source:{uri:`file://${filePath}`}}});
+            // this.state.source=this.state.record.source;
+            
+            setTimeout((() => {
+                this.loadSound(true).bind(this)
+            }).bind(this),100);
+        }
+    }
 
+    pause =async ()=> {
+        if (this.state.audioState=='recording') {
+            try {
+                const filePath = await AudioRecorder.pauseRecording();
+                this.setState({audioState: 'record.paused'});
+              } catch (error) {
+                console.error(error);
+              }
+            return;  
+        }
+        else if(this.state.audioState=='playing')
+        {
+            await this.soundPause();
+            this.setState({audioState:'play.paused'});
+        }
+        
+      }
+
+    resume=async ()=> {
+        if (this.state.audioState=='record.paused') {
+            try {
+                await AudioRecorder.resumeRecording();
+                this.setState({audioState: 'recording'});
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    }
+    
+    record=async()=>{
+        if(!this.state.hasRecordPermission) {
+            console.warn('Can\'t record, no permission granted!');
+            return;
+        }
+        if (this.state.audioState=='play.paused') {
+            try {
+                const filePath=await this.prepareRecordingPath();
+                const filePath2=await AudioRecorder.startRecording()
+                this.setState({audioState: 'recording',source:{uri:`file://${filePath}`},
+                    playSeconds:0,
+                    duration:config.file.maxSoundLength,
+                    isCacheable: false,
+                    cachedFilePath: null,
+                    progress: 0,
+                    isError: false,
+                });
+                this.props.selectAudio(this.props.work,`file://${filePath}`);
+                AudioRecorder.onProgress = ((data) => {
+                    this.setState({playSeconds: Math.floor(data.currentTime)});
+                    if(data.currentTime>config.file.maxSoundLength)
+                        this.stop()
+                  }).bind(this);
+                AudioRecorder.onFinished = (data) => {
+                // Android callback comes in the form of a promise instead.
+                    if (Platform.OS === 'ios') {
+                        this._finishRecording(data.status === "OK", data.audioFileURL, data.audioFileSize);
+                    }
+                };
+
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        else if(this.state.audioState=='playing'){
+            await this.soundStop();
+            try {
+                const filePath=await this.prepareRecordingPath();
+                const filePath2=await AudioRecorder.startRecording()
+                this.setState({audioState: 'recording',source:{uri:`file://${filePath}`},
+                    playSeconds:0,
+                    duration:config.file.maxSoundLength,
+                    isCacheable: false,
+                    cachedFilePath: null,
+                    progress: 0,
+                    isError: false,
+                });
+                this.props.selectAudio(this.props.work,`file://${filePath}`);
+                AudioRecorder.onProgress = ((data) => {
+                    this.setState({playSeconds: Math.floor(data.currentTime)});
+                    if(data.currentTime>config.file.maxSoundLength)
+                        this.stop()
+                  }).bind(this);
+          
+                AudioRecorder.onFinished = (data) => {
+                // Android callback comes in the form of a promise instead.
+                    if (Platform.OS === 'ios') {
+                        this._finishRecording(data.status === "OK", data.audioFileURL, data.audioFileSize);
+                    }
+                };
+
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    }
+
+    stop=async ()=> {
+        if (this.state.audioState=='recording'||this.state.audioState=='record.paused') {
+            try {
+              const filePath = await AudioRecorder.stopRecording();
+            
+              if (Platform.OS === 'android') {
+                this._finishRecording(true, filePath);
+              }
+              this.setState({audioState: 'play.paused'});
+              setTimeout((() => {
+                    this.loadSound(false)
+              }).bind(this),100);
+              return filePath;
+            } catch (error) {
+              console.error(error);
+            }
+        }
+        else if(this.state.audioState=='playing')
+        {
+            await this.soundPause();
+            this.setState({audioState:'play.paused'});
+        }
+        
+    }
+    
+    prepareRecordingPath=async ()=>{
+        
+        const uuid=await UUIDGenerator.getRandomUUID().then((uuid) => {
+            return uuid;
+            });
+        const filePath= `${FileUtils.baseCacheDir}/${uuid}.${config.file.soundMediaType}`;
+        // this.setState({source:{uri:`file://${filePath}`}});
+            
+        AudioRecorder.prepareRecordingAtPath(filePath, {
+            SampleRate: 22050,
+            Channels: 1,
+            AudioQuality: "Low",
+            AudioEncoding: config.file.soundMediaType
+          });
+       return filePath;
+    }
+        
     constructor(props){
         super(props);
         this._isMounted = false;
         this.state = {
-            playState:'paused', //playing, paused
+            audioState:'play.paused', //playing, paused
             playSeconds:0,
             duration:0,
             isCacheable: false,
             cachedFilePath: null,
             networkAvailable: true,
             progress: 0,
-            isError: false
+            isError: false,
+            hasRecordPermission:false,
+            source:props.source
         };
         console.log('init audio:',this.props.source.uri,this.state)
         this.sliderEditing = false;
@@ -55,17 +253,38 @@ export default class AudioTrack extends React.Component{
     componentDidMount(){
         // this.play();
         this._isMounted = true;
+      
         console.log('mount audio:',this.props.source.uri,this.state)
         this.loadSound(false);
         //重绘进度条
         this.timeout = setInterval(() => {
-            if(this.sound && this.sound.isLoaded() && this.state.playState == 'playing' && !this.sliderEditing){
+            if(this.sound && this.sound.isLoaded() && this.state.audioState == 'playing' && !this.sliderEditing){
                 this.sound.getCurrentTime((seconds, isPlaying) => {
                     this.setState({playSeconds:seconds});
                 })
             }
         }, 100);
+
+
+        AudioRecorder.requestAuthorization().then((isAuthorised) => {
+            this.setState({ hasRecordPermission: isAuthorised });
+    
+            if (!isAuthorised) return;
+            // const recordFilePath=this.getNewAudioPath();
+            // this.prepareRecordingPath();
+            
+           
+          });
+    
     }
+    _finishRecording(didSucceed, filePath, fileSize) {
+        this.setState({source:{
+            ...this.state.source, 
+            duration:this.state.playSeconds 
+        }});
+        console.log(`Finished recording of duration ${this.state.currentTime} seconds at path: ${filePath} and size of ${fileSize || 0} bytes`);
+      }    
+
     componentWillUnmount(){
         if(this.sound){
             this.sound.release();
@@ -82,14 +301,16 @@ export default class AudioTrack extends React.Component{
         return this.setState(newState);
       }
 
-    processSource = (source) => {
+    processSource = (source,play) => {
         let url = _.get(source, ['uri'], null);
         if (FileUtils.isLocalFile(url)) {
             this.safeSetState({
-                cachedFilePath: null,
+                cachedFilePath: FileUtils.cleanLocalFilePath(url),
                 isCacheable: false,
-                isError: false
+                isError: false,
+                playSeconds:0,
             });
+            this.loadSound(play);
             return;
         }
 
@@ -112,9 +333,10 @@ export default class AudioTrack extends React.Component{
                     {
                     let x=this.state;
                     this.safeSetState({
-                        cachedFilePath
+                        cachedFilePath,
+                        playSeconds:0,
                     });
-                    this.loadSound(false);
+                    this.loadSound(play);
                     // console.log('cached image and change state ',url,cachedImagePath,x,this.state)
                     }          
             })
@@ -149,34 +371,34 @@ export default class AudioTrack extends React.Component{
         this.safeSetState({progress});
       }
     loadSound=(play)=>{
-        if(this.props.source.uri!=config.flags.plus){
+        if(this.state.source.uri!=config.flags.plus){
             if(!this.props.cache || this.state.cachedFilePath){
-                const filepath = this.props.cache?  this.state.cachedFilePath:this.props.source.uri;
+                const filepath = this.props.cache?  this.state.cachedFilePath:this.state.source.uri;
                 console.log('[loading]', filepath)
                 this.sound = new Sound(filepath,'', ((error) => {
                     if (error) {
                         console.log('failed to load the sound', error);
                         Alert.alert('Notice', 'audio file error. (Error code : 1)');   
-                        this.setState({playState:'paused'});
+                        this.setState({audioState:'play.paused'});
                     }else{
                         if(play)
                         {
-                            this.setState({playState:'playing',duration:this.sound.getDuration()});
+                            this.setState({audioState:'playing',duration:this.sound.getDuration()});
                             this.sound.play(this.playComplete);
                         }
                         else
                         {
-                            this.setState({playState:'paused', duration:this.sound.getDuration()});
-                            
+                            this.setState({audioState:'play.paused', duration:this.sound.getDuration()});
                         } 
                     }
                 }).bind(this));   
             }else if(this.props.cache)
             {
-                this.processSource(this.props.source);
+                this.processSource(this.props.source,play);
             }
         }
     }
+    
     onSliderEditStart = () => {
         this.sliderEditing = true;
     }
@@ -189,15 +411,6 @@ export default class AudioTrack extends React.Component{
             this.setState({playSeconds:value});
         }
     }
-
-    play = async () => {
-        if(this.sound){
-            this.sound.play(this.playComplete);
-            this.setState({playState:'playing'});
-        }else{
-            this.loadSound(true).bind(this);
-        }
-    }
     playComplete = (success) => {
         if(this.sound){
             if (success) {
@@ -206,32 +419,23 @@ export default class AudioTrack extends React.Component{
                 console.log('playback failed due to audio decoding errors');
                 Alert.alert('Notice', 'audio file error. (Error code : 2)');
             }
-            this.setState({playState:'paused', playSeconds:0});
+            this.setState({audioState:'play.paused', playSeconds:0});
             this.sound.setCurrentTime(0);
         }
     }
-
-    pause = () => {
-        if(this.sound){
-            this.sound.pause();
-        }
-
-        this.setState({playState:'paused'});
-    }
-
-    jumpPrev15Seconds = () => {this.jumpSeconds(-15);}
-    jumpNext15Seconds = () => {this.jumpSeconds(15);}
-    jumpSeconds = (secsDelta) => {
-        if(this.sound){
-            this.sound.getCurrentTime((secs, isPlaying) => {
-                let nextSecs = secs + secsDelta;
-                if(nextSecs < 0) nextSecs = 0;
-                else if(nextSecs > this.state.duration) nextSecs = this.state.duration;
-                this.sound.setCurrentTime(nextSecs);
-                this.setState({playSeconds:nextSecs});
-            })
-        }
-    }
+    // jumpPrev15Seconds = () => {this.jumpSeconds(-15);}
+    // jumpNext15Seconds = () => {this.jumpSeconds(15);}
+    // jumpSeconds = (secsDelta) => {
+    //     if(this.sound){
+    //         this.sound.getCurrentTime((secs, isPlaying) => {
+    //             let nextSecs = secs + secsDelta;
+    //             if(nextSecs < 0) nextSecs = 0;
+    //             else if(nextSecs > this.state.duration) nextSecs = this.state.duration;
+    //             this.sound.setCurrentTime(nextSecs);
+    //             this.setState({playSeconds:nextSecs});
+    //         })
+    //     }
+    // }
 
     getAudioTimeString(seconds){
         const h = parseInt(seconds/(60*60));
@@ -240,10 +444,8 @@ export default class AudioTrack extends React.Component{
 
         return ( (m<10?'0'+m:m) + ':' + (s<10?'0'+s:s));
     }
-    
-      
     render(){
-        console.log('render audio:',this.props.source.uri,this.state)
+        // console.log('render audio:',this.state.source.uri,this.state)
         const currentTimeString = this.getAudioTimeString(this.state.playSeconds);
         const durationString = this.getAudioTimeString(this.state.duration);
         const {style}=this.props;
@@ -251,21 +453,64 @@ export default class AudioTrack extends React.Component{
             <View style={[{justifyContent:'center'},style]}>
                 <View style={{marginVertical:5, marginHorizontal:15, flexDirection:'row'}}>
                     <Text style={{color:'white', alignSelf:'center',fontSize: em(20),width:em(60)}}>{currentTimeString}</Text>
-                    {this.state.playState == 'playing' && 
-                    <TouchableOpacity onPress={this.pause} style={{marginHorizontal:2,alignSelf:'center',}}>
-                        <Icon type="FontAwesome"   name="pause"  style={{alignSelf:'center',fontSize: 20, width:22,color: '#31a4db'}}/>
-                    </TouchableOpacity>}
-                    {this.state.playState == 'paused' && 
-                    <TouchableOpacity onPress={this.play} style={{marginHorizontal:2,alignSelf:'center',}}>
-                        <Icon type="FontAwesome"   name="play"   style={{alignSelf:'center',fontSize: 20,width:22, color: '#31a4db'}}/>
-                    </TouchableOpacity>}
-                    <Slider
+                    {this.state.audioState == 'play.paused'  && 
+                    <TouchableOpacity onPress={this.record} style={{marginHorizontal:4,alignSelf:'center',}}>
+                        <Icon type="FontAwesome"   name="circle"   style={{alignSelf:'center',fontSize: 20,width:24, color: 'red'}}/>
+                    </TouchableOpacity>
+                    }
+                    {this.state.audioState == 'playing'  && 
+                    <TouchableOpacity onPress={this.record} style={{marginHorizontal:4,alignSelf:'center',}}>
+                        <Icon type="FontAwesome"   name="circle"   style={{alignSelf:'center',fontSize: 20,width:24, color: 'red'}}/>
+                    </TouchableOpacity>
+                    }
+                    {this.state.audioState == 'playing'  && 
+                    <TouchableOpacity onPress={this.pause} style={{marginHorizontal:4,alignSelf:'center',}}>
+                        <Icon type="FontAwesome"   name="pause"   style={{alignSelf:'center',fontSize: 20,width:24, color: '#31a4db'}}/>
+                    </TouchableOpacity>
+                    }
+                    {this.state.audioState == 'record.paused'  && 
+                    <TouchableOpacity onPress={this.resume} style={{marginHorizontal:4,alignSelf:'center',}}>
+                        <Icon type="FontAwesome"   name="circle"   style={{alignSelf:'center',fontSize: 20,width:24, color: 'red'}}/>
+                    </TouchableOpacity>
+                    }
+                    {this.state.audioState == 'record.paused'  && 
+                    <TouchableOpacity onPress={this.stop} style={{marginHorizontal:4,alignSelf:'center',}}>
+                        <Icon type="FontAwesome"   name="stop"   style={{alignSelf:'center',fontSize: 20,width:24, color: 'red'}}/>
+                    </TouchableOpacity>
+                    }
+                    {this.state.audioState == 'recording'  && 
+                    <TouchableOpacity onPress={this.stop} style={{marginHorizontal:4,alignSelf:'center',}}>
+                        <Icon type="FontAwesome"   name="stop"   style={{alignSelf:'center',fontSize: 20,width:24, color: 'red'}}/>
+                    </TouchableOpacity>
+                    }
+                    {this.state.audioState == 'recording'  && 
+                    <TouchableOpacity onPress={this.pause} style={{marginHorizontal:4,alignSelf:'center',}}>
+                        <Icon type="FontAwesome"   name="pause"   style={{alignSelf:'center',fontSize: 20,width:24, color: 'red'}}/>
+                    </TouchableOpacity>
+                    }
+                    {this.state.audioState == 'play.paused'  && 
+                    <TouchableOpacity onPress={this.play} style={{marginHorizontal:4,alignSelf:'center',}}>
+                        <Icon type="FontAwesome"   name="play"   style={{alignSelf:'center',fontSize: 20,width:24, color: '#31a4db'}}/>
+                    </TouchableOpacity>
+                    }
+                    {this.state.audioState == 'recording'  && 
+                    <TouchableOpacity onPress={this.play} style={{marginHorizontal:4,alignSelf:'center',}}>
+                        <Icon type="FontAwesome"   name="play"   style={{alignSelf:'center',fontSize: 20,width:24, color: '#31a4db'}}/>
+                    </TouchableOpacity>
+                    }
+                    {this.state.audioState == 'record.paused'  && 
+                    <TouchableOpacity onPress={this.play} style={{marginHorizontal:4,alignSelf:'center',}}>
+                        <Icon type="FontAwesome"   name="play"   style={{alignSelf:'center',fontSize: 20,width:24, color: '#31a4db'}}/>
+                    </TouchableOpacity>
+                    }              
+                     <Slider
                         style={sliderStyle.container}
                         trackStyle={sliderStyle.track}
                         thumbStyle={sliderStyle.thumb}
                         minimumTrackTintColor='#31a4db'
                         thumbTouchSize={{width: 50, height: 40}}
                         value={this.state.playSeconds}
+                        maximumValue={this.state.duration}
                         onValueChange={this.onSliderEditing}
                         onSlidingStart={this.onSliderEditStart}
                         onSlidingComplete={this.onSliderEditEnd}
@@ -299,3 +544,23 @@ const sliderStyle = StyleSheet.create({
       shadowOpacity: 1,
     }
   });
+
+
+const matStateToProps = (state) => {
+    return {
+      user: state.user,
+      work: state.work
+      // eventList: state.eventList
+    }
+  }
+  
+  const mapDispatchToProps = (dispatch) => {
+    return {
+      selectAudio: (work,filepath) => {
+        dispatch(WorkAction.selectAudio(work, filepath))
+      },
+    }
+  }
+  
+  export default connect(matStateToProps, mapDispatchToProps, null, {withforwardRefRef: true})(AudioTrack)
+  

@@ -5365,6 +5365,11 @@ react-native-tab-view@^1.0.0, react-native-tab-view@^1.2.0:
   dependencies:
     prop-types "^15.6.1"
 
+react-native-uuid-generator@^5.0.0:
+  version "5.0.0"
+  resolved "http://registry.npm.taobao.org/react-native-uuid-generator/download/react-native-uuid-generator-5.0.0.tgz#1c947d6ac1fde77d37a81e4556c1fd088dd05757"
+  integrity sha1-HJR9asH95303qB5FVsH9CI3QV1c=
+
 react-native-vector-icons@6.1.0:
   version "6.1.0"
   resolved "http://registry.npm.taobao.org/react-native-vector-icons/download/react-native-vector-icons-6.1.0.tgz#770a3f8ced692d75deb3afbb9829195ceed1eedd"
