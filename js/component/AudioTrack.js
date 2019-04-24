@@ -33,6 +33,36 @@ class AudioTrack extends React.Component{
     // static navigationOptions = props => ({
     //     title:props.navigation.state.params.title,
     // })
+
+
+    static getDerivedStateFromProps(props, state) {
+        const prevProps = state.prevProps || {};
+        // Compare the incoming prop to previous prop
+        if(prevProps.source && prevProps.source.uri 
+            && props.source && props.source.uri 
+            && prevProps.source.uri!=props.source.uri){
+            return {
+                source:props.source,
+                audioState:'play.paused', //playing, paused
+                playSeconds:0,
+                duration:0,
+                isCacheable: false,
+                cachedFilePath: null,
+                progress: 0,
+                isError: false,                
+            }
+        }
+        else
+        {
+            return {
+                // Store the previous props in state
+                prevProps: props
+              };
+        }
+        
+      }
+
+
     soundStop=async ()=>{
         return new Promise(function(resolve,reject)
         {
@@ -246,15 +276,15 @@ class AudioTrack extends React.Component{
             hasRecordPermission:false,
             source:props.source
         };
-        console.log('init audio:',this.props.source.uri,this.state)
         this.sliderEditing = false;
+        Sound.setCategory('Playback');
     }
 
     componentDidMount(){
         // this.play();
         this._isMounted = true;
       
-        console.log('mount audio:',this.props.source.uri,this.state)
+        console.log('mount audio:',this.props.source.uri,this.props.sindex,this.state)
         this.loadSound(false);
         //重绘进度条
         this.timeout = setInterval(() => {
@@ -371,6 +401,11 @@ class AudioTrack extends React.Component{
         this.safeSetState({progress});
       }
     loadSound=(play)=>{
+        if(this.sound)
+        {
+            this.sound.release();
+            this.sound=null;
+        }
         if(this.state.source.uri!=config.flags.plus){
             if(!this.props.cache || this.state.cachedFilePath){
                 const filepath = this.props.cache?  this.state.cachedFilePath:this.state.source.uri;
@@ -381,6 +416,8 @@ class AudioTrack extends React.Component{
                         Alert.alert('Notice', 'audio file error. (Error code : 1)');   
                         this.setState({audioState:'play.paused'});
                     }else{
+                        if(Platform.OS=='ios')
+                            
                         if(play)
                         {
                             this.setState({audioState:'playing',duration:this.sound.getDuration()});
@@ -446,6 +483,10 @@ class AudioTrack extends React.Component{
     }
     render(){
         // console.log('render audio:',this.state.source.uri,this.state)
+        if(this.props.sindex==1)
+        {
+            console.log('render audio',this.state,this.props)
+        }
         const currentTimeString = this.getAudioTimeString(this.state.playSeconds);
         const durationString = this.getAudioTimeString(this.state.duration);
         const {style}=this.props;

@@ -74,12 +74,20 @@ export default function messageReducer(state = initState, action) {
       return {
         ...state,
         uploadingProcess:action.process,
+        content:{
+          ...state.content,
+          ...action.work.content
+        }
       }
     case types.WORK_SYNC_UPLOAD_SUCCESS:
       return {
         ...state,
         uploadingProcess:100,
-        merging:action.merging
+        merging:action.merging,
+        content:{
+          ...state.content,
+          ...action.work.content
+        }
       }
     case types.WORK_SYNC_MERGED:
     return {
@@ -98,12 +106,19 @@ export default function messageReducer(state = initState, action) {
         isSynced: false,
         uploadingProcess:100,
         error:action.error,
-        
+        content:{
+          ...state.content,
+          ...action.work.content
+        }
       }
     case types.WORK_SCENE_SELECT:
       return {
         ...state ,
-        current:action.index
+        current:action.index,
+        content:{
+          ...state.content,
+          ...action.work.content
+        }
       }
     case types.WORK_SCENE_DEL:
       preScenes=[];
@@ -136,28 +151,37 @@ export default function messageReducer(state = initState, action) {
       }
 
     case types.WORK_SCENE_ADD:
-      current=state.current;
-      preScenes=[];
-      if(current>=0){
-        preScenes=[
-          ...action.work.content.scenes.slice(0,current+1)
-        ]
-      }
-      postScenes=[];
-      if(current<action.work.content.scenes.length-1)
-      {
-        postScenes=[
-          ...action.work.content.scenes.slice(current+1)
-        ]
-      } 
+     let newScenes= action.work.content.scenes.reduce((acc,scene,index)=>{
+       acc.push({img:scene.img,snd:scene.snd});
+        if(index==state.current)
+        {
+          acc.push(action.scene)
+        }
+        return acc;
+     },[]);
+      // current=state.current;
+      // preScenes=[];
+      // if(current>=0){
+      //   preScenes=[
+      //     ...newScenes.slice(0,current+1)
+      //   ]
+      // }
+      // postScenes=[];
+      // if(current<newScenes.length-1)
+      // {
+      //   postScenes=[
+      //     ...newScenes.slice(current+1)
+      //   ]
+      // } 
       return {
         ...state,
         content:{
           ...action.work.content,
           scenes:[
-            ...preScenes,
-            action.scene,
-            ...postScenes
+            ...newScenes
+            // ...preScenes,
+            // action.scene,
+            // ...postScenes
           ]
         }
       }

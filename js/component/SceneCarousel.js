@@ -66,7 +66,7 @@ export default class SceneCarousel extends Component {
   }
   _renderItem = ({item, index}) => {
     const {scenes,itemWidth, itemHeight,audioHeight} = this.props
-    console.log('scenes:',scenes)
+    // console.log('scenes:',scenes)
     return (
        
           <View style={styles.sceneWraper}>
@@ -86,7 +86,7 @@ export default class SceneCarousel extends Component {
                 </View>
               </View>
             </TouchableHighlight>
-            <AudioTrack style={{width:SCREEN_WIDTH,height:em(100),backgroundColor:'transparent'}} source={{uri:item.snd,duration:item.duration}} cache={true}/>
+            <AudioTrack style={{width:SCREEN_WIDTH,height:em(100),backgroundColor:'transparent'}} source={{uri:item.snd,duration:item.duration}} cache={true} sindex={index}/>
           </View>
     )
   }
