@@ -222,7 +222,8 @@ export default function messageReducer(state = initState, action) {
       scene=action.work.content.scenes[state.current];
       scene={
         ...scene,
-        snd:action.filepath
+        snd:action.filepath,
+        sndPlay:action.play
       }
       preScenes=[];
       if(state.current>0){

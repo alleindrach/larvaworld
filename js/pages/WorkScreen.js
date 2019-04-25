@@ -121,11 +121,11 @@ class WorkScreen extends BaseScreen {
             snd:'http://192.168.2.149/s/2.mp3',
             duration:200
           },
-          {
-            img:'https://www.xinrong.com/webapp2.0/webapp3.0/images/banner/20.jpg',
-            snd:'http://192.168.2.149/s/3.mp3',
-            duration:300
-          }            
+          // {
+          //   img:'https://www.xinrong.com/webapp2.0/webapp3.0/images/banner/20.jpg',
+          //   snd:'http://192.168.2.149/s/3.mp3',
+          //   duration:300
+          // }            
         ]
       }
     }
@@ -218,8 +218,8 @@ const mapDispatchToProps = (dispatch) => {
     selectImage: (work,index,filepath) => {
       dispatch(WorkAction.selectImage(work,index, filepath))
     },
-    selectAudio: (work,index,filepath) => {
-      dispatch(WorkAction.selectAudio(work,index, filepath))
+    selectAudio: (work,index,filepath,play) => {
+      dispatch(WorkAction.selectAudio(work,index, filepath,play))
     },
     deleteCurrentScene:(work) => {
       dispatch(WorkAction.deleteScene(work))
