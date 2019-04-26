@@ -13,7 +13,7 @@ export default config = {
       cacheDir:"/temp"
     },
     websocket:{
-      base: 'http://192.168.2.233:8762',
+      base: 'http://192.168.2.233:8765',
       address:'/websocket',
       single:'/user/topic/message',
       broadcast:'/topic/message',
@@ -27,7 +27,7 @@ export default config = {
       // base: 'http://60.205.171.124:3000/',
   
       //production server
-      base: 'http://192.168.2.233:8762',
+      base: 'http://192.168.2.233:8765',
   
       login: '/user/login',
       captcha: '/common/captcha.jpg',

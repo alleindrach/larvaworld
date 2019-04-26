@@ -3,6 +3,7 @@ import config from '../config/Config'
 import _ from 'lodash'
 import RNFetchBlob from 'rn-fetch-blob'
 import {Platform} from 'react-native';
+import * as mime from 'react-native-mime-types';
 export const baseCacheDir = RNFetchBlob.fs.dirs.CacheDir + config.file.cacheDir;
 export const clearCache=() =>{
     return RNFetchBlob.fs.unlink(baseCacheDir)
@@ -193,7 +194,12 @@ export const  uploadWork=(url,work) =>
       if (isLocalFile(scene.snd) &&  _.indexOf(files,scene.snd)<0)
           files.push(scene.snd);
       return files;
-    },[]).map(file=>{return {name:getFileNameWithoutSuffix(file),filename:getFileName(file),data:RNFetchBlob.wrap(cleanLocalFilePath(file))}})
+    },[]).map(file=>{return {
+      name:getFileNameWithoutSuffix(file),
+      filename:getFileName(file),
+      data:RNFetchBlob.wrap(cleanLocalFilePath(file)),
+      type:mime.lookup(getSuffix(file)) 
+    }})
     
     return RNFetchBlob.fetch('POST', url, {
       // header...

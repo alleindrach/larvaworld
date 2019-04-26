@@ -4343,6 +4343,11 @@ mime-db@~1.23.0:
   resolved "http://registry.npm.taobao.org/mime-db/download/mime-db-1.23.0.tgz#a31b4070adaea27d732ea333740a64d0ec9a6659"
   integrity sha1-oxtAcK2uon1zLqMzdApk0OyaZlk=
 
+mime-db@~1.25.0:
+  version "1.25.0"
+  resolved "https://registry.npm.taobao.org/mime-db/download/mime-db-1.25.0.tgz#c18dbd7c73a5dbf6f44a024dc0d165a1e7b1c392"
+  integrity sha1-wY29fHOl2/b0SgJNwNFloeexw5I=
+
 mime-types@2.1.11:
   version "2.1.11"
   resolved "http://registry.npm.taobao.org/mime-types/download/mime-types-2.1.11.tgz#c259c471bda808a85d6cd193b430a5fae4473b3c"
@@ -5311,6 +5316,13 @@ react-native-loading-spinner-overlay@^1.0.1:
   dependencies:
     prop-types "^15.6.2"
 
+react-native-mime-types@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.npm.taobao.org/react-native-mime-types/download/react-native-mime-types-2.2.1.tgz#a9760e9916e4e7df03512c60516668f23543f2c0"
+  integrity sha1-qXYOmRbk598DUSxgUWZo8jVD8sA=
+  dependencies:
+    mime-db "~1.25.0"
+
 react-native-permissions@^1.1.1:
   version "1.1.1"
   resolved "http://registry.npm.taobao.org/react-native-permissions/download/react-native-permissions-1.1.1.tgz#4876004681ff8556454613d85249b01baff9b35b"
@@ -5488,10 +5500,8 @@ react-redux@^6.0.1:
     prop-types "^15.7.2"
     react-is "^16.8.2"
 
-react-stompjs@^0.5.3:
+"react-stompjs@file:./node_modules_private/react-stompjs":
   version "0.5.3"
-  resolved "http://registry.npm.taobao.org/react-stompjs/download/react-stompjs-0.5.3.tgz#c0d99444e414b98c3a1e8c4dc3c44ca85835b48b"
-  integrity sha1-wNmUROQUuYw6HoxNw8RMqFg1tIs=
   dependencies:
     "@stomp/stompjs" "^5.2.0"
     eventemitter3 "^3.1.0"
