@@ -3,9 +3,7 @@ import config from '../config/Config'
 import _ from 'lodash'
 import RNFetchBlob from 'rn-fetch-blob'
 import {Platform} from 'react-native';
-
-export const baseCacheDir = RNFetchBlob.fs.dirs.CacheDir + '/imagesCacheDir';
-
+export const baseCacheDir = RNFetchBlob.fs.dirs.CacheDir + config.file.cacheDir;
 export const clearCache=() =>{
     return RNFetchBlob.fs.unlink(baseCacheDir)
       .catch(() => {
@@ -102,7 +100,7 @@ export const ensurePath=(dirPath)=> {
       )
       .catch(err => {
         // swallow folder already exists errors
-        if (err.message.includes('folder already exists')) {
+        if (err.message.includes('already exists')) {
           return;
         }
         throw err;

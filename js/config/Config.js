@@ -10,6 +10,7 @@ export default config = {
       downloadTimeout:50000,
       soundMediaType:'aac',
       maxSoundLength:100,
+      cacheDir:"/temp"
     },
     websocket:{
       base: 'http://192.168.2.233:8762',

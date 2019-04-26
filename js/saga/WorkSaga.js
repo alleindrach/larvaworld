@@ -7,6 +7,7 @@ import * as CacheProvider from '../component/cached/CacheProvider';
 import config from '../config/Config'
 import * as FileUtils from '../utils/FileUtils'
 import _  from 'lodash'
+import { UserAction } from '../redux/action';
 export function  watchWorkCach() {
     function cacheFiles(work)
     {
@@ -81,10 +82,10 @@ export function  watchWorkStartSync() {
               merging=JSON.parse(JSON.parse(res.data).data)
               return {success:true,merging}
           }else if(JSON.parse(res.data).state!=1){
-              return {success:false,error:JSON.parse(res.data).message}
+              return {success:false,error:JSON.parse(res.data).message,errorCode:JSON.parse(res.data).reason}
           }
           else{
-            return {success:false,error:''}
+            return {success:false,error:'',errorCode:0}
           }
           console.log(res);
         }).catch((err) => {
@@ -100,7 +101,12 @@ export function  watchWorkStartSync() {
                if(result.success)
                     yield put(WorkActions.syncWorkUploadSuccess(state.work,result.merging))
                 else
+                {
                     yield put(WorkActions.syncWorkUploadFail(state.work,result.error))
+                    if(result.errorCode=='0001')
+                        yield put(UserAction.logout())
+                }
+                    
             // }catch(error)
             // {
             //     yield put(WorkActions.syncWorkUploadFail(state.work,error))
@@ -121,7 +127,7 @@ export function  watchWorkStartSync() {
     };
 }
 export function  watchWorkMerge() {
-    function mergeFiles(local,merging)
+    async function  mergeFiles(local,merging)
     {
         
         allUrls=_.filter(_.reduce(_.mergeWith(_.cloneDeep(local.scenes),merging.scenes,(local,remote)=>{
@@ -134,17 +140,22 @@ export function  watchWorkMerge() {
             acc.push(scene.snd);
             return acc;
         } ,[]),(item)=>{ 
-            if( item.local!=item.remote && FilesUtils.isLocalFile(item.local.img)) 
+            if( item.local!=item.remote && FileUtils.isLocalFile(item.local)) 
             return true;
             else 
             return false;
         });
         if(allUrls && allUrls.length>0)
-            return  CacheProvider.cacheMultipleFiles(allUrls).then(()=>{
-                return true;
-            }).catch(()=>{
+        {
+            result=  await  CacheProvider.cacheMultipleFiles(allUrls).then(()=>{
+                console.log('cached finished!')
+                return true
+            }).catch((err)=>{
                 return false;
-            })
+            });
+            console.log('mergefile finished!')
+            return result;
+        }            
         else
             return true;
     }

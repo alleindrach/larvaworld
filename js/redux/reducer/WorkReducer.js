@@ -4,10 +4,11 @@ const initState = {
   isCaching: false,
   isCached: false,
   isSyncing:false,
-  isSynced:false,
+  isSynced:true,
   uploadingProcess:100,
   content:null,
-  current:0
+  current:0,
+  isDirty:false
 }
 
 export default function messageReducer(state = initState, action) {
@@ -18,7 +19,7 @@ export default function messageReducer(state = initState, action) {
         isCaching: false,
         isCached: false,
         isSyncing:false,
-        isSynced:false,
+        isSynced:true,
         uploadingProcess:100,
         current:0,
         error: '',
@@ -87,7 +88,8 @@ export default function messageReducer(state = initState, action) {
         content:{
           ...state.content,
           ...action.work.content
-        }
+        },
+        isDirty:false,
       }
     case types.WORK_SYNC_MERGED:
     return {
@@ -106,6 +108,7 @@ export default function messageReducer(state = initState, action) {
         isSynced: false,
         uploadingProcess:100,
         error:action.error,
+        errorCode:action.errorCode,
         content:{
           ...state.content,
           ...action.work.content
@@ -147,7 +150,8 @@ export default function messageReducer(state = initState, action) {
             ...preScenes,
             ...postScenes
           ]
-        }
+        },
+        isDirty:true
       }
 
     case types.WORK_SCENE_ADD:
@@ -183,7 +187,8 @@ export default function messageReducer(state = initState, action) {
             // action.scene,
             // ...postScenes
           ]
-        }
+        },
+        isDirty:true
       }
 
     case types.WORK_SCENE_IMAGE_SELECT:
@@ -215,7 +220,8 @@ export default function messageReducer(state = initState, action) {
             scene,
             ...postScenes
           ]
-        }
+        },
+        isDirty:true
       }
 
     case types.WORK_SCENE_AUDIO_SELECT:
@@ -247,7 +253,8 @@ export default function messageReducer(state = initState, action) {
             scene,
             ...postScenes
           ]
-        }
+        },
+        isDirty:true
       }    
     default:
       return state;

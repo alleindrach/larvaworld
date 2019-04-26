@@ -46,10 +46,11 @@ return {
 }
 
 
-export function syncWorkUploadFail(work,error) {
+export function syncWorkUploadFail(work,errorCode,error) {
     return {
         type: types.WORK_SYNC_UPLOAD_FAIL,
         work,
+        errorCode,
         error
     }
 }

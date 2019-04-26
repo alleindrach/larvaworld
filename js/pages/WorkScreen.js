@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import {ActivityIndicator, Image, StyleSheet, TouchableHighlight, TouchableOpacity, View} from 'react-native';
+import {ActivityIndicator, Image, StyleSheet, TouchableHighlight, TouchableOpacity, View,Alert} from 'react-native';
 import BaseScreen from '../pages/BaseScreen'
 import Avatar from '../component/Avatar'
 import Work from '../component/Work'
@@ -70,8 +70,24 @@ class WorkScreen extends BaseScreen {
 
   componentDidMount() {
     this.state.index=0;
-    this.props.selectWork(this.getWork());
+    this.props.selectWork(this.getEmptyWork());
   }
+
+  static getDerivedStateFromProps(props, state) {
+    const prevProps = state.prevProps || {};
+    // Compare the incoming prop to previous prop
+    if(prevProps.work && prevProps.work.isDirty && props.work && !props.work.isDirty){
+        console.log('clean state!',prevProps,"=>",props)
+        state.onCleaned&&state.onCleaned();
+    }
+    else
+    {
+       
+    }
+    return {
+        prevProps:props      
+    }
+}
   onSnapToItem=(index)=>
   {
     this.props.selectScene(this.props.work,index);
@@ -97,6 +113,52 @@ class WorkScreen extends BaseScreen {
     scene={img:'+',snd:'+',duration:10};
     this.props.insertScene(this.props.work,scene)
     this._workControl.snapToItem(this.props.work.current+1);
+  }
+  createWork=()=>{
+    if(this.props.work.isDirty)
+    {
+      Alert.alert(
+        '温馨提示',
+        '当前作品已经修改，是否保存？',
+        [
+          {text: '不保存', onPress: () =>{
+            const work=this.getEmptyWork();
+            this.props.selectWork(work);
+          }},
+          {text: '取消', onPress: () => {}, style: 'cancel'},
+          {text: '保存后继续', onPress: () => {
+            this.syncWork();
+            this.setState({onCleaned:(()=>{
+              const work=this.getEmptyWork();
+              this.props.selectWork(work); 
+            }).bind(this)});
+          }},
+        ],
+        { cancelable: false }
+      )
+    }
+    
+
+  }
+  getEmptyWork=()=>{
+    let source = require('../assets/icon_nan.png');
+    return {
+      content:{
+        channel:1,
+        titleIcon:{source},
+        title:'',
+        titleDescription:'',
+        likes:0,
+        comments:0,
+        age:'刚才',
+        scenes: [
+          {
+            img:'+',
+            snd:'+',
+          }     
+        ]
+      }
+    }
   }
   getWork = ()=>{
     let source = require('../assets/icon_nan.png');
@@ -154,16 +216,16 @@ class WorkScreen extends BaseScreen {
         </Button>
         <Button vertical>
           <Icon type="EvilIcons"   name="sc-instagram" />
-          <Text>录音</Text>
-        </Button>
-        <Button vertical active={true} onPress={this.syncWork}>
-          <Icon  type="EvilIcons"   name="refresh" />
-          <Text>同步</Text>
+          <Text>新建</Text>
         </Button>
         <Button vertical>
           <Icon  type="EvilIcons"  name="trash" />
           <Text>删除</Text>
         </Button>
+        <Button vertical active={true} onPress={this.syncWork}>
+        <Icon  type="EvilIcons"   name="refresh" />
+        <Text>同步</Text>
+      </Button>
       </FooterTab>
     </Footer>
     )

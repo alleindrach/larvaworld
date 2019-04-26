@@ -163,7 +163,10 @@ function runPrefetchTaskEx(prefetcher, options) {
        // allow prefetch task to fail without terminating other prefetch tasks
        .catch(_.noop)
        // then run next task
-       .then(() => runPrefetchTaskEx(prefetcher, options));
+       .then(() => {
+         console.log('next from ',url)     
+         runPrefetchTaskEx(prefetcher, options)
+       });
   }
   else{
     // check cache
@@ -202,6 +205,7 @@ function isIcon(url) {
  */
 function getCachedPath(url, options = defaultOptions) {
   const filePath = getCachedFilePath(url, options);
+  console.log('getCachedPath ',url,"=>",filePath)
   return fs.stat(filePath)
     .then(res => {
       if (res.type !== 'file') {
@@ -237,14 +241,46 @@ function cacheFile(url, options = defaultOptions, resolveHeaders = defaultResolv
     .then(headers => downloadFile(url, filePath, headers));
 }
 
-function cacheLocalFile(url,localUrl, options = defaultOptions, resolveHeaders = defaultResolveHeaders){
+async function cacheLocalFile(url,localUrl, options = defaultOptions, resolveHeaders = defaultResolveHeaders){
   const   filePath = getCachedFilePath(url, options);
   const   dirPath = FileUtils.getDirPath(filePath);
-  return  FileUtils.ensurePath(dirPath)
-          .then(
-            ()=>fs.cp(localUrl,dirPath).then(()=>{}).catch((err)=>{console.log('cacheLocalFile '+url +' from '+localUrl+' to '+dirPath+' fail!',err )})
-            )
-          .catch((err)=>{console.log('ensurePath '+dirPath+' failed',err)})
+  localUrl=FileUtils.cleanLocalFilePath(localUrl)
+  await  fs.exists(filePath).then(exists=>{
+    if(!exists)
+    {
+      return FileUtils.ensurePath(dirPath)
+      .then(
+        ()=>fs.cp(localUrl,filePath)
+        .catch(err=>{
+          if(err.message.includes('already exists'))
+          {
+
+          }else
+          {
+            throw err;
+          }
+        })
+        .then(
+          ()=>{console.table('file copy ',url,localUrl,filePath);}
+        )
+        .catch(
+          (err)=>{
+            console.log('cacheLocalFile '+url +' from '+localUrl+' to '+filePath+' fail!',err )
+          }
+        )
+      )
+      .catch(
+        (err)=>{
+          console.log('ensurePath '+dirPath+' failed',err)
+        }
+      )
+    }
+    else
+    {
+      console.table('file exist ',url,localUrl,filePath);
+    }
+  })
+  
 }
 /**
  * Delete the cached file corresponding to the given url and options.
