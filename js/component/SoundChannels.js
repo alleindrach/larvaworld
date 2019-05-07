@@ -11,21 +11,23 @@ import {
 } from 'react-native'
 import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
 import Colors from '../common/Colors'
-import SceneCarousel from '../component/SceneCarousel'
+import SceneCarousel from './SceneCarousel'
 import {Menu} from 'teaset'
 import ActionSheet from 'teaset/components/ActionSheet/ActionSheet'
 import config from '../config/Config'
 import Toast from 'teaset/components/Toast/Toast'
 import {getDateTimeString} from '../utils/TimeUtils'
 import PropTypes from 'prop-types'
-
-export default class Work extends Component {
+import *  as SoundChannelsAction from "../redux/action/SoundChannelsAction"
+import {connect} from 'react-redux'
+export  class SoundChannels extends Component {
   static defaultProps = {
     data: {},
     textSelectable: false,
     showDelBtn: true,
     showCommentBtn: true,
     showLikeBtn: true,
+    visualItem:0
   };
 
   static propTypes = {
@@ -67,28 +69,9 @@ export default class Work extends Component {
       });
     });
   };
-// data:
-  // {
-  //   content:{
-  //     scenes: [
-  //       {
-  //         img:'https://www.xinrong.com/webapp2.0/webapp3.0/images/banner/22.jpg',
-  //         snd:require('../assets/sound/test.mp3')
-  //       }
-  //       ,
-  //       {
-  //         img:'https://www.xinrong.com/webapp2.0/webapp3.0/images/banner/23.jpg',
-  //         snd:require('../assets/sound/test.mp3')
-  //       },
-  //       {
-  //         img:'https://www.xinrong.com/webapp2.0/webapp3.0/images/banner/4.jpg',
-  //         snd:require('../assets/sound/test.mp3')
-  //       }            
-  //     ]
-  //   }
-  // }
+
   render() {
-    const work = this.props.work;
+    const channels = this.props.channels;
     // data.user._id = data.user.id
     return (
 
@@ -96,44 +79,19 @@ export default class Work extends Component {
       <Header style={{height:em(10)}}/>
       <Content>
         <Card>
-          <CardItem>
-            <Left>
-            {work.content.titleIcon && work.content.titleIcon.source ?
-              <Thumbnail source={work.content.titleIcon.source} />:
-              null
-            }
-              <Body>
-                <Text>{work.content.title}</Text>
-                <Text note>{work.content.titleDescription}</Text>
-              </Body>
-            </Left>
-          </CardItem>
+          
           <CardItem cardBody>
-            <SceneCarousel ref={ref => this._scenesCarousel = ref} 
+            <SceneCarousel 
+            ref={ref => this._scenesCarousel = ref} 
             style={{marginTop: em(10)}}   
-            scenes={work.content.scenes}  
+            scenes={channels.channels}  
             navigation={this.props.navigation}
             onImageSelect={this.props.imageSelector} 
             onSnapToItem={this.props.onSnapToItem}
-            type='super-morphy'/>
+            firstItem={this.props.firstItem}
+            type='sound-morphy'/>
           </CardItem>
-          <CardItem>
-            <Left>
-              <Button transparent>
-                <Icon active name="thumbs-up" />
-                <Text>{work.content.likes}赞</Text>
-              </Button>
-            </Left>
-            <Body>
-              <Button transparent style={{justifyContent:'center'}}>
-                <Icon active name="chatbubbles" />
-                <Text>{work.content.comments}评论</Text>
-              </Button>
-            </Body>
-            <Right>
-              <Text>{work.content.age}</Text>
-            </Right>
-          </CardItem>
+          
         </Card>
       </Content>
     </Container>
@@ -141,58 +99,37 @@ export default class Work extends Component {
     )
   }
 
-  _showActionSheet = () => {
-    const {data} = this.props;
-    let items = [
-      {
-        title: '屏蔽', onPress: () => {
-          Alert.alert(
-            '提示',
-            '您是否要屏蔽这条动态？',
-            [
-              {
-                text: '取消', onPress: () => {
-                }, style: 'cancel'
-              },
-              {
-                text: '屏蔽', onPress: () => {
-                  this.props.onDelete && this.props.onDelete()
-                  Toast.success('屏蔽成功')
-                  if (this.props.user.isLogin) {
-                    request.post(config.api.base + config.api.shieldEvent, {eventId: data.eventId})
-                      .then(r => {
-                        if (r.code === 0) {
-                          //success
-                          // Toast.success('屏蔽成功')
-                        } else {
-                          // Toast.fail('屏蔽失败，原因是：' + r.message)
-                        }
-                      })
-                      .catch(err => {
-                        // Toast.fail('屏蔽失败，原因是：' + err.message)
-                      })
-                  }
-                }
-              },
-            ],
-            {cancelable: true}
-          )
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    // Typical usage (don't forget to compare props):
+        if(!this.props.channels.isFetch){
+            
+            this.props.fetchChannelsBg();
         }
-      },
-      {
-        title: '举报', onPress: () => {
-          this.props.navigation.navigate('ReportPage', {
-            data: {
-              workId: data.content.workId
-            }
-          })
-        }
-      },
-    ];
-    let cancelItem = {title: '取消'};
-    ActionSheet.show(items, cancelItem);
+    }
+    
+}
+
+const matStateToProps = (state) => {
+  return {
+    user: state.user,
+    // soundChannels: state.soundChannels,
+    // message:state.message
+
+    // eventList: state.eventList
   }
 }
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    fetchChannelsBg: (channel) => {
+      dispatch(SoundChannelsAction.prefetchChannels())
+    },
+    
+  }
+}
+
+export default connect(matStateToProps, mapDispatchToProps, null, {withforwardRefRef: true})(SoundChannels)
+
 
 
 const styles = StyleSheet.create({

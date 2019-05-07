@@ -4,6 +4,7 @@ import AppReducer from './AppReducer'
 import MessageReducer from './MessageReducer'
 import  EventReducer from './EventReducer'
 import  WorkReducer from './WorkReducer'
+import SoundChannelsReducer from './SoundChannelsReducer'
 import {persistStore, persistReducer, createMigrate} from 'redux-persist'
 import {AsyncStorage} from 'react-native';
 import hardSet from 'redux-persist/lib/stateReconciler/hardSet'
@@ -35,9 +36,18 @@ const workPersistConfig = {
   whitelist:[],// ['isConnecting','isConnected','error','stompClient','stompContext','msgReceiver'],
   // stateReconciler:hardSet
 }
+
+const soundChannelsPersistConfig = {
+  key: 'soundchannels',
+  storage: AsyncStorage,
+  version: 1.2,
+  whitelist:[],// ['isConnecting','isConnected','error','stompClient','stompContext','msgReceiver'],
+  // stateReconciler:hardSet
+}
 const RootReducer = combineReducers({
   app:    AppReducer,
   work:   persistReducer(workPersistConfig,WorkReducer),
+  soundChannels:   persistReducer(soundChannelsPersistConfig,SoundChannelsReducer),
   user:   persistReducer(userPersistConfig, UserReducer),
   message: persistReducer(messagePersistConfig, MessageReducer),
   event:  persistReducer(eventPersistConfig, EventReducer),

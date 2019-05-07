@@ -90,6 +90,7 @@ function downloadFile(fromUrl, toFile, headers = {}) {
     // create an active download for this file
     const tmpFile = toFile + '.tmp';
     activeDownloads[toFile] = new Promise((resolve, reject) => {
+      console.log('start download ',fromUrl)
       RNFetchBlob
         .config({path: tmpFile,timeout:config.file.downloadTimeout})
         .fetch('GET', fromUrl, headers)
@@ -99,11 +100,16 @@ function downloadFile(fromUrl, toFile, headers = {}) {
         })
         .then(res => {
           if (Math.floor(res.respInfo.status / 100) !== 2) {
+            console.log('Failed to successfully download file',fromUrl)
             throw new Error('Failed to successfully download file');
           }
+          console.log('success download ',fromUrl,toFile)
           return fs.mv(tmpFile, toFile);
         })
-        .then(() => resolve(toFile))
+        .then(() => {
+          console.log('success end ',fromUrl,toFile)
+          resolve(toFile);
+          })
         .catch(err => {
           return deleteFile(tmpFile)
             .then(() => reject(err))

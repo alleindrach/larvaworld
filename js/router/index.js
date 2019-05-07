@@ -7,6 +7,7 @@ import ForgetPasswordScreen from '../pages/ForgetPasswordScreen';
 import QrCodeScreen from "../pages/QrCodeScreen";
 import MakeFriendScreen from '../pages/MakeFriendScreen';
 import WorkScreen from '../pages/WorkScreen'
+import SoundScreen from "../pages/SoundScreen";
 
 const AppNavigator = createStackNavigator({
   
@@ -35,6 +36,9 @@ const AppNavigator = createStackNavigator({
   MakeFriend:{
     screen:MakeFriendScreen
   },
+  Sound:{
+    screen:SoundScreen
+  }
   // AppDrawerNavigator: {
   //   screen: ActivityDrawer,
   //   navigationOptions: {
@@ -48,7 +52,7 @@ const AppNavigator = createStackNavigator({
 
 },
 {
-  initialRouteName: 'Work',
+  initialRouteName: 'Sound',
   /* The header config from HomeScreen is now here */
   initialRouteParams: {},
   mode: 'card',

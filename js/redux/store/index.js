@@ -22,9 +22,9 @@ const migrations = {
 const persistConfig = {
     key: 'root',
     storage: AsyncStorage,
-    version: 1.4,
+    version: 1.5,
     // whitelist: ['user'],
-    blacklist: ['user','message'],
+    blacklist: ['user','message','soundChannels'],
     migrate: createMigrate(migrations, {debug: false}),
 }
   

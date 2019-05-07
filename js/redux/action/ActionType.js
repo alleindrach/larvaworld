@@ -54,6 +54,22 @@ export const WORK_SYNC_MERGED='work/sync/merged'
 export const WORK_SYNC_UPLOAD_FAIL='work/sync/update/fail'
 export const WORK_SCENE_IMAGE_SELECT='work/scene/image/select'
 export const WORK_SCENE_AUDIO_SELECT='work/scene/audio/select'
+//sound channel activity
+export const SOUND_CHANNELS_PREFETCH='sound/channels/prefetch'
+export const SOUND_CHANNELS_PREFETCH_SUCCESS='sound/channels/prefetch/success'
+export const SOUND_CHANNELS_PREFETCH_FAIL='sound/channels/prefetch/fail'
+export const SOUND_CHANNELS_CHANNEL_SELECT='sound/channels/channel/select'
+export const SOUND_CHANNELS_MSG_SEND='sound/channels/msg/send'
+export const SOUND_CHANNELS_MSG_SENDING='sound/channels/msg/sending'
+export const SOUND_CHANNELS_MSG_SEND_SUCCESS='sound/channels/msg/send/success'
+export const SOUND_CHANNELS_MSG_SEND_FAIL='sound/channels/msg/send/fail'
+export const SOUND_CHANNELS_MSG_SEND_MERGED='sound/channels/msg/send/merged'
+export const SOUND_CHANNELS_SYNC='sound/channels/sync'
+export const SOUND_CHANNELS_SYNC_UPLOADING='sound/channels/sync/uploading'
+export const SOUND_CHANNELS_SYNC_UPLOAD_SUCCESS='sound/channels/sync/upload/success'
+export const SOUND_CHANNELS_SYNC_MERGED='sound/channels/sync/merged'
+export const SOUND_CHANNELS_SYNC_UPLOAD_FAIL='sound/channels/sync/fail'
+export const SOUND_CHANNELS_IMAGE_SELECT='sound/channels/image/select'
 
 
 //home page event list

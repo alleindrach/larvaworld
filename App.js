@@ -41,7 +41,7 @@ class App extends Component {
     //     .catch(err => {
     //     })
 
-      
+      store.dispatch(Action.SoundChannelsAction.prefetchChannels());
     })
 
     store.dispatch(Action.MessageAction.initContext(

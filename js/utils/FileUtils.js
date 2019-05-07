@@ -195,7 +195,7 @@ export const  uploadWork=(url,work) =>
           files.push(scene.snd);
       return files;
     },[]).map(file=>{return {
-      name:getFileNameWithoutSuffix(file),
+      name:'files',
       filename:getFileName(file),
       data:RNFetchBlob.wrap(cleanLocalFilePath(file)),
       type:mime.lookup(getSuffix(file)) 
@@ -214,6 +214,34 @@ export const  uploadWork=(url,work) =>
       ])
       
 }
+export const  uploadChannels=(url,channels) =>
+{
+  
+    files=
+    _.reduce(channels,(files,channel)=>{
+      if (isLocalFile(channel.img) &&  _.indexOf(files,channel.img)<0)
+          files.push(channel.img);
+      return files;
+    },[]).map(file=>{return {
+      name:'files',
+      filename:getFileName(file),
+      data:RNFetchBlob.wrap(cleanLocalFilePath(file)),
+      type:mime.lookup(getSuffix(file)) 
+    }})
+    
+    return RNFetchBlob.fetch('PUT', url, {
+      // header...
+      'Content-Type': 'multipart/form-data',
+      'enctype': 'multipart/form-data'
+      }, [
+        // path是指文件的路径，wrap方法可以根据文件路径获取到文件信息
+        ...files,
+        { name: 'channels', data: JSON.stringify(channels) },
+        //... 可能还会有其他非文件字段{name:'字段名',data:'对应值'}
+      ])
+      
+}
+    
     
 export const uploadFiles = (uri, host, formInput, onprogress) => {
     let promiseArray = [];

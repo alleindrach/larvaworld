@@ -114,6 +114,12 @@ class WorkScreen extends BaseScreen {
     this.props.insertScene(this.props.work,scene)
     this._workControl.snapToItem(this.props.work.current+1);
   }
+  sendNewMessage=()=>{
+    const {stompClient}=this.props.message;
+    if(stompClient){
+      stompClient.publish({destination: "/center/message", body: JSON.stringify({action:"hello"})});
+    }
+  }
   createWork=()=>{
     if(this.props.work.isDirty)
     {
@@ -215,7 +221,7 @@ class WorkScreen extends BaseScreen {
           <Text>删页</Text>
         </Button>
         <Button vertical>
-          <Icon type="EvilIcons"   name="sc-instagram" />
+          <Icon type="EvilIcons"   name="sc-instagram" onPress={this.sendNewMessage} />
           <Text>新建</Text>
         </Button>
         <Button vertical>
@@ -267,7 +273,9 @@ class WorkScreen extends BaseScreen {
 const matStateToProps = (state) => {
   return {
     user: state.user,
-    work: state.work
+    work: state.work,
+    message:state.message
+
     // eventList: state.eventList
   }
 }

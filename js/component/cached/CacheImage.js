@@ -171,8 +171,8 @@ export default class CachedImage extends React.Component {
         .catch(
           () => 
           {
-            // console.log('begin to cache,url ',url)
-            CacheProvider.cacheFile(url, options, this.props.resolveHeaders)
+            console.log('begin to cache,url ',url)
+            return  CacheProvider.cacheFile(url, options, this.props.resolveHeaders)
           }
           )
         .then(
@@ -182,7 +182,7 @@ export default class CachedImage extends React.Component {
               this.safeSetState({
                 cachedImagePath
               });
-              // console.log('cached image and change state ',url,cachedImagePath,x,this.state)
+              console.log('cached image and change state ',url,cachedImagePath)
             }
           
         })

@@ -382,7 +382,7 @@ class AudioTrack extends React.Component{
                 () => 
                     {
                         // console.log('begin to cache,url ',url)
-                        CacheProvider.cacheFile(url, options, this.props.resolveHeaders)
+                        return CacheProvider.cacheFile(url, options, this.props.resolveHeaders)
                     }
                 )
                 .then(
