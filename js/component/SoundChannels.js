@@ -20,7 +20,7 @@ import {getDateTimeString} from '../utils/TimeUtils'
 import PropTypes from 'prop-types'
 import *  as SoundChannelsAction from "../redux/action/SoundChannelsAction"
 import {connect} from 'react-redux'
-export  class SoundChannels extends Component {
+export  default class SoundChannels extends Component {
   static defaultProps = {
     data: {},
     textSelectable: false,
@@ -69,7 +69,12 @@ export  class SoundChannels extends Component {
       });
     });
   };
-
+  startRecord=async ()=>{
+    this._scenesCarousel.startRecord();
+  }
+  stopRecord=async ()=>{
+    this._scenesCarousel.stopRecord();
+  }
   render() {
     const channels = this.props.channels;
     // data.user._id = data.user.id
@@ -79,7 +84,6 @@ export  class SoundChannels extends Component {
       <Header style={{height:em(10)}}/>
       <Content>
         <Card>
-          
           <CardItem cardBody>
             <SceneCarousel 
             ref={ref => this._scenesCarousel = ref} 
@@ -88,10 +92,11 @@ export  class SoundChannels extends Component {
             navigation={this.props.navigation}
             onImageSelect={this.props.imageSelector} 
             onSnapToItem={this.props.onSnapToItem}
+            onRecordFinished={this.props.onRecordFinished}
+            onRecording={this.props.onRecording}
             firstItem={this.props.firstItem}
             type='sound-morphy'/>
           </CardItem>
-          
         </Card>
       </Content>
     </Container>
@@ -101,34 +106,34 @@ export  class SoundChannels extends Component {
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     // Typical usage (don't forget to compare props):
-        if(!this.props.channels.isFetch){
+        // if(!this.props.channels.isFetch){
             
-            this.props.fetchChannelsBg();
-        }
+        //     this.props.fetchChannelsBg();
+        // }
     }
     
 }
 
-const matStateToProps = (state) => {
-  return {
-    user: state.user,
-    // soundChannels: state.soundChannels,
-    // message:state.message
+// const matStateToProps = (state) => {
+//   return {
+//     user: state.user,
+//     // soundChannels: state.soundChannels,
+//     // message:state.message
 
-    // eventList: state.eventList
-  }
-}
+//     // eventList: state.eventList
+//   }
+// }
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    fetchChannelsBg: (channel) => {
-      dispatch(SoundChannelsAction.prefetchChannels())
-    },
+// const mapDispatchToProps = (dispatch) => {
+//   return {
+//     fetchChannelsBg: (channel) => {
+//       dispatch(SoundChannelsAction.prefetchChannels())
+//     },
     
-  }
-}
+//   }
+// }
 
-export default connect(matStateToProps, mapDispatchToProps, null, {withforwardRefRef: true})(SoundChannels)
+// export default connect(matStateToProps, mapDispatchToProps, null, {withforwardRefRef: true})(SoundChannels)
 
 
 

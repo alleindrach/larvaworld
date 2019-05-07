@@ -43,23 +43,32 @@ export default class SceneCarousel extends Component {
   constructor(props) {
     super(props)
     this._touchRefs = []
+    this._audioTracks=[]
   }
 
   _onImagePress = (index) => {
-    
     if (!this.props.onImageSelect)
       return
     this.props.onImageSelect(index)
-
-    // this._touchRefs[index].measureInWindow((x, y, width, height) => {
-    //   this._fullImageView.show({x, y, width, height}, this.props.images, index)
-    // });
   }
   snapToItem=(index)=>{
     this._carousel.snapToItem(index);
   }
+  startRecord=async ()=>{
+    const index=this._carousel.currentIndex;
+    const audioTrack=this._audioTracks[index];
+    if(audioTrack){
+      return audioTrack.record();
+    }
+  }
+  stopRecord=async ()=>{
+    const index=this._carousel.currentIndex;
+    const audioTrack=this._audioTracks[index];
+    if(audioTrack){
+      return audioTrack.stop();
+    }
+  }
   _onSnapToItem=(index)=>{
-
     if (!this.props.onSnapToItem)
           return
     this.props.onSnapToItem(index)
@@ -68,7 +77,6 @@ export default class SceneCarousel extends Component {
     const {scenes,itemWidth, itemHeight,audioHeight} = this.props
     // console.log('scenes:',scenes)
     return (
-       
           <View style={styles.sceneWraper}>
             <TouchableHighlight
               ref={ref => this._touchRefs[index] = ref}
@@ -86,8 +94,14 @@ export default class SceneCarousel extends Component {
                 </View>
               </View>
             </TouchableHighlight>
-           <AudioTrack style={{width:SCREEN_WIDTH,height:em(100),backgroundColor:'transparent'}} source={{uri:item.snd,duration:item.duration}} cache={true} sindex={index} play={item.sndPlay}/>
-             
+            <AudioTrack
+              ref={ref => this._audioTracks[index] = ref}
+              style={{width:SCREEN_WIDTH,height:em(100),backgroundColor:'transparent'}} 
+              source={{uri:item.snd}} 
+              cache={true} sindex={index} play={item.sndPlay}
+              onRecordFinished={this.props.onRecordFinished}
+              onRecording={this.props.onRecording}
+            /> 
           </View>
     )
   }
@@ -105,7 +119,9 @@ export default class SceneCarousel extends Component {
           itemHeight={itemHeight}
           useNativeOnScroll={true}
           inactiveSlideScale={0.95}
-          onSnapToItem={this._onSnapToItem.bind(this)}
+          firstItem={this.props.firstItem}
+          onSnapToItem={this._onSnapToItem.bind(this)
+          }
         />
         
         

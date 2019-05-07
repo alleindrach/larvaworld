@@ -96,7 +96,12 @@ class WorkScreen extends BaseScreen {
     const ref = 'list' + this.props.eventList.index
     this.refs[ref] && this.refs[ref].scrollTo({x: 0, y: 0, animated: true})
   }
+  onRecordFinished=(event)=>{
+    this.props.selectAudio(this.props.work,event.sindex,event.file,false);
+  }
+  onRecording=(event)=>{
 
+  }
   onImageSelect=(index)=>{
     Picker.selectPhotoTapped((uri)=>{
       console.log("select:",uri)
@@ -258,6 +263,8 @@ class WorkScreen extends BaseScreen {
           work={work} 
           imageSelector={this.onImageSelect}
           onSnapToItem={this.onSnapToItem}
+          onRecordFinished={this.onRecordFinished}
+          onRecording={this.onRecording}
           />
         </View>
         
@@ -289,7 +296,7 @@ const mapDispatchToProps = (dispatch) => {
       dispatch(WorkAction.selectImage(work,index, filepath))
     },
     selectAudio: (work,index,filepath,play) => {
-      dispatch(WorkAction.selectAudio(work,index, filepath,play))
+      dispatch(WorkAction.selectAudio(work, filepath))
     },
     deleteCurrentScene:(work) => {
       dispatch(WorkAction.deleteScene(work))

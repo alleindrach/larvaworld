@@ -25,6 +25,7 @@ export function prefetchChannelsFail(error) {
     error
   }
 }
+//msg: {channel:channel,snd:filepath}
 export function sendSoundMessage(msg) {
   return {
     type: types.SOUND_CHANNELS_MSG_SEND,

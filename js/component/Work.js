@@ -67,6 +67,7 @@ export default class Work extends Component {
       });
     });
   };
+
 // data:
   // {
   //   content:{
@@ -115,6 +116,8 @@ export default class Work extends Component {
             navigation={this.props.navigation}
             onImageSelect={this.props.imageSelector} 
             onSnapToItem={this.props.onSnapToItem}
+            onRecordFinished={this.props.onRecordFinished}
+            onRecording={this.props.onRecording}
             type='super-morphy'/>
           </CardItem>
           <CardItem>

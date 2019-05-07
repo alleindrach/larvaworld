@@ -12,28 +12,30 @@ import UUIDGenerator from 'react-native-uuid-generator';
 import {AudioRecorder, AudioUtils} from 'react-native-audio';
 import {WorkAction} from '../redux/action'
 import {connect} from 'react-redux'
+import {EventEmitter} from 'events';
 
-class AudioTrack extends React.Component{
+export default class AudioTrack extends React.Component{
+    emitter = new EventEmitter();
     static defaultProps = {
         source: null,
         style:null,
-        cache:false
+        cache:false,
+        maxSoundLength:15
       };
     
-      static propTypes = {
-        // source:PropTypes.string
-        // style: ViewPropTypes.style,
-        // scenes: PropTypes.array.isRequired,
-        // showPreview: PropTypes.bool,
-        // sliderWidth: PropTypes.number,
-        // sliderHeight: PropTypes.number,
-        // itemWidth: PropTypes.number,
-        // itemHeight: PropTypes.number,
+    static propTypes = {
       };
     // static navigationOptions = props => ({
     //     title:props.navigation.state.params.title,
     // })
-
+    removeListener=(event, listener) =>{
+        this.emitter.removeListener(event, listener)
+      }
+      
+    addListener=(event, listener)=> {
+        this.emitter.addListener(event, listener)
+      }
+      
 
     soundStop=async ()=>{
         return new Promise(function(resolve,reject)
@@ -127,16 +129,17 @@ class AudioTrack extends React.Component{
     record=async()=>{
         if(!this.state.hasRecordPermission) {
             console.warn('Can\'t record, no permission granted!');
-            return;
+            throw new Error('permission denied!')
+            
         }
         if (this.state.audioState=='play.paused') {
             try {
                 const filePath=await this.prepareRecordingPath();
                 const filePath2=await AudioRecorder.startRecording()
                 this.setState({audioState: 'recording',
-                    source:{uri:`file://${filePath}`},
+                    // source:{uri:`file://${filePath}`},
                     playSeconds:0,
-                    duration:config.file.maxSoundLength,
+                    duration:this.props.maxSoundLength,
                     isCacheable: false,
                     cachedFilePath: null,
                     progress: 0,
@@ -145,8 +148,10 @@ class AudioTrack extends React.Component{
                
                 AudioRecorder.onProgress = ((data) => {
                     this.setState({playSeconds: Math.floor(data.currentTime)});
-                    if(data.currentTime>config.file.maxSoundLength)
+                    this.emitter.emit('recording',{current:data.currentTime,max:this.props.maxSoundLength})
+                    if(data.currentTime>this.props.maxSoundLength)
                         this.stop()
+                    
                   }).bind(this);
                 AudioRecorder.onFinished = (data) => {
                 // Android callback comes in the form of a promise instead.
@@ -157,6 +162,7 @@ class AudioTrack extends React.Component{
 
             } catch (error) {
                 console.error(error);
+                throw error
             }
         }
         else if(this.state.audioState=='playing'){
@@ -164,9 +170,10 @@ class AudioTrack extends React.Component{
             try {
                 const filePath=await this.prepareRecordingPath();
                 const filePath2=await AudioRecorder.startRecording()
-                this.setState({audioState: 'recording',source:{uri:`file://${filePath}`},
+                this.setState({audioState: 'recording',
+                // source:{uri:`file://${filePath}`},
                     playSeconds:0,
-                    duration:config.file.maxSoundLength,
+                    duration:this.props.maxSoundLength,
                     isCacheable: false,
                     cachedFilePath: null,
                     progress: 0,
@@ -175,7 +182,8 @@ class AudioTrack extends React.Component{
                 // this.props.selectAudio(this.props.work,`file://${filePath}`);
                 AudioRecorder.onProgress = ((data) => {
                     this.setState({playSeconds: Math.floor(data.currentTime)});
-                    if(data.currentTime>config.file.maxSoundLength)
+                    this.emitter.emit('recording',{current:data.currentTime,max:this.props.maxSoundLength})
+                    if(data.currentTime>this.props.maxSoundLength)
                         this.stop()
                   }).bind(this);
           
@@ -188,6 +196,7 @@ class AudioTrack extends React.Component{
 
             } catch (error) {
                 console.error(error);
+                throw error
             }
         }
     }
@@ -200,13 +209,10 @@ class AudioTrack extends React.Component{
               if (Platform.OS === 'android') {
                 this._finishRecording(true, filePath);
               }
-              //   this.setState({audioState: 'play.paused'});
-            //   setTimeout((() => {
-            //         this.loadSound(false)
-            //   }).bind(this),100);
               return filePath;
             } catch (error) {
               console.error(error);
+              throw error;
             }
         }
         else if(this.state.audioState=='playing')
@@ -223,7 +229,6 @@ class AudioTrack extends React.Component{
             return uuid;
             });
         const filePath= `${FileUtils.baseCacheDir}/${uuid}.${config.file.soundMediaType}`;
-        // this.setState({source:{uri:`file://${filePath}`}});
             
         AudioRecorder.prepareRecordingAtPath(filePath, {
             SampleRate: 22050,
@@ -233,14 +238,23 @@ class AudioTrack extends React.Component{
           });
        return filePath;
     }
-        
+    _finishRecording(didSucceed, filePath, fileSize,play) {
+        play=false||play;
+        this.setState({audioState:'play.paused',playSeconds:0,source:{
+            uri:filePath
+        }});
+        // this.props.selectAudio(this.props.work,this.state.source.uri,play);
+        this.emitter.emit('recordFinished',{success:didSucceed,file:filePath,size:fileSize,sindex:this.props.sindex})
+        console.log(`Finished recording of duration ${this.state.currentTime} seconds at path: ${filePath} and size of ${fileSize || 0} bytes`);
+      }    
+       
     constructor(props){
         super(props);
         this._isMounted = false;
         this.state = {
             audioState:'play.paused', //playing, paused
             playSeconds:0,
-            duration:0,
+            duration:config.file.maxSoundLength,
             isCacheable: false,
             cachedFilePath: null,
             networkAvailable: true,
@@ -256,9 +270,11 @@ class AudioTrack extends React.Component{
     static getDerivedStateFromProps(props, state) {
         const prevProps = state.prevProps || {};
         // Compare the incoming prop to previous prop
-        if(prevProps.source && prevProps.source.uri 
+        // console.log('Props=>State',prevProps,props)
+        if((prevProps.source 
             && props.source && props.source.uri 
-            && prevProps.source.uri!=props.source.uri){
+            && prevProps.source.uri!=props.source.uri)
+            ){
                
             console.log('reset state!',prevProps,"=>",props)
                 
@@ -286,16 +302,21 @@ class AudioTrack extends React.Component{
     }
     componentDidUpdate(prevProps, prevState, snapshot) {
     // Typical usage (don't forget to compare props):
-        if(prevProps.source && prevProps.source.uri 
+        if(prevProps.source 
             && this.props.source && this.props.source.uri 
             && prevProps.source.uri!=this.props.source.uri){
                 console.log('componentDidUpdate for source change,loadSound,prevProps:',prevProps,'props',this.props,'prevState',prevState,'state',this.state)
                 this.loadSound(this.state.autoPlay);
                 return ;
+        }else if(prevState.source && this.state.source && this.state.source.uri
+             &&  this.state.source.uri != prevState.source.uri ){
+                console.log('loadSound for state',this.state.source.uri)
+                this.loadSound(this.state.autoPlay);
+                return;
         }
     // console.log('componentDidUpdate,prevProps:',prevProps,'props',this.props,'prevState',prevState,'state',this.state)
         if(!prevState.cachedFilePath  && this.state.cachedFilePath){
-            console.log('loadSound for cached')
+            console.log('loadSound for cached',this.state.source.uri)
             this.loadSound(this.state.autoPlay);
         }
     }
@@ -314,7 +335,10 @@ class AudioTrack extends React.Component{
                 })
             }
         }, 100);
-
+        if(this.props.onRecordFinished)
+            this.emitter.addListener('recordFinished',this.props.onRecordFinished)
+        if(this.props.onRecording
+            )this.emitter.addListener('recording',this.props.onRecording)
 
         AudioRecorder.requestAuthorization().then((isAuthorised) => {
             this.setState({ hasRecordPermission: isAuthorised });
@@ -327,15 +351,6 @@ class AudioTrack extends React.Component{
           });
     
     }
-    _finishRecording(didSucceed, filePath, fileSize,play) {
-        play=false||play;
-        this.props.selectAudio(this.props.work,this.state.source.uri,play);
-        // this.setState({source:{
-        //     ...this.state.source, 
-        //     duration:this.state.playSeconds 
-        // }});
-        console.log(`Finished recording of duration ${this.state.currentTime} seconds at path: ${filePath} and size of ${fileSize || 0} bytes`);
-      }    
 
     componentWillUnmount(){
         if(this.sound){
@@ -344,6 +359,10 @@ class AudioTrack extends React.Component{
         }
         if(this.timeout){
             clearInterval(this.timeout);
+        }
+        if(this.emitter)
+        {
+            this.emitter.removeAllListeners();
         }
     }
     safeSetState = (newState,callback) => {
@@ -444,22 +463,25 @@ class AudioTrack extends React.Component{
                         Alert.alert('Notice', 'audio file error. (Error code : 1)');   
                         this.setState({audioState:'play.paused'});
                     }else{
-                        if(Platform.OS=='ios')
-                            
-                        if(play)
+                        console.log('[loaded]', filepath,"loaded:",this.sound._loaded)
+                        if(Platform.OS=='ios'&& this.sound._loaded)
                         {
-                            this.setState({audioState:'playing',duration:this.sound.getDuration()});
-                            this.sound.play(this.playComplete);
+                            if(play)
+                            {
+                                this.setState({audioState:'playing',duration:this.sound.getDuration()});
+                                this.sound.play(this.playComplete);
+                            }
+                            else
+                            {
+                                this.setState({audioState:'play.paused', duration:this.sound.getDuration()});
+                            } 
                         }
-                        else
-                        {
-                            this.setState({audioState:'play.paused', duration:this.sound.getDuration()});
-                        } 
+                       
                     }
                 }).bind(this));   
             }else if(this.props.cache)
             {
-                this.processSource(this.props.source,play);
+                this.processSource(this.state.source,play);
             }
         }
     }
@@ -488,19 +510,6 @@ class AudioTrack extends React.Component{
             this.sound.setCurrentTime(0);
         }
     }
-    // jumpPrev15Seconds = () => {this.jumpSeconds(-15);}
-    // jumpNext15Seconds = () => {this.jumpSeconds(15);}
-    // jumpSeconds = (secsDelta) => {
-    //     if(this.sound){
-    //         this.sound.getCurrentTime((secs, isPlaying) => {
-    //             let nextSecs = secs + secsDelta;
-    //             if(nextSecs < 0) nextSecs = 0;
-    //             else if(nextSecs > this.state.duration) nextSecs = this.state.duration;
-    //             this.sound.setCurrentTime(nextSecs);
-    //             this.setState({playSeconds:nextSecs});
-    //         })
-    //     }
-    // }
 
     getAudioTimeString(seconds){
         const h = parseInt(seconds/(60*60));
@@ -518,6 +527,7 @@ class AudioTrack extends React.Component{
         const currentTimeString = this.getAudioTimeString(this.state.playSeconds);
         const durationString = this.getAudioTimeString(this.state.duration);
         const {style}=this.props;
+        // console.log('this.state.duration',this.state.duration,'this.state.playSeconds',this.state.playSeconds)
         return (
             <View style={[{justifyContent:'center'},style]}>
                 <View style={{marginVertical:5, marginHorizontal:15, flexDirection:'row'}}>
@@ -606,21 +616,19 @@ const sliderStyle = StyleSheet.create({
   });
 
 
-const matStateToProps = (state) => {
-    return {
-      user: state.user,
-      work: state.work
-      // eventList: state.eventList
-    }
-  }
+// const matStateToProps = (state) => {
+//     return {
+//       user: state.user,
+//     }
+//   }
   
-  const mapDispatchToProps = (dispatch) => {
-    return {
-      selectAudio: (work,filepath) => {
-        dispatch(WorkAction.selectAudio(work, filepath))
-      },
-    }
-  }
+//   const mapDispatchToProps = (dispatch) => {
+//     return {
+//     //   selectAudio: (work,filepath) => {
+//     //     dispatch(WorkAction.selectAudio(work, filepath))
+//     //   },
+//     }
+//   }
   
-  export default connect(matStateToProps, mapDispatchToProps, null, {withforwardRefRef: true})(AudioTrack)
+//   export default connect(matStateToProps, mapDispatchToProps, null, {withforwardRefRef: true})(AudioTrack)
   

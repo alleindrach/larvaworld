@@ -29,11 +29,27 @@ export default function messageReducer(state = initState, action) {
         isFetched:true
       }
     case types.SOUND_CHANNELS_MSG_SEND:
-      return {
-        ...state,
-        isSending:true,
-        isSended:false,
-
+      {
+        let newChannels= state.channels.reduce((acc,channel,index)=>{
+        if(index==action.sendding.channel)
+        {
+          acc.push({
+            ...channel,
+            snd:action.sendding.snd
+          })
+        }else
+        {
+          acc.push(channel)
+        }
+        return acc;
+    },[]);
+        return {
+          ...state,
+          isSending:true,
+          isSended:false,
+          channels:newChannels
+          
+        }
       }
     case types.SOUND_CHANNELS_MSG_SEND_FAIL:
       return {
@@ -80,19 +96,21 @@ export default function messageReducer(state = initState, action) {
         currentChannel:action.channel
       }
     case types.SOUND_CHANNELS_IMAGE_SELECT:
-    let newChannels= state.channels.reduce((acc,channel,index)=>{
-       if(index==action.index)
-       {
-         acc.push({img:action.filepath})
-       }else
-       {
-         acc.push(channel)
-       }
-       return acc;
-    },[]);
-    return {
-      ...state,
-      channels:newChannels
+      {
+        let newChannels= state.channels.reduce((acc,channel,index)=>{
+        if(index==action.index)
+        {
+          acc.push({img:action.filepath})
+        }else
+        {
+          acc.push(channel)
+        }
+        return acc;
+      },[]);
+      return {
+        ...state,
+        channels:newChannels
+      }
     }
     default:
       return state;

@@ -60,7 +60,7 @@ class SoundScreen extends BaseScreen {
         prevProps:props      
     }
 }
-  onSnapToItem=(index)=>
+  _onSnapToItem=(index)=>
   {
      this.props.selectChannel(index);
   }
@@ -69,7 +69,7 @@ class SoundScreen extends BaseScreen {
     this.refs[ref] && this.refs[ref].scrollTo({x: 0, y: 0, animated: true})
   }
 
-  onImageSelect=(index)=>{
+  _onImageSelect=(index)=>{
     Picker.selectPhotoTapped((uri)=>{
       console.log("select:",uri)
       this.props.selectImage(index,uri);
@@ -94,24 +94,36 @@ class SoundScreen extends BaseScreen {
       this.props.navigation.navigate('Login');
     }
   }
-  _onPressIn=()=>{
-    this.setState({isRecording:true,recordingProgress:0})
-    this.timer=setInterval(
-      (()=>{
-        this.setState(
-          {
-            recordingProgress:this.state.recordingProgress+(1/150)
-        }
-        )
-      }).bind(this),
-      100
-    )
+  _startTalking=async ()=>{
+    try{
+      this._soundChannelsCtrl.startRecord();
+      this.setState({isRecording:true,recordingProgress:0})
+    }catch(ex )
+    {
+      console.log('start record failed ',ex)
+    }
+    
+    
+    
   }
-  _onPressOut=()=>{
-    if(this.timer)
-      clearInterval(this.timer)
-    this.setState({isRecording:false});
-
+  _stopTalking=async ()=>{
+    try{
+      await this._soundChannelsCtrl.stopRecord();
+    }catch(ex )
+    {
+      console.log('stop record failed ',ex)
+    }
+  }
+  _onRecording=(event)=>{
+    this.setState({recordingProgress:event.current/event.max})
+  }
+  _onRecordFinished=(event)=>{
+    //event: {success:didSucceed,file:filePath,size:fileSize,sindex:this.props.sindex}
+    this.setState({isRecording:false})
+    if(event.success){
+      this.props.sendSoundMessage(event.sindex,event.file);
+    }
+    
   }
   // <Footer style={{backgroundColor:'lightgrey',height:em(180) ,borderTopLeftRadius:em(100),borderTopRightRadius:em(100)}}>
   // <TouchableOpacity onPressIn={this._onPressIn} onPressOut={this._onPressOut} style={{backgroundColor:'red',borderRadius:em(80),width:em(160),height:em(160),justifyContent:"center",alignContent:"center",alignSelf:"center"}}>
@@ -129,7 +141,7 @@ class SoundScreen extends BaseScreen {
     }}>
     <TouchableHighlight 
     underlayColor='pink'
-    onPressIn={this._onPressIn} onPressOut={this._onPressOut} 
+    onPressIn={this._startTalking} onPressOut={this._stopTalking} 
       style={{backgroundColor:'#b22222', borderRadius:em(80),width:em(160),height:em(160),justifyContent:"center",alignContent:"center",alignSelf:"center"}}>
       
       <Progress.Circle
@@ -217,12 +229,17 @@ class SoundScreen extends BaseScreen {
       return (
         <View style={{flex: 1}}>
           {this.renderProgress()}
-          <SoundChannels  navigation={this.props.navigation}  ref={ref => this._workControl = ref} 
+          <SoundChannels  navigation={this.props.navigation}  
+          ref={
+            ref => this._soundChannelsCtrl = ref
+          } 
           user={user} 
           channels={soundChannels} 
           firstItem={soundChannels.currentChannel}
-          imageSelector={this.onImageSelect}
-          onSnapToItem={this.onSnapToItem}
+          imageSelector={this._onImageSelect}
+          onSnapToItem={this._onSnapToItem}
+          onRecordFinished={this._onRecordFinished}
+          onRecording={this._onRecording}
           />
         </View>
         
@@ -252,6 +269,10 @@ const mapDispatchToProps = (dispatch) => {
     },
     selectImage: (index,filepath) => {
       dispatch(SoundChannelsAction.selectImage(this.soundChannels,index,filepath))
+    },
+    sendSoundMessage:(channel,filepath)=>{
+      dispatch(SoundChannelsAction.sendSoundMessage(
+        {channel:channel,snd:filepath}))
     },
     syncChannels:()=>{
       dispatch(SoundChannelsAction.soundChannelsSync())
