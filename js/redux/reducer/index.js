@@ -55,11 +55,18 @@ const soundChannelsPersistConfig = {
 // }
 const RootReducer = combineReducers({
   app:    AppReducer,
-  work:   persistReducer(workPersistConfig,WorkReducer),
-  soundChannels:   persistReducer(soundChannelsPersistConfig,SoundChannelsReducer),
-  user:   persistReducer(userPersistConfig, UserReducer),
-  message: persistReducer(messagePersistConfig, MessageReducer),
-  event:  persistReducer(eventPersistConfig, EventReducer),
+  work:   WorkReducer,
+  soundChannels:   SoundChannelsReducer,
+  user:   UserReducer,
+  message:  MessageReducer,
+  event:   EventReducer,
+
+  // app:    AppReducer,
+  // work:   persistReducer(workPersistConfig,WorkReducer),
+  // soundChannels:   persistReducer(soundChannelsPersistConfig,SoundChannelsReducer),
+  // user:   persistReducer(userPersistConfig, UserReducer),
+  // message: persistReducer(messagePersistConfig, MessageReducer),
+  // event:  persistReducer(eventPersistConfig, EventReducer),
   // nav: NavigationReducer
 });
 

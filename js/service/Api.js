@@ -69,11 +69,16 @@ const publicAPI = (baseURL: string = config.api.base) => {
             ...baseOptions,
             body: 'username=' + username + '&password=' + password + '&captcha=' + captcha
         })
+        .then(res=>{
+            if(res.status!=200)
+            {
+                throw  new Error(res.status);
+            }
+            return res;
+        })
         .then((response) => {
                 return response.json();
-        }).catch(error=>{
-            return false
-        });
+        })
     const register = (username, password, captcha, mobile) =>
         fetch(baseURL + config.api.register, {
             ...baseOptions,

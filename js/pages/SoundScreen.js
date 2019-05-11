@@ -22,6 +22,7 @@ import { ActionSheetCustom as ActionSheet } from 'react-native-actionsheet'
 import global from '../common/Global';
 import Spinner from 'react-native-loading-spinner-overlay';
 import * as Types from '../redux/action/ActionType';
+import Api from '../service/Api'
 // import BlurView from 'react-native-blur';
 // var Overlay = require('react-native-overlay');
 // var BlurView = require('react-native-blur').BlurView;
@@ -40,10 +41,14 @@ class SoundScreen extends BaseScreen {
 
   constructor(props) {
     super(props);
+    const param=this.props.navigation.getParam()
+    const channel=param?(param.channel||0):0;
+    this.state={channel:channel,isRecording:false,recordingProgress:0,recordButtonColor:'red'};
+    
   }
 
   componentDidMount() {
-    this.state={index:0,isRecording:false,recordingProgress:0,recordButtonColor:'red'};
+    
     if(!this.props.user.isLogin)
     {
       this.props.navigation.navigate("Login")
@@ -79,7 +84,8 @@ class SoundScreen extends BaseScreen {
 }
   _onSnapToItem=(index)=>
   {
-     this.props.selectChannel(index);
+    //  this.props.selectChannel(index);
+    this.setState({channel:index})
   }
   scrollToTop = () => {
     const ref = 'list' + this.props.eventList.index
@@ -120,8 +126,6 @@ class SoundScreen extends BaseScreen {
       console.log('start record failed ',ex)
     }
     
-    
-    
   }
   _stopTalking=async ()=>{
     try{
@@ -138,7 +142,34 @@ class SoundScreen extends BaseScreen {
     //event: {success:didSucceed,file:filePath,size:fileSize,sindex:this.props.sindex}
     this.setState({isRecording:false})
     if(event.success){
-      this.props.sendSoundMessage(event.sindex,event.file);
+      this.setState({isSending:true,snd:event.file});
+
+      Api().uploadMessage({channel:this.state.channel,snd:event.file})
+      // .uploadProgress((written, total) => {
+      //   progress=written/total;
+      // })
+      .then((res)=>{
+          if (res.respInfo.status != 200) {
+              console.log('Failed to successfully http call ')
+              throw new Error('Failed with Code'+res.status);
+            }
+          return res;
+      })
+      .then((res) => {
+        if(res.data && JSON.parse(res.data).state==1)
+        {
+            msgid=JSON.parse(res.data).data
+            this.setState({isSending:false})
+        }else if(JSON.parse(res.data).state!=1){
+            this.setState({isSending:false,error:JSON.parse(res.data).reason})
+        }
+        else{
+          this.setState({isSending:false})
+        }
+        
+      }).catch((err) => {
+        this.setState({isSending:false,error:err})
+      })
     }
     
   }
@@ -153,7 +184,7 @@ class SoundScreen extends BaseScreen {
       <View style={{ 
         position: 'absolute', left: 0, right: 0, bottom: 0 ,
       height:em(200),backgroundColor:'#2f4f4f',
-      borderTopLeftRadius:em(100),borderTopRightRadius:em(100),
+      borderTopLeftRadius:em(50),borderTopRightRadius:em(50),
       justifyContent:'center',alignContent:'center'
     }}>
     <TouchableHighlight 
@@ -183,12 +214,20 @@ class SoundScreen extends BaseScreen {
       return this.renderProgress()
     }else
     {
+      if(this.state.isSending)
+      {
+        ModalIndicator.show(`正在发送`);  
+      }else
+      {
+        ModalIndicator.hide();  
+      }
       return (
         <View style={{backgroundColor:'red',borderRadius:em(80),width:em(160),height:em(160),alignSelf:"center"}}>
         </View>
       )
     }
    
+    
   }
   renderProgress(){
     if(this.state.isRecording)
@@ -206,8 +245,18 @@ class SoundScreen extends BaseScreen {
         direction="counter-clockwise"
       />
       )
-     
+    }else
+    {
+      if(this.state.isSending)
+      {
+        ModalIndicator.show(`正在发送`);  
+      }else
+      {
+        ModalIndicator.hide();  
+      }
+      
     }
+    
     return (null)
   }
   

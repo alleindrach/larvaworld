@@ -64,7 +64,9 @@ export default class CachedImage extends React.Component {
 
   static defaultProps = {
     renderImage: (props) => {
+      console.log('renderImage:',props)
       let imgControl=(<Image ref={CACHED_IMAGE_REF} {...props}/>)
+      console.log('renderCtrl:',imgControl);
       return imgControl;
     },
     renderIcon: (props) => {
@@ -275,10 +277,11 @@ export default class CachedImage extends React.Component {
     //     source: this.state.isError ? this.props.errorSource : source
     //   });
     
-
+    console.log('render:'+props,this.props.sindex,source)
     return this.props.renderImage({
       ...props,
       key: props.key || source.uri,
+      sindex:this.props.sindex,
       style,
       source: this.state.isError ? this.props.errorSource : source
     });
@@ -309,6 +312,7 @@ export default class CachedImage extends React.Component {
       ...imageProps,
       style: imageStyle,
       key: source.uri,
+      sindex:this.props.sindex,
       source,
       children: (
         this.props.showIndicator ?

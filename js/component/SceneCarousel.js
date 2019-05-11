@@ -87,7 +87,7 @@ export default class SceneCarousel extends Component {
                 <CachedImage
                   source={{uri: item.img}}
                   style={{width: itemWidth, height: itemHeight-audioHeight, alignSelf: 'center',backgroundColor:'white'}}
-                  resizeMode="cover" showIndicator={true}
+                  resizeMode="cover" showIndicator={true} sindex={index}
                 />
                 <View style={styles.pageView}>
                   <Text style={styles.pageText}>{`${index + 1}/${scenes.length}`}</Text>
@@ -105,8 +105,12 @@ export default class SceneCarousel extends Component {
           </View>
     )
   }
-
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    this._carousel.triggerRenderingHack();
+  }
   render() {
+    
+    
     const {scenes, style, sliderWidth, sliderHeight, itemWidth, itemHeight} = this.props
     return (
       <View style={[{width: SCREEN_WIDTH,backgroundColor:'transparent'}, style]}>
@@ -119,6 +123,7 @@ export default class SceneCarousel extends Component {
           itemHeight={itemHeight}
           useNativeOnScroll={true}
           inactiveSlideScale={0.95}
+          shouldOptimizeUpdates={false}
           firstItem={this.props.firstItem}
           onSnapToItem={this._onSnapToItem.bind(this)
           }

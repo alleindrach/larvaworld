@@ -25,7 +25,7 @@ export  class LoginScreen extends BaseScreen {
 
   constructor(props) {
     super(props);
-    this.state = {phone: props.user.username, password: '',captcha: '' , error: null};
+    this.state = {phone: props.user.username, password: '',captcha: '' , error: null,isLogining:false};
   }
   
   componentDidMount(){
@@ -53,13 +53,11 @@ export  class LoginScreen extends BaseScreen {
     else {
       this.setState({isLogining:true})
       Api().login(this.state.username,this.state.password,this.state.captcha)
-      .then(res=>{
-        return JSON.parse(res);
-      })
       .then(res=> {
         if(res.state==1)
         {
           this.props.onLoginSuccess();
+          this.props.navigation.goBack();
         }
         else
         {
@@ -68,6 +66,7 @@ export  class LoginScreen extends BaseScreen {
       })
       .catch(ex=>{
         this.props.onLoginFail(ex)
+        this.setState({error:ex})
       })
       .finally(()=>{
         this.setState({isLogining:false})
@@ -129,11 +128,11 @@ export  class LoginScreen extends BaseScreen {
           </TouchableOpacity>      
       </View>
       <View style={styles.errorInfo}>
-        {(user.error )? <Text style={styles.errorText}>{user.error}</Text> : null}
+        {(this.state.error )? <Text style={styles.errorText}>{this.state.error}</Text> : null}
       </View>
-      <TouchableOpacity type="primary" style={styles.loginButton} disabled={user.isLoading} onPress={this.check}>
-        {user.isLoading ? <ActivityIndicator color="#fff"/> : null}
-        <Text style={{fontSize: em(34), color: '#fff'}}>{user.isLoading ? "正在登录..." : "登录"}</Text>
+      <TouchableOpacity type="primary" style={styles.loginButton} disabled={this.state.isLogining?true:false} onPress={this.check}>
+        {this.state.isLogining? <ActivityIndicator color="#fff"/> : null}
+        <Text style={{fontSize: em(34), color: '#fff'}}>{this.state.isLogining? "正在登录..." : "登录"}</Text>
       </TouchableOpacity>
       <View style={styles.extraView}>
         <Button titleStyle={styles.extraButton} title="忘记密码？" type="link" onPress={this.resetPwd}/>
