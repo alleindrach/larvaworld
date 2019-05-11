@@ -26,27 +26,28 @@ export function prefetchChannelsFail(error) {
   }
 }
 //msg: {channel:channel,snd:filepath}
+//发消息
 export function sendSoundMessage(msg) {
   return {
     type: types.SOUND_CHANNELS_MSG_SEND,
-    sendding:msg
+    sending:msg
   }
 }
-
+//更新进度
 export function upadteSendSoundMessageProgress(progress) {
   return {
     type: types.SOUND_CHANNELS_MSG_SENDING,
     progress:progress
   }
 }
-
-export function sendSoundMessageSuccess(msg) {
+//发送消息成功
+export function soundMessageSendSuccess(msg) {
   return {
     type: types.SOUND_CHANNELS_MSG_SEND_SUCCESS,
     merging:msg
   }
 }
-
+//暂时不用
 export function soundMessageSended(msg) {
   return {
     type: types.SOUND_CHANNELS_MSG_SEND_MERGED,
@@ -54,7 +55,7 @@ export function soundMessageSended(msg) {
   }
 }
 
-
+//发送失败
 export function soundMessageSendFailed(error) {
   return {
     type: types.SOUND_CHANNELS_MSG_SEND_FAIL,

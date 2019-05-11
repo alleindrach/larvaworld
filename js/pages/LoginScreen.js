@@ -10,6 +10,7 @@ import * as UserAction from '../redux/action/UserAction';
 import CustomView from '../component/CustomView';
 import StringUtils from '../common/StringUtils';
 import config from '../config/Config';
+import Api from '../service/Api';
 export  class LoginScreen extends BaseScreen {
 
   static navigationOptions = {
@@ -50,7 +51,27 @@ export  class LoginScreen extends BaseScreen {
       Toast.show({text:'请输入验证码',buttonText:'OK',duration:3000});
     }
     else {
-      this.props.doLogin(this.state.username, this.state.password,this.state.captcha,goBack)
+      this.setState({isLogining:true})
+      Api().login(this.state.username,this.state.password,this.state.captcha)
+      .then(res=>{
+        return JSON.parse(res);
+      })
+      .then(res=> {
+        if(res.state==1)
+        {
+          this.props.onLoginSuccess();
+        }
+        else
+        {
+          throw new Error('Failed with Code'+res.reason);
+        }
+      })
+      .catch(ex=>{
+        this.props.onLoginFail(ex)
+      })
+      .finally(()=>{
+        this.setState({isLogining:false})
+      })
     }
   };
 
@@ -132,15 +153,14 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    doLogin: (username, password,captcha,goBack,stompContext) => {
-      dispatch(UserAction.doLogin(username, password,captcha,goBack,stompContext))
-    },
     refreshCaptcha:(seed) =>{
       dispatch(UserAction.refreshCaptcha(seed))
     },
     onLoginSuccess:()=>{
-      // this.props.navigation.navigate("UserCenterScreen");
-      // dispatch(MessageAction.fetchMsg())
+      dispatch(UserAction.loginSuccess());
+    },
+    onLoginFail:(error)=>{
+      dispatch(UserAction.loginFail(error))
     }
   }
 }

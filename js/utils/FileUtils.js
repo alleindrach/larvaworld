@@ -229,7 +229,7 @@ export const  uploadChannels=(url,channels) =>
       type:mime.lookup(getSuffix(file)) 
     }})
     
-    return RNFetchBlob.fetch('PUT', url, {
+    return RNFetchBlob.fetch('POST', url, {
       // header...
       'Content-Type': 'multipart/form-data',
       'enctype': 'multipart/form-data'
@@ -241,7 +241,8 @@ export const  uploadChannels=(url,channels) =>
       ])
       
 }
-    
+
+        
     
 export const uploadFiles = (uri, host, formInput, onprogress) => {
     let promiseArray = [];

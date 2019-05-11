@@ -35,9 +35,11 @@ export default config = {
       resetPassword: '/password/reset',
       storySync:'/story/sync',
       verifyCode: '/common/mobile/captcha',
-      soundChannelsPrefetch:'/story/sound/channels',
-      soundChannelsSync:'/story/sound/channels',
-
+      soundChannelsPrefetch:'/sound/channels/down',
+      soundChannelsSync:'/sound/channels/up',
+      soundMsgUp:'/sound/msg/up',
+      soundMsgList:'/sound/msg/list',
+      soundMsgCopy:'/sound/msg/copy',
     },
     shareUrl: {
       activity: 'http://iyababy.cn/fancyappShare/activityDetail.html',
@@ -45,5 +47,19 @@ export default config = {
     },
     qrCodeApi: {
       read: 'https://api.qrserver.com/v1/read-qr-code/',
-    }
+    },
+
+    // 路由信息配置
+    routes : {
+      Login: {
+        name: 'Login',
+        path: 'login',
+        title: '登录'
+      },
+      Home: {
+        name:'Home',
+        path: '/'
+      }
+    },
+
   };

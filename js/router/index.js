@@ -9,7 +9,7 @@ import MakeFriendScreen from '../pages/MakeFriendScreen';
 import WorkScreen from '../pages/WorkScreen'
 import SoundScreen from "../pages/SoundScreen";
 
-const AppNavigator = createStackNavigator({
+export const AppNavigator = createStackNavigator({
   
   Index: {
     screen: IndexScreen

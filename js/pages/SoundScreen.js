@@ -10,7 +10,7 @@ import SoundChannels from '../component/SoundChannels'
 import Colors from '../common/Colors'
 import {connect} from 'react-redux'
 // import BaseListView from '../component/BaseListView'
-import {SoundChannelsAction} from '../redux/action'
+import {SoundChannelsAction, UserAction} from '../redux/action'
 import {Projector, SegmentedBar, Theme, Toast} from 'teaset'
 import * as Picker from '../utils/PickerUtils'
 import * as FileUtils from '../utils/FileUtils'
@@ -21,6 +21,7 @@ import { ModalIndicator} from 'teaset'
 import { ActionSheetCustom as ActionSheet } from 'react-native-actionsheet'
 import global from '../common/Global';
 import Spinner from 'react-native-loading-spinner-overlay';
+import * as Types from '../redux/action/ActionType';
 // import BlurView from 'react-native-blur';
 // var Overlay = require('react-native-overlay');
 // var BlurView = require('react-native-blur').BlurView;
@@ -43,19 +44,35 @@ class SoundScreen extends BaseScreen {
 
   componentDidMount() {
     this.state={index:0,isRecording:false,recordingProgress:0,recordButtonColor:'red'};
+    if(!this.props.user.isLogin)
+    {
+      this.props.navigation.navigate("Login")
+    }else
+    {
+      this.props.prefetchChannels();
+    }
+  }
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    console.log('new state=>',this.state)
+    if(this.state.needReload)
+    {
+      this.props.prefetchChannels();
+    }
   }
 
   static getDerivedStateFromProps(props, state) {
     const prevProps = state.prevProps || {};
+    // console.log('getDerivedStateFromProps',prevProps,props)
     // Compare the incoming prop to previous prop
-    if(prevProps.work && prevProps.work.isDirty && props.work && !props.work.isDirty){
-        console.log('clean state!',prevProps,"=>",props)
-        state.onCleaned&&state.onCleaned();
-    }
-    else
-    {
-       
-    }
+    // if(prevProps.navigation && prevProps.navigation.state && !prevProps.navigation.state.params.action  
+    //   &&  props.navigation.state.params.action==Types.USER_LOGIN_SUCCESS){
+    //     return {
+    //       prevProps:props,
+    //       needReload:true 
+    //   }
+        
+    // }
+    // else
     return {
         prevProps:props      
     }
@@ -75,7 +92,7 @@ class SoundScreen extends BaseScreen {
       this.props.selectImage(index,uri);
     })
   }
-  syncWork=()=>{
+  _syncChannels=()=>{
     this.props.syncChannels();
   }
 
@@ -240,6 +257,7 @@ class SoundScreen extends BaseScreen {
           onSnapToItem={this._onSnapToItem}
           onRecordFinished={this._onRecordFinished}
           onRecording={this._onRecording}
+          onSync={this._syncChannels}
           />
         </View>
         
@@ -264,6 +282,12 @@ const matStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
+    prefetchChannels:()=>{
+      dispatch(SoundChannelsAction.prefetchChannels())
+    },
+    nav2Login:()=>{
+      dispatch(UserAction.navToLogin());
+    },
     selectChannel: (channel) => {
       dispatch(SoundChannelsAction.selectChannel(channel))
     },

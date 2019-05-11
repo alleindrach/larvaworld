@@ -87,7 +87,7 @@ export default class SceneCarousel extends Component {
                 <CachedImage
                   source={{uri: item.img}}
                   style={{width: itemWidth, height: itemHeight-audioHeight, alignSelf: 'center',backgroundColor:'white'}}
-                  resizeMode="cover"
+                  resizeMode="cover" showIndicator={true}
                 />
                 <View style={styles.pageView}>
                   <Text style={styles.pageText}>{`${index + 1}/${scenes.length}`}</Text>

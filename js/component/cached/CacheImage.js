@@ -79,7 +79,8 @@ export default class CachedImage extends React.Component {
     activityIndicatorProps: {color: '#fff'},
     useQueryParamsInCacheKey: true,
     resolveHeaders: () => Promise.resolve({}),
-    showOriginal: false
+    showOriginal: false,
+    errorSource:require("../../assets/pengyouquan.png")
   }
 
   setNativeProps = (nativeProps) => {

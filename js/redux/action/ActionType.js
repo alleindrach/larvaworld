@@ -3,6 +3,7 @@
 export const APP_NETWORK_AVAILABLE_CHANGE = 'app/networkAvailable/change'
 
 //user action types
+export const USER_NAV_LOGIN='user/login/navigate'
 export const USER_LOGIN_FAIL = 'user/login/fail'
 export const USER_LOGIN_SUCCESS = 'user/login/success'
 export const USER_LOGIN_DOING = 'user/login/doing'
@@ -17,7 +18,7 @@ export const STOMP_CONNECT_FAIL='stomp/connect/fail'
 export const STOMP_CONNECT_DISCONNECTED='stomp/disconnected'
 export const STOMP_CONNECT_SUCCESS='stomp/connect/success'
 export const STOMP_MSG_RECEIVED='stomp/msg/received'
-export const STOMP_MSG_SENDDING='stomp/msg/sendding'
+export const STOMP_MSG_SENDING='stomp/msg/sending'
 export const STOMP_MSG_SEND_SUCCESS='stomp/msg/send/success'
 export const STOMP_MSG_SEND_FAIL='stomp/msg/send/fail'
 

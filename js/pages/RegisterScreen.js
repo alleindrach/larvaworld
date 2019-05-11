@@ -57,7 +57,7 @@ export default class RegisterScreen extends BaseScreen {
         username: this.state.nickName,
         mobileCaptcha: this.state.code
       };
-      Api().put(config.api.register, {username:this.state.nickName,password:this.state.pwd,mobileCaptcha:this.state.code,mobile:this.state.tel})
+      Api().post(config.api.register, {username:this.state.nickName,password:this.state.pwd,mobileCaptcha:this.state.code,mobile:this.state.tel})
       .then(data => {
           if (data.state === 1) {
             Toast.message('注册成功');

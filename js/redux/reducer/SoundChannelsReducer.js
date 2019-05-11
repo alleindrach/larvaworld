@@ -28,14 +28,19 @@ export default function messageReducer(state = initState, action) {
         channels:action.channels,
         isFetched:true
       }
+    case types.SOUND_CHANNELS_PREFETCH_FAIL:
+      return {
+        ...state,
+        error:action.error
+      }
     case types.SOUND_CHANNELS_MSG_SEND:
       {
         let newChannels= state.channels.reduce((acc,channel,index)=>{
-        if(index==action.sendding.channel)
+        if(index==action.sending.channel)
         {
           acc.push({
             ...channel,
-            snd:action.sendding.snd
+            snd:action.sending.snd
           })
         }else
         {
@@ -47,8 +52,8 @@ export default function messageReducer(state = initState, action) {
           ...state,
           isSending:true,
           isSended:false,
-          channels:newChannels
-          
+          channels:newChannels,
+          sending:action.sending
         }
       }
     case types.SOUND_CHANNELS_MSG_SEND_FAIL:
@@ -56,13 +61,15 @@ export default function messageReducer(state = initState, action) {
         ...state,
         isSending:false,
         isSended:true,
-        error:action.error
+        error:action.error,
+        sending:undefined
       }
     case types.SOUND_CHANNELS_MSG_SEND_SUCCESS:
       return {
         ...state,
         isSended:true,
-        isSending:false
+        isSending:false,
+        sending:undefined
       }
     case types.SOUND_CHANNELS_SYNC:
       return {

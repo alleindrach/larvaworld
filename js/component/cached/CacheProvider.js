@@ -111,9 +111,12 @@ function downloadFile(fromUrl, toFile, headers = {}) {
           resolve(toFile);
           })
         .catch(err => {
-          return deleteFile(tmpFile)
-            .then(() => reject(err))
-            .catch(() => reject(err));
+          return FileUtils.deleteFile(tmpFile)
+            .finally(
+              () => {
+                reject(err)
+              }
+            );
         })
         .finally(() => {
           // cleanup
@@ -220,7 +223,7 @@ function getCachedPath(url, options = defaultOptions) {
       }
       if (!res.size) {
         // something went wrong with the download, file size is 0, remove it
-        return deleteFile(filePath)
+        return FileUtils.deleteFile(filePath)
           .then(() => {
             throw new Error('Failed to get file from cache');
           });

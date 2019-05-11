@@ -5,7 +5,12 @@
 import * as types from "./ActionType"
 // import config from '../../config/Config'
 
-
+export function navToLogin(goBack){
+  return {
+    type: types.USER_NAV_LOGIN,
+    goBack
+  }
+}
 export function doLogin(username, password,captcha,goBack,stompContext) {
   return {
       type: types.USER_LOGIN_DOING,
@@ -16,6 +21,7 @@ export function doLogin(username, password,captcha,goBack,stompContext) {
       stompContext
     }
 }
+
 export function loginSuccess(username,goBack) {
   return {
       type: types.USER_LOGIN_SUCCESS,

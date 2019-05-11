@@ -7,6 +7,7 @@ import { Root } from "native-base";
 import {StompEventTypes, withStomp} from 'react-stompjs'
 import config from './js/config/Config'
 import * as Action from './js/redux/action/index'
+import  NavigationService  from './js/service/Nav'
 class App extends Component {
   constructor(props) {
     super(props)
@@ -41,7 +42,7 @@ class App extends Component {
     //     .catch(err => {
     //     })
 
-      store.dispatch(Action.SoundChannelsAction.prefetchChannels());
+      // store.dispatch(Action.SoundChannelsAction.prefetchChannels());
     })
 
     store.dispatch(Action.MessageAction.initContext(
@@ -82,7 +83,9 @@ class App extends Component {
     return (
       <Provider store={this.state.store}>
         <Root>
-          <AppContainer/>
+          <AppContainer ref={ref=>{
+            NavigationService.setTopLevelNavigator(ref)
+          }}/>
         </Root>
       </Provider>
     )

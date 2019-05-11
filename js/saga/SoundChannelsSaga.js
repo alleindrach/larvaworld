@@ -27,8 +27,11 @@ export function  watchSoundChannelsPrefetch() {
                result=yield call(fetchFiles,state.soundChannels)
                if(result.state==1)
                     yield put(SoundChannelsAction.prefetchChannelsSuccess(result.data))
-                else
+                else{
+                    
                     yield put(SoundChannelsAction.prefetchChannelsFail(result.reason))
+                }
+                   
             }catch(error)
             {
                 yield put(SoundChannelsAction.prefetchChannelsFail(error))
@@ -52,9 +55,16 @@ export function  watchSoundChannelsPrefetch() {
 export function  watchSoundChannelsPrefetchFail() {
     
     function * worker() {
-        yield setTimeout(
-            ()=>{ put(SoundChannelsAction.prefetchChannels());},5000
-        )
+        const state = yield select();
+        if(state.soundChannels.error=='000001')
+        {
+                yield put(UserAction.navToLogin());
+        }else{
+            yield setTimeout(
+                ()=>{ put(SoundChannelsAction.prefetchChannels());},5000
+            )
+        }
+        
     }
     
     function * watcher() {
@@ -80,12 +90,14 @@ export function  watchChannelsStartSync() {
         //   progress=written/total;
         // })
         .then((res) => {
-          if(res.data && JSON.parse(res.data).state==1)
-          {
-              merging=JSON.parse(res.data).data
-              return {success:true,merging}
-          }else if(JSON.parse(res.data).state!=1){
-              return {success:false,error:JSON.parse(res.data).message,errorCode:JSON.parse(res.data).reason}
+          if(res.data ){
+            if( JSON.parse(res.data).state==1)
+            {
+                merging=JSON.parse(res.data).data
+                return {success:true,merging}
+            }else if(JSON.parse(res.data).state!=1){
+                return {success:false,error:JSON.parse(res.data).message,errorCode:JSON.parse(res.data).reason}
+            }
           }
           else{
             return {success:false,error:'',errorCode:0}
@@ -102,12 +114,15 @@ export function  watchChannelsStartSync() {
             // try{
                result=yield call(uploadFiles,state.soundChannels.channels)
                if(result.success)
-                    yield put(SoundChannelsAction.soundChannelsSyncSuccess(state.soundChannels,result.merging))
+                    yield put(SoundChannelsAction.soundChannelsSyncSuccess(result.merging))
                 else
                 {
-                    yield put(SoundChannelsAction.soundChannelsSyncFail(state.soundChannels,result.error))
+                    yield put(SoundChannelsAction.soundChannelsSyncFail(result.error))
                     if(result.errorCode=='000001')
-                        yield put(UserAction.logout())
+                    {
+                        yield   put(UserAction.logout()),
+                        yield   put(UserAction.navToLogin())
+                    }
                 }
                     
             // }catch(error)
@@ -194,3 +209,72 @@ export function  watchSoundChannelMerge() {
 
 
 
+
+export function  watchChannelsSendMessage() {
+    function sendMessage(message)
+    {
+        
+        return Api().uploadMessage(message)
+        // .uploadProgress((written, total) => {
+        //   progress=written/total;
+        // })
+        .then((res)=>{
+            if (res.respInfo.status != 200) {
+                console.log('Failed to successfully http call ')
+                throw new Error('Failed with Code'+res.status);
+              }
+            return res;
+        })
+        .then((res) => {
+          if(res.data && JSON.parse(res.data).state==1)
+          {
+              msgid=JSON.parse(res.data).data
+              return {success:true,msgid}
+          }else if(JSON.parse(res.data).state!=1){
+              return {success:false,error:JSON.parse(res.data).message,errorCode:JSON.parse(res.data).reason}
+          }
+          else{
+            return {success:false,error:'',errorCode:0}
+          }
+          console.log(res);
+        }).catch((err) => {
+          return {success:false,error:'网络错误'}
+        })
+    }
+    function * worker() {
+        console.log('start watch msg send')
+        const state = yield select();
+        // if (!state.work.isSynced) {
+            // try{
+               result=yield call(sendMessage,state.soundChannels.sending)
+               if(result.success)
+                    yield put(SoundChannelsAction.soundMessageSendSuccess(state.soundChannels.sending))
+                else
+                {
+                    yield put(SoundChannelsAction.soundMessageSendFailed(result.error))
+                    if(result.errorCode=='000001')
+                    {
+                        yield   put(UserAction.logout()),
+                        yield   put(UserAction.navToLogin())
+                    }
+                }
+                    
+            // }catch(error)
+            // {
+            //     yield put(WorkActions.syncWorkUploadFail(state.work,error))
+            // }
+        // }
+      }
+    
+    function * watcher() {
+        while (true) {
+            yield take(Types.SOUND_CHANNELS_MSG_SEND);
+            yield call(worker);
+        }
+    }
+    
+    return {
+        watcher,
+        worker
+    };
+}

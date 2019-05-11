@@ -97,6 +97,14 @@ export  default class SoundChannels extends Component {
             firstItem={this.props.firstItem}
             type='sound-morphy'/>
           </CardItem>
+          <CardItem>
+         
+          <Right>
+            
+              <Icon  type="EvilIcons"  style={{fontSize:em(60)}}   name="refresh"  onPress={this.props.onSync}/>
+            
+          </Right>
+        </CardItem>
         </Card>
       </Content>
     </Container>
