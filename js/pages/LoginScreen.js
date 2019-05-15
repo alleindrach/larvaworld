@@ -95,7 +95,7 @@ export  class LoginScreen extends BaseScreen {
     
     return (
       <View style={styles.container}>
-      <Image style={styles.logo} source={require('../assets/logo.png')}/>
+      <Image style={styles.logo} source={require('../assets/logo.png')} resizeMode='contain'/>
       <Image style={{alignSelf: 'flex-end', marginRight: em(136)}} source={require('../assets/dialog_top.png')}/>
       <CustomView containerStyle={styles.inputView} bottomIcon={require('../assets/activity/link_small.png')}
                   bottomIconStyle={styles.linkRight}>
@@ -179,7 +179,9 @@ const styles = StyleSheet.create({
   logo: {
     alignSelf: 'center',
     marginTop: em(100),
-    marginBottom: em(80)
+    marginBottom: em(80),
+    height:em(300),
+    width:(400)
   },
   inputView: {
     height: em(92),
