@@ -47,6 +47,14 @@ function getCacheInfo() {
         };
       });
   }
+export function getThumbFileUrl(fileUrl){
+  filePath=config.api.file,
+  thumbPath=config.api.thumb;
+  pattern=new RegExp(`^(http(s)*:\\/\\/([\\w.]*)(:\\d*)*\\/${filePath})\\/(\\w*)$`)
+  return fileUrl.replace(pattern,(m,p1,p2,p3,p4,p5)=>{
+    return [p1,thumbPath,p5].join('/')
+  })
+}
 export const getSuffix=(uri)=>{
     if (uri.match('^\\S+\\.\\S+$')) {
       let array = uri.split(".");

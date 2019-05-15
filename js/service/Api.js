@@ -26,9 +26,14 @@ const publicAPI = (baseURL: string = config.api.base) => {
                 ...headers
             },
             body: StringUtils.param(data)
-        }).then((response) => {
-            return response.json();
-        });
+        })
+        .then((res)=>{
+            if (res.status != 200) {
+                console.log('Failed to successfully http call ')
+                throw new Error('Failed with Code'+res.status);
+              }
+              return res.json();
+        })
     const put = (path, data, headers) =>
         fetch(baseURL + path, {
             ...baseOptions,
@@ -38,9 +43,13 @@ const publicAPI = (baseURL: string = config.api.base) => {
                 ...headers
             },
             body: StringUtils.param(data)
-        }).then((response) => {
-            return response.json();
-        });
+        }).then((res)=>{
+            if (res.status != 200) {
+                console.log('Failed to successfully http call ')
+                throw new Error('Failed with Code'+res.status);
+              }
+              return res.json();
+        })
     const del = (path, data, headers) =>
         fetch(baseURL + path, {
             ...baseOptions,
@@ -50,9 +59,13 @@ const publicAPI = (baseURL: string = config.api.base) => {
                 ...headers
             },
             body: StringUtils.param(data)
-        }).then((response) => {
-            return response.json();
-        });
+        }).then((res)=>{
+            if (res.status != 200) {
+                console.log('Failed to successfully http call ')
+                throw new Error('Failed with Code'+res.status);
+              }
+              return res.json();
+        })
     const get = (path, data, headers) =>
         fetch(baseURL + path+"?"+StringUtils.param(data), {
             ...baseOptions,
@@ -61,24 +74,14 @@ const publicAPI = (baseURL: string = config.api.base) => {
                 ...baseOptions.headers,
                 ...headers
             }
-        }).then((response) => {
-            return response.json();
-        });        
-    const login = (username, password, captcha) =>
-        fetch(baseURL + config.api.login, {
-            ...baseOptions,
-            body: 'username=' + username + '&password=' + password + '&captcha=' + captcha
-        })
-        .then(res=>{
-            if(res.status!=200)
-            {
-                throw  new Error(res.status);
-            }
-            return res;
-        })
-        .then((response) => {
-                return response.json();
-        })
+        }).then((res)=>{
+            if (res.status != 200) {
+                console.log('Failed to successfully http call ')
+                throw new Error('Failed with Code'+res.status);
+              }
+              return res.json();
+        })  
+   
     const register = (username, password, captcha, mobile) =>
         fetch(baseURL + config.api.register, {
             ...baseOptions,
@@ -143,9 +146,9 @@ const publicAPI = (baseURL: string = config.api.base) => {
                 //... 可能还会有其他非文件字段{name:'字段名',data:'对应值'}
             ])
         }
-
+    
     return {
-        post,get,put,del, login, register, mobileCaptcha, checkVersion, fetchHomepageInfo,
+        post,get,put,del, register, mobileCaptcha, checkVersion, fetchHomepageInfo,
         uploadMessage
     }
 

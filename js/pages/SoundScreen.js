@@ -1,6 +1,3 @@
-/**
- * Created by jialing on 2017/5/25.
- */
 
 import React from 'react';
 import {ActivityIndicator, Image, StyleSheet, TouchableHighlight, TouchableOpacity, View,Alert,TouchableNativeFeedback} from 'react-native';
@@ -35,7 +32,7 @@ class SoundScreen extends BaseScreen {
 
   static defaultProps = {
     navColor: Colors.navColor,
-    title: '主页',
+    title: '声音变变变',
     showBackButton: false,
   };
 
@@ -173,12 +170,7 @@ class SoundScreen extends BaseScreen {
     }
     
   }
-  // <Footer style={{backgroundColor:'lightgrey',height:em(180) ,borderTopLeftRadius:em(100),borderTopRightRadius:em(100)}}>
-  // <TouchableOpacity onPressIn={this._onPressIn} onPressOut={this._onPressOut} style={{backgroundColor:'red',borderRadius:em(80),width:em(160),height:em(160),justifyContent:"center",alignContent:"center",alignSelf:"center"}}>
-  //   {this.renderRecordButton()}  
-  // </TouchableOpacity>
 
-  // </Footer>
   renderFooterView(){
     return (
       <View style={{ 
@@ -207,28 +199,7 @@ class SoundScreen extends BaseScreen {
     )
     
   }
-  renderRecordButton()
-  {
-    if(this.state.isRecording)
-    {
-      return this.renderProgress()
-    }else
-    {
-      if(this.state.isSending)
-      {
-        ModalIndicator.show(`正在发送`);  
-      }else
-      {
-        ModalIndicator.hide();  
-      }
-      return (
-        <View style={{backgroundColor:'red',borderRadius:em(80),width:em(160),height:em(160),alignSelf:"center"}}>
-        </View>
-      )
-    }
-   
-    
-  }
+
   renderProgress(){
     if(this.state.isRecording)
     {

@@ -28,7 +28,9 @@ export default config = {
   
       //production server
       base: 'http://192.168.2.233/bz',
-  
+      filebase:'http://192.168.2.233/bz/file',
+      file:'file',
+      thumb:'small',
       login: '/login',
       captcha: '/common/captcha.jpg',
       register: '/register',

@@ -96,3 +96,48 @@ export function selectImage(soundChannels,index,filepath){
       filepath
   }
 }
+export function soundChannelsMsgListFetch(msgType){
+  return {
+    type:types.SOUND_CHANNELS_MSG_LIST_FETCH,
+    msgType
+  }
+}
+export function soundChannelsMsgListReset(msgType){
+  return {
+    type:types.SOUND_CHANNELS_MSG_LIST_RESET,
+    msgType
+  }
+}
+export function soundChannelsMsgListFetchSuccess(msgs){
+  return {
+    type:types.SOUND_CHANNELS_MSG_LIST_FETCH_SUCCESS,
+    fetchedMsgs:msgs
+  }
+}
+export function soundChannelsMsgListFetchFail(error){
+  return {
+    type:types.SOUND_CHANNELS_MSG_LIST_FETCH_FAIL,
+    msglistFetchError:error
+  }
+}
+
+export function soundChannelsMsgListCopy(msgId){
+  return {
+    type:types.SOUND_CHANNELS_MSG_LIST_COPY,
+    msgId
+  }
+}
+
+export function soundChannelsMsgListCopied(msgId){
+  return {
+    type:types.SOUND_CHANNELS_MSG_LIST_COPIED,
+    msgId
+  }
+}
+
+export function soundChannelsMsgListCopyFail(msgId){
+  return {
+    type:types.SOUND_CHANNELS_MSG_LIST_COPY_FAIL,
+    msgId
+  }
+}

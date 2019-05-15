@@ -17,5 +17,8 @@ export default function * root (): any {
     yield fork(SoundChannelsSaga.watchChannelsStartSync().watcher);
     yield fork(SoundChannelsSaga.watchSoundChannelMerge().watcher);
     yield fork(SoundChannelsSaga.watchSoundChannelsPrefetchFail().watcher);
+    yield fork(SoundChannelsSaga.watchChannelsMessagesFetch().watcher);
+    yield fork(SoundChannelsSaga.watchChannelsMessagesReset().watcher);
+    yield fork(SoundChannelsSaga.watchChannelsMessagesCopy().watcher);
     // yield fork(SoundChannelsSaga.watchChannelsSendMessage().watcher);
   };

@@ -15,8 +15,6 @@ export default function messageReducer(state = initState, action) {
     case types.STOMP_CONTEXT_INIT:
       return {
         ...state,
-        isConnecting: true,
-        isConnected: false,
         error: '',
         stompContext:action.stompContext,
         msgReceiver:action.msgReceiver

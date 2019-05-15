@@ -5377,6 +5377,16 @@ react-native-tab-view@^1.0.0, react-native-tab-view@^1.2.0:
   dependencies:
     prop-types "^15.6.1"
 
+react-native-timeline-flatlist@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.npm.taobao.org/react-native-timeline-flatlist/download/react-native-timeline-flatlist-0.3.1.tgz#92fd24d74a1e459e06ab0f0388e390ad3d53c12c"
+  integrity sha1-kv0k10oeRZ4Gqw8DiOOQrT1TwSw=
+
+react-native-timeline-listview@^0.2.3:
+  version "0.2.3"
+  resolved "https://registry.npm.taobao.org/react-native-timeline-listview/download/react-native-timeline-listview-0.2.3.tgz#e46b7f0fd2c2206329eee6194795e03899afe882"
+  integrity sha1-5Gt/D9LCIGMp7uYZR5XgOJmv6II=
+
 react-native-uuid-generator@^5.0.0:
   version "5.0.0"
   resolved "http://registry.npm.taobao.org/react-native-uuid-generator/download/react-native-uuid-generator-5.0.0.tgz#1c947d6ac1fde77d37a81e4556c1fd088dd05757"

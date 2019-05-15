@@ -26,7 +26,13 @@ export function  watchSoundChannelsPrefetch() {
             try{
                result=yield call(fetchFiles,state.soundChannels)
                if(result.state==1)
-                    yield put(SoundChannelsAction.prefetchChannelsSuccess(result.data))
+                    {
+                        yield put(SoundChannelsAction.prefetchChannelsSuccess(result.data));
+                        if(state.soundChannels.msgList.initFetch && !state.soundChannels.msgList.isFetching)
+                        {
+                            yield put(SoundChannelsAction.soundChannelsMsgListFetch());
+                        }
+                    }
                 else{
                     
                     yield put(SoundChannelsAction.prefetchChannelsFail(result.reason))
@@ -269,6 +275,145 @@ export function  watchChannelsSendMessage() {
     function * watcher() {
         while (true) {
             yield take(Types.SOUND_CHANNELS_MSG_SEND);
+            yield call(worker);
+        }
+    }
+    
+    return {
+        watcher,
+        worker
+    };
+}
+
+
+
+export function  watchChannelsMessagesFetch() {
+    function fetchMsgs(type,pageIndex,pageSize)
+    {
+        
+        console.log('fetching messages ');
+        return Api().post(config.api.soundMsgList,{criteria:type,page:pageIndex,size:pageSize})
+        // .uploadProgress((written, total) => {
+        //   progress=written/total;
+        // })
+        .then((res) => {
+          if(res.state==1)
+          {
+              msgs=res.data
+              return {success:true,msgs}
+          }else if(res.state!=1){
+              return {success:false,error:res.message,errorCode:res.reason}
+          }
+          else{
+            return {success:false,error:'',errorCode:0}
+          }
+          console.log(res);
+        }).catch((err) => {
+          return {success:false,error:err}
+        })
+    }
+    function * worker() {
+        console.log('start fetch msgs')
+        const state = yield select();
+
+        // if(state.soundChannels.msgList.isFetching)
+        //     return;
+
+        result=yield call(fetchMsgs,0,state.soundChannels.msgList.pageIndex,state.soundChannels.msgList.pageSize)
+        if(result.success)
+            yield put(SoundChannelsAction.soundChannelsMsgListFetchSuccess(result.msgs))
+        else
+        {
+            yield put(SoundChannelsAction.soundChannelsMsgListFetchFail(result.error))
+            if(result.errorCode=='000001')
+            {
+                yield   put(UserAction.logout()),
+                yield   put(UserAction.navToLogin())
+            }
+        }
+            
+      }
+    
+    function * watcher() {
+        while (true) {
+            yield take(Types.SOUND_CHANNELS_MSG_LIST_FETCH);
+            yield call(worker);
+        }
+    }
+    
+    return {
+        watcher,
+        worker
+    };
+}
+
+
+export function  watchChannelsMessagesReset() {
+    
+    function * worker() {
+       
+        yield put(SoundChannelsAction.soundChannelsMsgListFetch())
+       
+      }
+    
+    function * watcher() {
+        while (true) {
+            yield take(Types.SOUND_CHANNELS_MSG_LIST_RESET);
+            yield call(worker);
+        }
+    }
+    
+    return {
+        watcher,
+        worker
+    };
+}
+
+export function  watchChannelsMessagesCopy() {
+    function copyMsg(msgId)
+    {
+        
+        console.log('copy message',msgId);
+        return Api().post(config.api.soundMsgCopy+"/"+msgId)
+        // .uploadProgress((written, total) => {
+        //   progress=written/total;
+        // })
+        .then((res) => {
+          if(res.state==1)
+          {
+              msgId=res.data
+              return {success:true,msgId}
+          }else if(res.state!=1){
+              return {success:false,error:res.message,errorCode:res.reason}
+          }
+          else{
+            return {success:false,error:'',errorCode:0}
+          }
+          console.log(res);
+        }).catch((err) => {
+          return {success:false,error:err.message}
+        })
+    }
+    function * worker() {
+        const state = yield select();
+
+        // if(state.soundChannels.msgList.isFetching)
+        //     return;
+
+        result=yield call(copyMsg,state.soundChannels.msgList.copyId);
+        if(result.success){
+            yield put(SoundChannelsAction.soundChannelsMsgListCopied(state.soundChannels.msgList.copyId))
+        }else
+        {
+            yield put(SoundChannelsAction.soundChannelsMsgListCopyFail(state.soundChannels.msgList.copyId))
+        }
+        
+       
+      }
+    
+    function * watcher() {
+        while (true) {
+            yield take(Types.SOUND_CHANNELS_MSG_LIST_COPY);
             yield call(worker);
         }
     }

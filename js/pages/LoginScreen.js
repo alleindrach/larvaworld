@@ -52,21 +52,24 @@ export  class LoginScreen extends BaseScreen {
     }
     else {
       this.setState({isLogining:true})
-      Api().login(this.state.username,this.state.password,this.state.captcha)
+      Api().post(
+        config.api.login,
+        {username: this.state.username,password: this.state.password,captcha: this.state.captcha}
+        )
       .then(res=> {
         if(res.state==1)
         {
-          this.props.onLoginSuccess();
+          this.props.onLoginSuccess(res.data);
           this.props.navigation.goBack();
         }
         else
         {
-          throw new Error('Failed with Code'+res.reason);
+          throw new Error('Failed with Code:'+res.reason);
         }
       })
       .catch(ex=>{
-        this.props.onLoginFail(ex)
-        this.setState({error:ex})
+        this.props.onLoginFail(ex.message)
+        this.setState({error:ex.message})
       })
       .finally(()=>{
         this.setState({isLogining:false})
@@ -155,8 +158,8 @@ const mapDispatchToProps = (dispatch) => {
     refreshCaptcha:(seed) =>{
       dispatch(UserAction.refreshCaptcha(seed))
     },
-    onLoginSuccess:()=>{
-      dispatch(UserAction.loginSuccess());
+    onLoginSuccess:(payload)=>{
+      dispatch(UserAction.loginSuccess(payload));
     },
     onLoginFail:(error)=>{
       dispatch(UserAction.loginFail(error))

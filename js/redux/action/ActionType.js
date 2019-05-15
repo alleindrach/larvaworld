@@ -71,8 +71,13 @@ export const SOUND_CHANNELS_SYNC_UPLOAD_SUCCESS='sound/channels/sync/upload/succ
 export const SOUND_CHANNELS_SYNC_MERGED='sound/channels/sync/merged'
 export const SOUND_CHANNELS_SYNC_UPLOAD_FAIL='sound/channels/sync/fail'
 export const SOUND_CHANNELS_IMAGE_SELECT='sound/channels/image/select'
-
-
+export const SOUND_CHANNELS_MSG_LIST_FETCH='sound/channels/msg/list/fetch'
+export const SOUND_CHANNELS_MSG_LIST_FETCH_SUCCESS='sound/channels/msg/list/fetch/success'
+export const SOUND_CHANNELS_MSG_LIST_FETCH_FAIL='sound/channels/msg/list/fetch/fail'
+export const SOUND_CHANNELS_MSG_LIST_RESET='sound/channels/msg/list/reset'
+export const SOUND_CHANNELS_MSG_LIST_COPY='sound/channels/msg/list/copy'
+export const SOUND_CHANNELS_MSG_LIST_COPIED='sound/channels/msg/list/copied'
+export const SOUND_CHANNELS_MSG_LIST_COPY_FAIL='sound/channels/msg/list/fail'
 //home page event list
 export const EVENT_LIST_FETCH_DOING = 'event/fetching'
 export const EVENT_LIST_FETCH_SUCCESS = 'event/fetchSuccess'

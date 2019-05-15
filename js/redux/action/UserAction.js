@@ -22,11 +22,10 @@ export function doLogin(username, password,captcha,goBack,stompContext) {
     }
 }
 
-export function loginSuccess(username,goBack) {
+export function loginSuccess(payload) {
   return {
       type: types.USER_LOGIN_SUCCESS,
-      username,
-      goBack
+      payload
     }
 }
 export function loginFail(error) {

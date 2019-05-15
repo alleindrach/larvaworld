@@ -7,7 +7,7 @@ const initState = {
   isLogin: false,
   error: '',
 
-  _id: '',
+  id: '',
   nickname: '',
   avatar: '',
   identity: [],
@@ -33,6 +33,8 @@ export default function userReducer(state = initState, action) {
         isLoading: false,
         isLogin: true,
         error: '',
+        nickname:action.payload.username,
+        id:action.payload.id,
         ...action.user
       }
     case types.USER_LOGIN_FAIL:

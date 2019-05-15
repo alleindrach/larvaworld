@@ -8,6 +8,7 @@ import QrCodeScreen from "../pages/QrCodeScreen";
 import MakeFriendScreen from '../pages/MakeFriendScreen';
 import WorkScreen from '../pages/WorkScreen'
 import SoundScreen from "../pages/SoundScreen";
+import SoundListScreen from "../pages/SoundListScreen";
 
 export const AppNavigator = createStackNavigator({
   
@@ -38,6 +39,9 @@ export const AppNavigator = createStackNavigator({
   },
   Sound:{
     screen:SoundScreen
+  },
+  SoundList:{
+    screen:SoundListScreen
   }
   // AppDrawerNavigator: {
   //   screen: ActivityDrawer,
@@ -52,7 +56,7 @@ export const AppNavigator = createStackNavigator({
 
 },
 {
-  initialRouteName: 'Sound',
+  initialRouteName: 'SoundList',
   /* The header config from HomeScreen is now here */
   initialRouteParams: {},
   mode: 'card',
